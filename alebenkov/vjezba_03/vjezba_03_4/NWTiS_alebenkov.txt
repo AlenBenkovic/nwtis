@@ -1,0 +1,4 @@
+#NWTiS alebenkov
+#Fri Mar 25 13:47:28 CET 2016
+lozinka=123456
+korisnik=pero
