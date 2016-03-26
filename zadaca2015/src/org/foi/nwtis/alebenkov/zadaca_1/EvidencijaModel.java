@@ -31,7 +31,7 @@ public class EvidencijaModel implements Serializable{
         return true;
     }
     
-    public String getOznaka() { 
+    public String getOznaka() {
         return oznaka;
     }
 

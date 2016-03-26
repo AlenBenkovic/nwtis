@@ -42,7 +42,6 @@ public class KonfiguracijaXML extends KonfiguracijaApstraktna{
             this.postavke.storeToXML(new FileOutputStream(datoteka), "NWTiS alebenkov");
         } catch (IOException ex) {
             throw new NeispravnaKonfiguracija(ex.getMessage());
-            
         }
     }
     
