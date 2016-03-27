@@ -3,7 +3,7 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package org.foi.nwtis.alebenkov.zadaca_1;
+package org.foi.nwtis.alebenkov.zadaca_1_15;
 
 import java.io.File;
 import java.util.logging.Level;
@@ -18,13 +18,13 @@ import org.foi.nwtis.alebenkov.konfiguracije.NemaKonfiguracije;
  *
  * @author alen
  */
-public class KlijentSustava {
+public class KlijentSustava15 {
 
     protected Konfiguracija konfig;
     protected String parametri;
     protected Matcher mParametri;
 
-    public KlijentSustava(String parametri) throws Exception {
+    public KlijentSustava15(String parametri) throws Exception {
         this.parametri = parametri;
         this.mParametri = provjeraParametara(parametri);
         if (this.mParametri == null) {
@@ -67,7 +67,7 @@ public class KlijentSustava {
             razmakDretvi = Integer.parseInt(konfig.dajPostavku("razmakDretvi"));
             System.out.println("Razmak dretvi je: " + razmakDretvi);
         } catch (NemaKonfiguracije ex) {
-            Logger.getLogger(ServerSustava.class.getName()).log(Level.SEVERE, null, ex);
+            Logger.getLogger(ServerSustava15.class.getName()).log(Level.SEVERE, null, ex);
         }
 
         String server = this.mParametri.group(1);
@@ -101,7 +101,7 @@ public class KlijentSustava {
             System.out.println("Kreiram " + nasumicniBroj + " dretvi, s razmakom " + nasumicniRazmakDretvi);
             for (int i = 0; i < nasumicniBroj; i++) {
                 System.out.println("Kreiram " + i);
-                SlanjeZahtjeva sz = new SlanjeZahtjeva();
+                SlanjeZahtjeva15 sz = new SlanjeZahtjeva15();
                 sz.setServer(server);
                 sz.setPort(port);
                 sz.setBrojCiklusa(ukupniBrojCiklusa);
@@ -111,7 +111,7 @@ public class KlijentSustava {
             }
 
         } else {
-            SlanjeZahtjeva sz = new SlanjeZahtjeva();
+            SlanjeZahtjeva15 sz = new SlanjeZahtjeva15();
             sz.setServer(server);
             sz.setPort(port);
             sz.setBrojCiklusa(ukupniBrojCiklusa);

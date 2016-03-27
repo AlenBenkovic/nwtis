@@ -3,7 +3,7 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package org.foi.nwtis.alebenkov.zadaca_1;
+package org.foi.nwtis.alebenkov.zadaca_1_15;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -12,13 +12,13 @@ import java.net.Socket;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import org.foi.nwtis.alebenkov.konfiguracije.Konfiguracija;
-import static org.foi.nwtis.alebenkov.zadaca_1.ObradaZahtjeva.StanjeDretve.Slobodna;
+import static org.foi.nwtis.alebenkov.zadaca_1_15.ObradaZahtjeva15.StanjeDretve.Slobodna;
 
 /**
  *
  * @author alen
  */
-public class ObradaZahtjeva extends Thread {
+public class ObradaZahtjeva15 extends Thread {
 
     public enum StanjeDretve {
 
@@ -29,7 +29,7 @@ public class ObradaZahtjeva extends Thread {
     private Socket socket;
     private StanjeDretve stanje;
 
-    public ObradaZahtjeva(ThreadGroup group, String name) {
+    public ObradaZahtjeva15(ThreadGroup group, String name) {
         super(group, name);
         this.stanje = StanjeDretve.Slobodna;
     }
@@ -66,17 +66,17 @@ public class ObradaZahtjeva extends Thread {
             this.setStanje(Slobodna);
         } catch (IOException ex) {
             System.out.println("Problem neki " + ex.getMessage());
-            Logger.getLogger(ObradaZahtjeva.class.getName()).log(Level.SEVERE, null, ex);
+            Logger.getLogger(ObradaZahtjeva15.class.getName()).log(Level.SEVERE, null, ex);
 
         } catch (InterruptedException ex) {
-            Logger.getLogger(ObradaZahtjeva.class.getName()).log(Level.SEVERE, null, ex);
+            Logger.getLogger(ObradaZahtjeva15.class.getName()).log(Level.SEVERE, null, ex);
         }
 
         if (is != null) {
             try {
                 is.close();
             } catch (IOException ex) {
-                Logger.getLogger(ObradaZahtjeva.class.getName()).log(Level.SEVERE, null, ex);
+                Logger.getLogger(ObradaZahtjeva15.class.getName()).log(Level.SEVERE, null, ex);
             }
         }
 
@@ -84,7 +84,7 @@ public class ObradaZahtjeva extends Thread {
             try {
                 os.close();
             } catch (IOException ex) {
-                Logger.getLogger(ObradaZahtjeva.class.getName()).log(Level.SEVERE, null, ex);
+                Logger.getLogger(ObradaZahtjeva15.class.getName()).log(Level.SEVERE, null, ex);
 
             }
         }
@@ -93,7 +93,7 @@ public class ObradaZahtjeva extends Thread {
             try {
                 socket.close();
             } catch (IOException ex) {
-                Logger.getLogger(ObradaZahtjeva.class.getName()).log(Level.SEVERE, null, ex);
+                Logger.getLogger(ObradaZahtjeva15.class.getName()).log(Level.SEVERE, null, ex);
             }
         }
     }

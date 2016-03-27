@@ -3,7 +3,7 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package org.foi.nwtis.alebenkov.zadaca_1;
+package org.foi.nwtis.alebenkov.zadaca_1_15;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -19,7 +19,7 @@ import org.foi.nwtis.alebenkov.konfiguracije.Konfiguracija;
  *
  * @author alen
  */
-public class SlanjeZahtjeva extends Thread {
+public class SlanjeZahtjeva15 extends Thread {
 
     private Konfiguracija konfig;
     private String server;
@@ -44,7 +44,7 @@ public class SlanjeZahtjeva extends Thread {
 
             System.out.println("Sada je " + sdf.format(new Date()));
         } catch (InterruptedException ex) {
-            Logger.getLogger(SlanjeZahtjeva.class.getName()).log(Level.SEVERE, null, ex);
+            Logger.getLogger(SlanjeZahtjeva15.class.getName()).log(Level.SEVERE, null, ex);
         }
 
         InputStream is = null;
@@ -78,7 +78,7 @@ public class SlanjeZahtjeva extends Thread {
                             Thread.sleep(this.cekaj * 1000);
                             System.out.println("Dretva na cekanju prije slanja naredbe " + sdf.format(new Date()));
                         } catch (InterruptedException ex) {
-                            Logger.getLogger(SlanjeZahtjeva.class.getName()).log(Level.SEVERE, null, ex);
+                            Logger.getLogger(SlanjeZahtjeva15.class.getName()).log(Level.SEVERE, null, ex);
                         }
                     }
                     os.write(komanda.getBytes());
@@ -102,7 +102,7 @@ public class SlanjeZahtjeva extends Thread {
                     System.out.println(sb.toString());
 
                 } catch (IOException ex) {
-                    Logger.getLogger(SlanjeZahtjeva.class.getName()).log(Level.SEVERE, null, ex);
+                    Logger.getLogger(SlanjeZahtjeva15.class.getName()).log(Level.SEVERE, null, ex);
                     brojNuspjelihPokusaja++;
                     spavanje = true;
                 }
@@ -111,7 +111,7 @@ public class SlanjeZahtjeva extends Thread {
                     try {
                         is.close();
                     } catch (IOException ex) {
-                        Logger.getLogger(ObradaZahtjeva.class.getName()).log(Level.SEVERE, null, ex);
+                        Logger.getLogger(ObradaZahtjeva15.class.getName()).log(Level.SEVERE, null, ex);
                     }
                 }
 
@@ -119,7 +119,7 @@ public class SlanjeZahtjeva extends Thread {
                     try {
                         os.close();
                     } catch (IOException ex) {
-                        Logger.getLogger(ObradaZahtjeva.class.getName()).log(Level.SEVERE, null, ex);
+                        Logger.getLogger(ObradaZahtjeva15.class.getName()).log(Level.SEVERE, null, ex);
                     }
                 }
 
@@ -127,7 +127,7 @@ public class SlanjeZahtjeva extends Thread {
                     try {
                         socket.close();
                     } catch (IOException ex) {
-                        Logger.getLogger(ObradaZahtjeva.class.getName()).log(Level.SEVERE, null, ex);
+                        Logger.getLogger(ObradaZahtjeva15.class.getName()).log(Level.SEVERE, null, ex);
                     }
                 }
 
@@ -139,7 +139,7 @@ public class SlanjeZahtjeva extends Thread {
                     try {
                         sleep(vrijemeSpavanja);
                     } catch (InterruptedException ex) {
-                        Logger.getLogger(SlanjeZahtjeva.class.getName()).log(Level.SEVERE, null, ex);
+                        Logger.getLogger(SlanjeZahtjeva15.class.getName()).log(Level.SEVERE, null, ex);
                     }
                 }
             }

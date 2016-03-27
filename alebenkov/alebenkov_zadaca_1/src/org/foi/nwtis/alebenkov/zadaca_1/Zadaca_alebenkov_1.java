@@ -1,8 +1,4 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
+
 package org.foi.nwtis.alebenkov.zadaca_1;
 
 import java.util.regex.Matcher;
@@ -33,9 +29,18 @@ public class Zadaca_alebenkov_1 {
                 System.out.println("Server trazis...");
                 String rServer = "^-server -konf ([^\\s]+\\.(?i)(txt|xml))( +-load)?"; //dozvoljeno: -server -konf -datoteka(.xml | .txt) [-load]
                 p = Pattern.compile(rServer); //kompajliram regex izraz za usporedjivanje
-                m = p.matcher(naredba); //usporedjujem regex sa dobivenom naredbom
+                m = p.matcher(naredba); //usporedjujem regex sa dobivenom naredbom, grupa 1=datoteka.txt, 2=txt, 3=-load
                 status = m.matches(); //spremam status usporedbe, true, false
-                System.out.println(status);
+                if (status) {
+                    try {
+                        ServerSustava server = new ServerSustava(m.group(1), m.group(3));
+                    } catch (Exception ex) {
+                        System.out.println("Nisam uspio pokrenuti server");
+                    }
+                } else {
+                    System.out.println("Neispravni argumenti");
+                    return;
+                }
                 break;
             case "-admin":
                 System.out.println("Admin trazis...");
@@ -47,7 +52,7 @@ public class Zadaca_alebenkov_1 {
                 System.out.println("Show trazis...");
                 break;
             default:
-                System.out.println("Neispravan unos");
+                System.out.println("Neispravan unos argumenata!");
                 break;
         }
 

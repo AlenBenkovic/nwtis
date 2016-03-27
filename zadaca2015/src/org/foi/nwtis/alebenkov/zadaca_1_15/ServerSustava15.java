@@ -3,7 +3,7 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package org.foi.nwtis.alebenkov.zadaca_1;
+package org.foi.nwtis.alebenkov.zadaca_1_15;
 
 import java.io.File;
 import java.io.IOException;
@@ -19,14 +19,14 @@ import java.util.regex.Pattern;
 import org.foi.nwtis.alebenkov.konfiguracije.Konfiguracija;
 import org.foi.nwtis.alebenkov.konfiguracije.KonfiguracijaApstraktna;
 import org.foi.nwtis.alebenkov.konfiguracije.NemaKonfiguracije;
-import static org.foi.nwtis.alebenkov.zadaca_1.ObradaZahtjeva.StanjeDretve.Slobodna;
-import static org.foi.nwtis.alebenkov.zadaca_1.ObradaZahtjeva.StanjeDretve.Zauzeta;
+import static org.foi.nwtis.alebenkov.zadaca_1_15.ObradaZahtjeva15.StanjeDretve.Slobodna;
+import static org.foi.nwtis.alebenkov.zadaca_1_15.ObradaZahtjeva15.StanjeDretve.Zauzeta;
 
 /**
  *
  * @author alen
  */
-public class ServerSustava {
+public class ServerSustava15 {
 
     protected String parametri;
     protected Matcher mParametri;
@@ -34,7 +34,7 @@ public class ServerSustava {
     private static boolean pauziran = false;
     private static boolean zaustavljen = false;
 
-    public ServerSustava(String parametri) throws Exception {
+    public ServerSustava15(String parametri) throws Exception {
         this.parametri = parametri;
         this.mParametri = provjeraParametara(parametri);
         if (this.mParametri == null) {
@@ -72,19 +72,19 @@ public class ServerSustava {
                 ucitajSerijaliziranuEvidenciju(datEvid);
             }
         } catch (NemaKonfiguracije ex) {
-            Logger.getLogger(ServerSustava.class.getName()).log(Level.SEVERE, null, ex);
+            Logger.getLogger(ServerSustava15.class.getName()).log(Level.SEVERE, null, ex);
         }
 
-        SerijalizatorEvidencije se = new SerijalizatorEvidencije(konfig);
+        SerijalizatorEvidencije15 se = new SerijalizatorEvidencije15(konfig);
         se.start();
 
         int brojDretvi = Integer.parseInt(konfig.dajPostavku("brojDretvi"));
         System.out.println("Ucitavam broj dretvi iz datoteke:" + brojDretvi);
         
         ThreadGroup tg = new ThreadGroup("alebenkov");
-        ObradaZahtjeva[] dretve = new ObradaZahtjeva[brojDretvi];
+        ObradaZahtjeva15[] dretve = new ObradaZahtjeva15[brojDretvi];
         for (int i = 0; i < brojDretvi; i++) {
-            dretve[i] = new ObradaZahtjeva(tg, "alebenkov_" + i);
+            dretve[i] = new ObradaZahtjeva15(tg, "alebenkov_" + i);
             dretve[i].setKonfig(konfig);
             System.out.println("Kreiram dretvu " + dretve[i].getName() + " stanje " + dretve[i].getState());
         }
@@ -97,7 +97,7 @@ public class ServerSustava {
             while (!zaustavljen) {
                 Socket socket = ss.accept();
                 System.out.println("Zahtjev primljen, odgovaram...");
-                ObradaZahtjeva oz = dajSlobodnuDretvu(dretve);
+                ObradaZahtjeva15 oz = dajSlobodnuDretvu(dretve);
                 if (oz == null) {
                     System.out.println("ERROR 80: Nema slobodne dretve.");//ja dodao
                     return;
@@ -109,12 +109,12 @@ public class ServerSustava {
                        oz.notify(); 
                     }
                     oz.start();
-                    oz.setStanje(ObradaZahtjeva.StanjeDretve.Zauzeta);
+                    oz.setStanje(ObradaZahtjeva15.StanjeDretve.Zauzeta);
                     oz.setSocket(socket);
                 }
             }
         } catch (IOException ex) {
-            Logger.getLogger(ServerSustava.class.getName()).log(Level.SEVERE, null, ex);
+            Logger.getLogger(ServerSustava15.class.getName()).log(Level.SEVERE, null, ex);
         }
     }
 
@@ -122,7 +122,7 @@ public class ServerSustava {
         //TODO napravite sami
     }
 
-    private ObradaZahtjeva dajSlobodnuDretvu(ObradaZahtjeva[] dretve) {
+    private ObradaZahtjeva15 dajSlobodnuDretvu(ObradaZahtjeva15[] dretve) {
        int slobodnaDretvaID = -1;
         for (int i = dretve.length-1; i >= 0; i--) { //na ovaj nacin uzimam prvu dretvu
             if (dretve[i].getStanje()== Slobodna) {

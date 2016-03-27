@@ -3,7 +3,7 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package org.foi.nwtis.alebenkov.zadaca_1;
+package org.foi.nwtis.alebenkov.zadaca_1_15;
 
 import java.io.Serializable;
 import java.util.ArrayList;
@@ -13,7 +13,7 @@ import java.util.Date;
  *
  * @author alen
  */
-public class EvidencijaModel implements Serializable{
+public class EvidencijaModel15 implements Serializable{
     private String oznaka;
     private Date prviZahtjev;
     private Date zadnjiZahtjev;
@@ -22,7 +22,7 @@ public class EvidencijaModel implements Serializable{
     private long ukupnoVrijemeRada = 0;
     private ArrayList<ZahtjevKorisnika> zahtjevi = new ArrayList();
     
-    public EvidencijaModel(String oznaka) {
+    public EvidencijaModel15(String oznaka) {
         this.oznaka = oznaka;
     }
     

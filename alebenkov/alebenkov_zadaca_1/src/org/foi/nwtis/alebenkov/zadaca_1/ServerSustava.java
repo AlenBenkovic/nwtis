@@ -1,44 +1,28 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
+
 package org.foi.nwtis.alebenkov.zadaca_1;
 
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
-
 /**
- *
- * @author alen
+ * Server class
+ * @author Alen Benkovic
  */
 public class ServerSustava {
 
-    protected String parametri;
-    protected Matcher mParametri;
+    private static String datoteka; //konfig datoteka
+    private static boolean load=false; //datoteka sa serijaliziranim podacima
+
     
-   
-
-    public ServerSustava(String parametri) throws Exception {
-        this.parametri = parametri;
-        this.mParametri = provjeraParametara(parametri);
-        if (this.mParametri == null) {
-            throw new Exception("Parametri servera ne odgovaraju!");
-        }
-    }
-
-    public Matcher provjeraParametara(String p) {
-        String sintaksa = "^-server -konf +([^\\s]+.(xml|txt))( +-load)?$";
-
-        Pattern pattern = Pattern.compile(sintaksa);
-        Matcher m = pattern.matcher(p);
-        boolean status = m.matches();
-        if (status) {
-            return m;
-        } else {
-            System.out.println("Ne odgovara!");
-            return null;
-        }
+    /**
+     * 
+     * @param datoteka - naziv konfiguracijske datoteke
+     * @param load - parametar za ucitavanje datoteke sa serijaliziranim podacima
+     * 
+     */
+    
+    public ServerSustava(String datoteka, String load) {
+        this.datoteka = datoteka;
+        if(load != null) this.load=true;
+        System.out.println(datoteka);
+        System.out.println(this.load);
     }
 
     public void pokreniServer() {
@@ -49,6 +33,5 @@ public class ServerSustava {
     private void ucitajSerijaliziranuEvidenciju(String datEvid) {
         //TODO napravite sami
     }
-
 
 }

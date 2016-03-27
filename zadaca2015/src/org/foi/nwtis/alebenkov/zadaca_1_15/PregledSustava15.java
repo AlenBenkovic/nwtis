@@ -3,7 +3,7 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package org.foi.nwtis.alebenkov.zadaca_1;
+package org.foi.nwtis.alebenkov.zadaca_1_15;
 
 import java.io.File;
 import java.util.regex.Matcher;
@@ -13,11 +13,11 @@ import java.util.regex.Pattern;
  *
  * @author alen
  */
-public class PregledSustava {
+public class PregledSustava15 {
     protected String parametri;
     protected Matcher mParametri;
 
-    public PregledSustava(String parametri) throws Exception {
+    public PregledSustava15(String parametri) throws Exception {
         this.parametri = parametri;
         this.mParametri = provjeraParametara(parametri);
         if (this.mParametri == null) {

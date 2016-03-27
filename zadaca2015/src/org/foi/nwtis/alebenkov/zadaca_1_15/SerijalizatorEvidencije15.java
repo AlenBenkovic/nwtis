@@ -3,7 +3,7 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package org.foi.nwtis.alebenkov.zadaca_1;
+package org.foi.nwtis.alebenkov.zadaca_1_15;
 
 import org.foi.nwtis.alebenkov.konfiguracije.Konfiguracija;
 
@@ -11,11 +11,11 @@ import org.foi.nwtis.alebenkov.konfiguracije.Konfiguracija;
  *
  * @author alen
  */
-public class SerijalizatorEvidencije extends Thread {
+public class SerijalizatorEvidencije15 extends Thread {
     
     Konfiguracija konfig;
 
-    public SerijalizatorEvidencije(Konfiguracija konfig) {
+    public SerijalizatorEvidencije15(Konfiguracija konfig) {
         super();
         this.konfig = konfig;
     }
