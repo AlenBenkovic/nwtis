@@ -49,30 +49,12 @@ public class ServerSustava {
             }
         }
         if (this.load == false) { //ako ne postoji zapis o staroj igri kreiram novu
-            System.out.println("Kreiram novu igru...");
-            int brojX = 3 + (int) (Math.random() * ((10 - 3) + 1)); //http://stackoverflow.com/questions/363681/generating-random-integers-in-a-specific-range
-            int brojY = 3 + (int) (Math.random() * ((10 - 3) + 1));
-            System.out.println("Ploca velicine " + brojX + " X " + brojY);
             int brojIgraca = Integer.parseInt(konfig.dajPostavku("brojIgraca"));
-            System.out.println("Broj IGRACA:" + brojIgraca);
             int brojBrodova = Integer.parseInt(konfig.dajPostavku("brojBrodova"));
-            System.out.println("Broj BRODOVA:" + brojBrodova);
-            int[][][] poljeBrodova = new int [brojIgraca][brojX][brojY]; //kreiram trodimenzionalno polje
-            for (int i = 0; i < brojIgraca; i++) { 
-                for(int j=0; j<brojBrodova;j++){//spremam brodove na razlicite lokacije
-                    int nasumicniX=0 + (int) (Math.random() * (((brojX-1) - 0) + 1));
-                    int nasumicniY=0 + (int) (Math.random() * (((brojY-1) - 0) + 1));
-                    if(poljeBrodova[i][nasumicniX][nasumicniY] ==1)
-                    {
-                        j--; //ukoliko broj postoji pokusavam ponovno na novoj nasumicnoj lokaciji
-                    } else
-                    {
-                        poljeBrodova[i][nasumicniX][nasumicniY] =1; //ako broj ne postoji spremam ga na lokaciju
-                    }
-                }
-                
-                System.out.println("IGRAC " + i + ":" + Arrays.deepToString(poljeBrodova[i]));
-            }
+            potapanjeBrodova igra = new potapanjeBrodova(2, 2, 2,2);
+            igra.kreirajBrodove();
+            igra.pogodiBrod(0, 1, 1);
+            
         } else { //ako postoji stara igra ucitavam nju
             System.out.println("Ucitavam staru igru...");
         }
