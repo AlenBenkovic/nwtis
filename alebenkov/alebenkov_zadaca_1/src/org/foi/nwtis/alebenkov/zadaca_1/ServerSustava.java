@@ -51,9 +51,9 @@ public class ServerSustava {
         if (this.load == false) { //ako ne postoji zapis o staroj igri kreiram novu
             int brojIgraca = Integer.parseInt(konfig.dajPostavku("brojIgraca"));
             int brojBrodova = Integer.parseInt(konfig.dajPostavku("brojBrodova"));
-            potapanjeBrodova igra = new potapanjeBrodova(2, 2, 2,2);
+            potapanjeBrodova igra = new potapanjeBrodova(1);
             igra.kreirajBrodove();
-            igra.pogodiBrod(0, 1, 1);
+            igra.pogodiBrod(0, 1,1 );
             
         } else { //ako postoji stara igra ucitavam nju
             System.out.println("Ucitavam staru igru...");

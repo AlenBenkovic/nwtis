@@ -14,13 +14,12 @@ public class potapanjeBrodova {
     private final int brojBrodova;
     private final int[][][] poljeBrodova;
 
-    public potapanjeBrodova(int brojIgraca, int brojBrodova) {
+    public potapanjeBrodova(int brojIgraca) {
         this.brojX = 3 + (int) (Math.random() * ((10 - 3) + 1)); //http://stackoverflow.com/questions/363681/generating-random-integers-in-a-specific-range;
         this.brojY = 3 + (int) (Math.random() * ((10 - 3) + 1));
+        this.brojBrodova = 2 + (int) (Math.random() * ((5 - 2) + 1));
         this.brojIgraca = brojIgraca;
-        this.brojBrodova = brojBrodova;
-        this.poljeBrodova = new int[brojIgraca][brojX][brojY]; //kreiram trodimenzionalno polje
-
+        this.poljeBrodova = new int[brojIgraca][brojX][brojY];
     }
     
     public potapanjeBrodova(int x, int y, int brojIgraca, int brojBrodova) {
@@ -28,8 +27,7 @@ public class potapanjeBrodova {
         this.brojY = y;
         this.brojIgraca = brojIgraca;
         this.brojBrodova = brojBrodova;
-        this.poljeBrodova = new int[brojIgraca][brojX][brojY]; //kreiram trodimenzionalno polje
-
+        this.poljeBrodova = new int[brojIgraca][brojX][brojY];
     }
 
     public void kreirajBrodove() {
