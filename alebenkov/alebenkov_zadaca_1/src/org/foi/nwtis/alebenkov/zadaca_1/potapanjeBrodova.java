@@ -3,7 +3,6 @@ package org.foi.nwtis.alebenkov.zadaca_1;
 import java.util.Arrays;
 
 /**
- *
  * @author alen benkovic
  */
 public class potapanjeBrodova {
@@ -12,14 +11,14 @@ public class potapanjeBrodova {
     private final int brojY;
     private final int brojIgraca;
     private final int brojBrodova;
-    private final int[][][] poljeBrodova;
+    private final int[][] poljeBrodova;
 
     public potapanjeBrodova(int brojIgraca) {
         this.brojX = 3 + (int) (Math.random() * ((10 - 3) + 1)); //http://stackoverflow.com/questions/363681/generating-random-integers-in-a-specific-range;
         this.brojY = 3 + (int) (Math.random() * ((10 - 3) + 1));
         this.brojBrodova = 2 + (int) (Math.random() * ((5 - 2) + 1));
         this.brojIgraca = brojIgraca;
-        this.poljeBrodova = new int[brojIgraca][brojX][brojY];
+        this.poljeBrodova = new int[brojX][brojY];
     }
     
     public potapanjeBrodova(int x, int y, int brojIgraca, int brojBrodova) {
@@ -27,7 +26,7 @@ public class potapanjeBrodova {
         this.brojY = y;
         this.brojIgraca = brojIgraca;
         this.brojBrodova = brojBrodova;
-        this.poljeBrodova = new int[brojIgraca][brojX][brojY];
+        this.poljeBrodova = new int[brojX][brojY];
     }
 
     public void kreirajBrodove() {
@@ -36,26 +35,26 @@ public class potapanjeBrodova {
         System.out.println("Broj IGRACA:" + this.brojIgraca);
         System.out.println("Broj BRODOVA:" + this.brojBrodova);
 
-        for (int i = 0; i < this.brojIgraca; i++) {
+        for (int i = 1; i <= this.brojIgraca; i++) {
             for (int j = 0; j < this.brojBrodova; j++) {//spremam brodove na razlicite lokacije
                 int nasumicniX = 0 + (int) (Math.random() * (((this.brojX - 1) - 0) + 1));
                 int nasumicniY = 0 + (int) (Math.random() * (((this.brojY - 1) - 0) + 1));
-                if (this.poljeBrodova[i][nasumicniX][nasumicniY] == 1) {
-                    j--; //ukoliko broj postoji pokusavam ponovno na novoj nasumicnoj lokaciji
+                if (this.poljeBrodova[nasumicniX][nasumicniY] == 0) {
+                    this.poljeBrodova[nasumicniX][nasumicniY] = i; //ako broj ne postoji spremam ga na lokaciju
                 } else {
-                    this.poljeBrodova[i][nasumicniX][nasumicniY] = 1; //ako broj ne postoji spremam ga na lokaciju
+                    j--; //ukoliko broj postoji pokusavam ponovno na novoj nasumicnoj lokaciji
                 }
             }
-            System.out.println("IGRAC " + i + ":" + Arrays.deepToString(this.poljeBrodova[i]));
         }
+        System.out.println("Polje brodova: " + Arrays.deepToString(this.poljeBrodova));
     }
 
-    public boolean pogodiBrod(int igrac, int x, int y) {
+    public boolean pogodiBrod(int idIgraca, int x, int y) {
         if (this.brojX<=x | this.brojY<=y){
             System.out.println("Neispravne koordinate!");
             return false;
         }
-        else if (this.poljeBrodova[igrac][x][y] == 1) {
+        else if (this.poljeBrodova[x][y] == idIgraca) {
             System.out.println("POGODAK!");
             return true;
         } else {
