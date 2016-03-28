@@ -66,7 +66,6 @@ public class ServerSustava15 {
         }
         try {
             konfig = KonfiguracijaApstraktna.preuzmiKonfiguraciju(datoteka);
-
             if (this.mParametri.group(2) != null) {
                 String datEvid = konfig.dajPostavku("evidDatoteka");
                 ucitajSerijaliziranuEvidenciju(datEvid);

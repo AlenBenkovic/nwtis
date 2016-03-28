@@ -33,7 +33,8 @@ public class Zadaca_alebenkov_1 {
                 status = m.matches(); //spremam status usporedbe, true, false
                 if (status) {
                     try {
-                        ServerSustava server = new ServerSustava(m.group(1), m.group(3));
+                        ServerSustava server = new ServerSustava(m.group(1), m.group(3)); //kreiram server i saljem mu paremetre naziv konfig datoteke i da li treba ucitati datoteku sa serijalizirnim podacima
+                        server.pokreniServer(); //pokrecem server
                     } catch (Exception ex) {
                         System.out.println("Nisam uspio pokrenuti server");
                     }
