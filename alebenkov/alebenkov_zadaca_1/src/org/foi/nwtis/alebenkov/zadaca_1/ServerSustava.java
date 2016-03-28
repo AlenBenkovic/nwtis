@@ -1,6 +1,7 @@
 package org.foi.nwtis.alebenkov.zadaca_1;
 
 import java.io.File;
+import java.util.Arrays;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import org.foi.nwtis.alebenkov.konfiguracije.Konfiguracija;
@@ -55,6 +56,13 @@ public class ServerSustava {
             System.out.println("BrojY= " + brojY);
             int brojIgraca = Integer.parseInt(konfig.dajPostavku("brojIgraca"));
             System.out.println("Ucitavam broj igraca iz datoteke:" + brojIgraca);
+            int brojBrodova = Integer.parseInt(konfig.dajPostavku("brojBrodova"));
+            System.out.println("Ucitavam broj brodova iz datoteke:" + brojBrodova);
+            int[][][] poljeBrodova = new int [brojIgraca+1][brojX][brojY];
+            for (int i = 1; i <= brojIgraca; i++) {
+                poljeBrodova[i][0 + (int) (Math.random() * (((brojX-1) - 0) + 1))][0 + (int) (Math.random() * (((brojY-1) - 0) + 1))] =1;
+                System.out.println("Pozicija brodova za igraca " + i + ":" + Arrays.deepToString(poljeBrodova[i]));
+            }
         } else { //ako postoji stara igra ucitavam nju
             System.out.println("Ucitavam staru igru...");
         }
