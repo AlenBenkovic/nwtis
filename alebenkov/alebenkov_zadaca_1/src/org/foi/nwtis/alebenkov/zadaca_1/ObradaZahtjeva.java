@@ -13,7 +13,7 @@ import java.util.logging.Logger;
  */
 public class ObradaZahtjeva extends Thread {
 
-    private Socket socket;
+    private Socket server;
 
     public ObradaZahtjeva(ThreadGroup group, String name) {
         super(group, name);
@@ -26,9 +26,46 @@ public class ObradaZahtjeva extends Thread {
 
     @Override
     public void run() {
-        super.run(); //To change body of generated methods, choose Tools | Templates.
-        System.out.println("Dretva radi");
-        
+        InputStream is = null;
+        OutputStream os = null;
+        System.out.println("Pokrecem serversku dretvu " + this.getName() + " stanje " + this.getState());
+
+        try {
+            is = server.getInputStream();
+            os = server.getOutputStream();
+            
+            String slanjeNaredbe = "SERVER KAZE OK!";
+
+            os.write(slanjeNaredbe.getBytes());
+            os.flush();
+            server.shutdownOutput();
+
+            StringBuilder naredba = new StringBuilder();
+            while (is.available() > 0) {
+                int znak = is.read();
+                if (znak == -1) {
+                    break;
+                }
+                naredba.append((char) znak);
+            }
+
+            System.out.println("Dobivena naredba: " + naredba.toString());
+
+        } catch (IOException ex) {
+            System.out.println("GRESKA");
+        }
+        finally{
+            try {
+                if (is != null)
+                    is.close();
+                if (os != null)
+                    os.close();
+                                
+            } catch (IOException ex) {
+                Logger.getLogger(ObradaZahtjeva.class.getName()).log(Level.SEVERE, null, ex);
+                System.out.println("ERROR");
+            }
+        }
     }
 
     @Override
@@ -36,8 +73,8 @@ public class ObradaZahtjeva extends Thread {
         super.start(); //To change body of generated methods, choose Tools | Templates.
     }
 
-    public void setSocket(Socket socket) {
-        this.socket = socket;
+    public void setSocket(Socket server) {
+        this.server = server;
     }
 
 }

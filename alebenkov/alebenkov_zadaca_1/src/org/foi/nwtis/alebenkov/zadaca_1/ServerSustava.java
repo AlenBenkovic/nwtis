@@ -3,12 +3,8 @@ package org.foi.nwtis.alebenkov.zadaca_1;
 import java.io.File;
 import java.io.IOException;
 import java.lang.Thread.State;
-import static java.lang.Thread.State.WAITING;
 import java.net.ServerSocket;
 import java.net.Socket;
-import java.util.Arrays;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import org.foi.nwtis.alebenkov.konfiguracije.Konfiguracija;
 import org.foi.nwtis.alebenkov.konfiguracije.KonfiguracijaApstraktna;
 import org.foi.nwtis.alebenkov.konfiguracije.NemaKonfiguracije;
@@ -22,7 +18,7 @@ public class ServerSustava {
 
     private static String datoteka; //konfig datoteka
     private static boolean load = false; //datoteka sa serijaliziranim podacima
-    private static boolean zaustavljen = false;
+    private static boolean zaustavljen = false; //za provjeru stanja servera
 
     /**
      *
@@ -66,7 +62,7 @@ public class ServerSustava {
         int brojDretvi = Integer.parseInt(konfig.dajPostavku("brojDretvi"));
         System.out.println("BROJ DRETVI: " + brojDretvi);
 
-        ThreadGroup tg = new ThreadGroup("alebenkov");
+        ThreadGroup tg = new ThreadGroup("alebenkov");//kreiram grupu dretvi
         ObradaZahtjeva[] dretve = new ObradaZahtjeva[brojDretvi];
 
         for (int i = 0; i < brojDretvi; i++) {
@@ -83,12 +79,17 @@ public class ServerSustava {
             while (!zaustavljen) {
                 Socket socket = ss.accept();
                 System.out.println("Zahtjev primljen, odgovaram...");
+                String spojenKorisnik = socket.getInetAddress().getHostName();
                 int sd = dajSlobodnuDretvu(dretve);
+               //int wd = dajDretvu(dretve);
+                //System.out.println("Dretva koja ceka novi zadatak je " +  dretve[wd].getName());
                 if (sd == -1) {
                     System.out.println("ERROR 80: Nema slobodne dretve.");
                 } else {
-                    dretve[sd].start();
+                    System.out.println("Netko se spojio sa: " + spojenKorisnik + " . Pokrecem dretvu...");
+                    dretve[sd].start(); //pokrecem prvu slobodnu dretvu
                     dretve[sd].setSocket(socket);
+
                 }
 
             }
@@ -102,6 +103,18 @@ public class ServerSustava {
         for (int i = 0; i < dretve.length; i++) {
             System.out.println(dretve[i].getState());
             if (dretve[i].getState() == State.NEW) {
+                slobodnaDretvaID = i;
+                break;
+            }
+        }
+        return slobodnaDretvaID;
+    }
+
+    private int dajDretvu(ObradaZahtjeva[] dretve) {
+        int slobodnaDretvaID = -1;
+        for (int i = 0; i < dretve.length; i++) {
+            System.out.println(dretve[i].getState());
+            if (dretve[i].getState() == State.WAITING) {
                 slobodnaDretvaID = i;
                 break;
             }
