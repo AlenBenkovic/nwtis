@@ -13,6 +13,11 @@ public class Zadaca_alebenkov_1 {
         Pattern p; //spremam u njega odredjeni regex izraz ovisno o caseu
         Matcher m; //za provjeru izraza
         boolean status; //spremam status provjere izraza
+        
+        if(args[0] == null){//ako ne postoje argumenti prekidam program
+            System.out.println("Niste unjeli ni jedan argument! Izlazim.");
+            return;
+        }
 
         //kreiram stringbuilder i u njega spremam argumente radi lakse manipulacije
         StringBuilder sb = new StringBuilder();
