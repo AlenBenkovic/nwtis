@@ -14,7 +14,7 @@ public class Zadaca_alebenkov_1 {
         Matcher m; //za provjeru izraza
         boolean status; //spremam status provjere izraza
         
-        if(args[0] == null){//ako ne postoje argumenti prekidam program
+        if(args.length==0){//ako ne postoje argumenti prekidam program
             System.out.println("Niste unjeli ni jedan argument! Izlazim.");
             return;
         }
