@@ -58,7 +58,7 @@ class Dretva extends Thread {
     }
 
     public void run() {
-        for (int i = 0; i < 5; i++) {
+        for (int i = 0; i < 1; i++) {
             //gen_spavanje();
 
             long poc = System.currentTimeMillis();
@@ -71,7 +71,7 @@ class Dretva extends Thread {
             } catch (InterruptedException ex) {
                 Logger.getLogger(Dretva.class.getName()).log(Level.SEVERE, null, ex);
             }
-            System.out.println("Saljem na spavanje dretvu " + i + " dodatne informacije: " + this.getState() + this.getName());
+            System.out.println("Saljem na spavanje dretvu " + i + " dodatne informacije: " + this.getState() +  " " + this.getName());
 
         }
 
