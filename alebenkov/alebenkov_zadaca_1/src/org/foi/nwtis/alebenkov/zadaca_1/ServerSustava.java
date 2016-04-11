@@ -85,7 +85,8 @@ public class ServerSustava {
                 } else {
 
                     if (dretve[sd].brojacRada() > 0) {
-                        System.out.println("Radim interrup dretve " + dretve[sd].getName());
+                        System.out.println("PONOVNO pokrecem dretvu " + dretve[sd].getName());
+                        //dretve[sd].interrupt();
                         dretve[sd].interrupt();
                     } else {
                         System.out.println("Pokrecem dretvu " + dretve[sd].getName());

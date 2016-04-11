@@ -30,9 +30,16 @@ public class ObradaZahtjeva extends Thread {
         brojacRada++;
         super.interrupt(); //To change body of generated methods, choose Tools | Templates.
     }
-
+    
     @Override
     public void run() {
+        while(true){
+            this.pokreni();
+        }
+    }
+
+    
+    public synchronized void pokreni() {
         stanjeDretve=1;
         brojacRada++;
         long pocetakRadaDretve = System.currentTimeMillis(); //biljezim pocetak rada dretve
@@ -89,6 +96,13 @@ public class ObradaZahtjeva extends Thread {
             Logger.getLogger(ObradaZahtjeva.class.getName()).log(Level.SEVERE, null, ex);
         }
         stanjeDretve=0;
+        while(this.stanjeDretve==0){
+            try {
+                this.wait();
+            } catch (InterruptedException ex) {
+                System.out.println("Dretva NASTAVLJA S RADOM!");
+            }
+        }
 
     }
 
@@ -110,5 +124,13 @@ public class ObradaZahtjeva extends Thread {
         System.out.println(this.getName() +">Rad dretve: "+this.brojacRada);
         return this.brojacRada;
     }
+
+    @Override
+    public boolean isInterrupted() {
+        System.out.println("PREKINUTA JE DRETVA INTERRPUT!!");
+        return super.isInterrupted(); //To change body of generated methods, choose Tools | Templates.
+    }
+    
+    
 
 }
