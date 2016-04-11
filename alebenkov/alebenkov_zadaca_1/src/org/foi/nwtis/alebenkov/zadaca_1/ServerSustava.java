@@ -56,21 +56,20 @@ public class ServerSustava {
             igra.kreirajBrodove();
             igra.pogodiBrod(2, 0, 0);
         } else { //ako postoji stara igra ucitavam nju
-            System.out.println("Ucitavam staru igru...");
+            System.out.println("SERVER | Ucitavam staru igru...");
         }
 
         int brojDretvi = Integer.parseInt(konfig.dajPostavku("brojDretvi"));
-        System.out.println("BROJ DRETVI: " + brojDretvi);
-
         int port = Integer.parseInt(konfig.dajPostavku("port"));
-        System.out.println("PORT: " + port);
+        System.out.println("SERVER | Broj dretvi: " + brojDretvi + " | Port: " + port);
 
-        ThreadGroup tg = new ThreadGroup("alebenkov");//kreiram grupu dretvi
+        //kreiram grupu dretvi
+        ThreadGroup tg = new ThreadGroup("alebenkov");
         ObradaZahtjeva[] dretve = new ObradaZahtjeva[brojDretvi];
 
         for (int i = 0; i < brojDretvi; i++) {
             dretve[i] = new ObradaZahtjeva(tg, "alebenkov_" + i);
-            System.out.println("Kreiram dretvu " + dretve[i].getName() + " " + dretve[i].getState());
+            System.out.println("SERVER | Kreiram dretvu " + dretve[i].getName() + " " + dretve[i].getState());
         }
 
         try {
@@ -78,18 +77,17 @@ public class ServerSustava {
             //ss.setSoTimeout(1000); //da ne blokira kod citanja do kraja vec 1000
             while (!zaustavljen) {
                 Socket socket = ss.accept();
-                System.out.println("Zahtjev primljen, odgovaram...");
+                System.out.println("SERVER | Zahtjev primljen, odgovaram...");
                 int sd = dajSlobodnuDretvu(dretve);
                 if (sd == -1) {
-                    System.out.println("ERROR 80: Nema slobodne dretve.");
+                    System.out.println("SERVER | ERROR 80: Nema slobodne dretve.");
                 } else {
 
-                    if (dretve[sd].brojacRada() > 0) {
-                        System.out.println("PONOVNO pokrecem dretvu " + dretve[sd].getName());
-                        //dretve[sd].interrupt();
+                    if (dretve[sd].brojacRada() > 0) {//ako je dretva do sada radila ona radim interrupt nad njom kako bi nastavila
+                        System.out.println("SERVER | Ponovno pokrecem dretvu " + dretve[sd].getName());
                         dretve[sd].interrupt();
-                    } else {
-                        System.out.println("Pokrecem dretvu " + dretve[sd].getName());
+                    } else {//ako nije onda ju pokrecem
+                        System.out.println("SERVER | Pokrecem dretvu " + dretve[sd].getName());
                         dretve[sd].start(); //pokrecem prvu slobodnu dretvu
                     }
                     dretve[sd].setSocket(socket);
@@ -98,10 +96,12 @@ public class ServerSustava {
 
             }
         } catch (IOException ex) {
-            System.out.println("Nastala greska prilikom rada socketa " + ex.getMessage());
+            System.out.println("SERVER | Nastala greska prilikom rada socketa " + ex.getMessage());
         }
     }
 
+    //gledam koja mi je dretva slobodna i ako ih ima više slobodnih gledam koliko je koja radila
+    //tako da sve budu jednako zastupljene
     private int dajSlobodnuDretvu(ObradaZahtjeva[] dretve) {
         int slobodnaDretvaID = -1;
         int najmanjiBrojac = 9999;
@@ -110,7 +110,7 @@ public class ServerSustava {
                 slobodnaDretvaID = i;
                 break;
             } else if (dretve[i].stanjeDretve() == 0) { //ovo radim kako bi jednako zaposlio sve dretve
-                if(najmanjiBrojac>dretve[i].brojacRada()){
+                if (najmanjiBrojac > dretve[i].brojacRada()) {
                     najmanjiBrojac = dretve[i].brojacRada();
                     slobodnaDretvaID = i;
                 }

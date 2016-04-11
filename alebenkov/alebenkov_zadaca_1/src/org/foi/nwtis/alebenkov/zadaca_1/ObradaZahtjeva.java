@@ -4,10 +4,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.Socket;
-import java.text.SimpleDateFormat;
-import java.util.Date;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 /**
  *
@@ -23,29 +19,27 @@ public class ObradaZahtjeva extends Thread {
         super(group, name);
     }
 
-
     @Override
     public void interrupt() {
-        stanjeDretve=1;
+        stanjeDretve = 1;
         brojacRada++;
         super.interrupt(); //To change body of generated methods, choose Tools | Templates.
     }
-    
+
     @Override
     public void run() {
-        while(true){
+        while (true) {
             this.pokreni();
         }
     }
 
-    
     public synchronized void pokreni() {
-        stanjeDretve=1;
+        stanjeDretve = 1;
         brojacRada++;
         long pocetakRadaDretve = System.currentTimeMillis(); //biljezim pocetak rada dretve
         InputStream is = null;
         OutputStream os = null;
-        System.out.println("Pokrecem dretvu koja ce posluziti korisnika " + this.getName() + " stanje " + this.getState());
+        System.out.println(this.getName() + " | Pokrecem dretvu koja ce posluziti korisnika. Stanje " + this.getState());
 
         try {
             is = server.getInputStream();
@@ -66,10 +60,10 @@ public class ObradaZahtjeva extends Thread {
                 naredba.append((char) znak);
             }
 
-            System.out.println("Dobivena naredba: " + naredba.toString());
+            System.out.println(this.getName() + " | Dobivena naredba: " + naredba.toString());
 
         } catch (IOException ex) {
-            System.out.println("GRESKA");
+            System.out.println(this.getName() + " | GRESKA kod IO operacija!");
         } finally {
             try {
                 if (is != null) {
@@ -80,27 +74,27 @@ public class ObradaZahtjeva extends Thread {
                 }
 
             } catch (IOException ex) {
-                Logger.getLogger(ObradaZahtjeva.class.getName()).log(Level.SEVERE, null, ex);
-                System.out.println("ERROR");
+                System.out.println(this.getName() + " | GRESKA kod IO operacija 2");
             }
         }
         //po zavrsetku svih poslova dretve, saljem ju na spavanje
         long trajanjeRadaDretve = System.currentTimeMillis() - pocetakRadaDretve;
         try {
-            System.out.println( this.getName() + "Saljem dretvu na spavanje..");
-            System.out.println(this.getName() +"Stanje dretve: " + this.getState());
+            System.out.println(this.getName() + " | Saljem dretvu na spavanje" );
             sleep(5000 - trajanjeRadaDretve);
-            
-            System.out.println(this.getName() +"Dretva dosla sa spavanja..");
+
+            System.out.println(this.getName() + " | Dretva dosla sa spavanja");
         } catch (InterruptedException ex) {
-            Logger.getLogger(ObradaZahtjeva.class.getName()).log(Level.SEVERE, null, ex);
+            System.out.println(this.getName() + " | Prekid dretve za vrijeme spavanja");
         }
-        stanjeDretve=0;
-        while(this.stanjeDretve==0){
+        
+        stanjeDretve = 0;//oslobadjam dretvu
+        
+        while (this.stanjeDretve == 0) {//dokle god je slobodna, dretva ceka dok netko ne pozove 
             try {
                 this.wait();
             } catch (InterruptedException ex) {
-                System.out.println("Dretva NASTAVLJA S RADOM!");
+                System.out.println(this.getName() + " | Dretva nastavlja s radom");
             }
         }
 
@@ -114,23 +108,13 @@ public class ObradaZahtjeva extends Thread {
     public void setSocket(Socket server) {
         this.server = server;
     }
-    
-    public int stanjeDretve(){
-        System.out.println(this.getName() +">Stanje dretve: "+this.stanjeDretve);
+
+    public int stanjeDretve() {
         return this.stanjeDretve;
     }
-    
-    public int brojacRada(){
-        System.out.println(this.getName() +">Rad dretve: "+this.brojacRada);
+
+    public int brojacRada() {
         return this.brojacRada;
     }
-
-    @Override
-    public boolean isInterrupted() {
-        System.out.println("PREKINUTA JE DRETVA INTERRPUT!!");
-        return super.isInterrupted(); //To change body of generated methods, choose Tools | Templates.
-    }
-    
-    
 
 }
