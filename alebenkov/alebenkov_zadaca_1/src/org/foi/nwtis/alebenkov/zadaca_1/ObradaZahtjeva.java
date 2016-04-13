@@ -22,7 +22,6 @@ public class ObradaZahtjeva extends Thread {
     @Override
     public void interrupt() {
         stanjeDretve = 1;
-        brojacRada++;
         super.interrupt(); //To change body of generated methods, choose Tools | Templates.
     }
 
@@ -34,13 +33,18 @@ public class ObradaZahtjeva extends Thread {
     }
 
     public synchronized void pokreni() {
+
         stanjeDretve = 1;
-        brojacRada++;
+        this.brojacRada+=1;
         long pocetakRadaDretve = System.currentTimeMillis(); //biljezim pocetak rada dretve
         InputStream is = null;
         OutputStream os = null;
-        System.out.println(this.getName() + " | Pokrecem dretvu koja ce posluziti korisnika. Stanje " + this.getState());
+        System.out.println(this.getName() + " | Pokrecem dretvu koja ce posluziti korisnika.| Brojac rada: "+ this.brojacRada + ". | Stanje dretve: " + this.getState());
 
+        for (int i = 0; i < 50 ; i++) {
+            System.out.println(this.getName() + " | " + i);
+
+        }
         try {
             is = server.getInputStream();
             os = server.getOutputStream();
@@ -80,16 +84,16 @@ public class ObradaZahtjeva extends Thread {
         //po zavrsetku svih poslova dretve, saljem ju na spavanje
         long trajanjeRadaDretve = System.currentTimeMillis() - pocetakRadaDretve;
         try {
-            System.out.println(this.getName() + " | Saljem dretvu na spavanje" );
+            System.out.println(this.getName() + " | Saljem dretvu na spavanje");
             sleep(5000 - trajanjeRadaDretve);
 
             System.out.println(this.getName() + " | Dretva dosla sa spavanja");
         } catch (InterruptedException ex) {
             System.out.println(this.getName() + " | Prekid dretve za vrijeme spavanja");
         }
-        
+
         stanjeDretve = 0;//oslobadjam dretvu
-        
+
         while (this.stanjeDretve == 0) {//dokle god je slobodna, dretva ceka dok netko ne pozove 
             try {
                 this.wait();
