@@ -2,7 +2,7 @@ package org.foi.nwtis.alebenkov.zadaca_1;
 
 import java.io.File;
 import java.io.IOException;
-import java.lang.Thread.State;
+import java.io.OutputStream;
 import java.net.ServerSocket;
 import java.net.Socket;
 import org.foi.nwtis.alebenkov.konfiguracije.Konfiguracija;
@@ -19,6 +19,7 @@ public class ServerSustava {
     private static String datoteka; //konfig datoteka
     private static boolean load = false; //datoteka sa serijaliziranim podacima
     private static boolean zaustavljen = false; //za provjeru stanja servera
+    private Socket klijent;
 
     /**
      *
@@ -74,12 +75,13 @@ public class ServerSustava {
 
         try {
             ServerSocket ss = new ServerSocket(port);
-            //ss.setSoTimeout(1000); //da ne blokira kod citanja do kraja vec 1000
+            //ss.setSoTimeout(10000); //da ne blokira kod citanja do kraja vec 1000
             while (!zaustavljen) {
-                Socket socket = ss.accept();
-                System.out.println("SERVER | Zahtjev primljen, odgovaram...");
+                this.klijent = ss.accept();
+                System.out.println("SERVER | Zahtjev primljen, trazim slobodnu dretvu...");
                 int sd = dajSlobodnuDretvu(dretve);
                 if (sd == -1) {
+                    this.posaljiPorukuKorisniku("ERROR 80: Nema slobodne dretve.");
                     System.out.println("SERVER | ERROR 80: Nema slobodne dretve.");
                 } else {
 
@@ -90,7 +92,7 @@ public class ServerSustava {
                         System.out.println("SERVER | Pokrecem dretvu " + dretve[sd].getName());
                         dretve[sd].start(); //pokrecem prvu slobodnu dretvu
                     }
-                    dretve[sd].setSocket(socket);
+                    dretve[sd].setSocket(this.klijent);
 
                 }
 
@@ -105,6 +107,14 @@ public class ServerSustava {
     private int dajSlobodnuDretvu(ObradaZahtjeva[] dretve) {
         int slobodnaDretvaID = -1;
         int najmanjiBrojac = 9999;
+        //radim posebnu petlju za ispis stanja dretvi kako bi izbjegao komplikacije kod samog izbora
+        for (int i = 0; i < dretve.length; i++) {
+            if (dretve[i].stanjeDretve() == 0) {
+                System.out.println("SERVER | Dretva " + dretve[i].getName() + " je slobodna.");
+            } else if (dretve[i].stanjeDretve() == 1) {
+                System.out.println("SERVER | Dretva " + dretve[i].getName() + " je zauzeta.");
+            }
+        }
         for (int i = 0; i < dretve.length; i++) {
             if (dretve[i].stanjeDretve() == 0 & dretve[i].brojacRada() == 0) {
                 slobodnaDretvaID = i;
@@ -121,6 +131,29 @@ public class ServerSustava {
 
     private void ucitajSerijaliziranuEvidenciju(String datEvid) {
         //TODO napravite sami
+    }
+    
+    private void posaljiPorukuKorisniku (String poruka) throws IOException{
+         OutputStream os = null;
+                    try {
+
+                        os = this.klijent.getOutputStream();
+                        String slanjeNaredbe = "Nema slobodne dretve!";
+
+                        os.write(slanjeNaredbe.getBytes());
+                        os.flush();
+                        this.klijent.shutdownOutput();
+
+                    } finally {
+                        try {
+                            if (os != null) {
+                                os.close();
+                            }
+                        } catch (IOException ex) {
+                            System.out.println(" | GRESKA kod IO operacija 2");
+                        }
+                    }
+        
     }
 
 }

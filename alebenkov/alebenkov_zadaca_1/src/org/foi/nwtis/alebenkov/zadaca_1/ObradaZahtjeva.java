@@ -41,10 +41,6 @@ public class ObradaZahtjeva extends Thread {
         OutputStream os = null;
         System.out.println(this.getName() + " | Pokrecem dretvu koja ce posluziti korisnika.| Brojac rada: "+ this.brojacRada + ". | Stanje dretve: " + this.getState());
 
-        for (int i = 0; i < 50 ; i++) {
-            System.out.println(this.getName() + " | " + i);
-
-        }
         try {
             is = server.getInputStream();
             os = server.getOutputStream();
