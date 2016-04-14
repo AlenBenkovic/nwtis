@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.Socket;
+import org.foi.nwtis.alebenkov.konfiguracije.Konfiguracija;
 
 /**
  *
@@ -14,9 +15,11 @@ public class ObradaZahtjeva extends Thread {
     private Socket server;
     private int stanjeDretve = 0; //0-slobodna, 1-zauzeta
     private int brojacRada = 0; //brojim koliko je puta dretva posluzila klijenta
+    Konfiguracija konfig = null;
 
-    public ObradaZahtjeva(ThreadGroup group, String name) {
+    public ObradaZahtjeva(ThreadGroup group, String name, Konfiguracija konfig) {
         super(group, name);
+        this.konfig = konfig;
     }
 
     @Override
@@ -35,32 +38,35 @@ public class ObradaZahtjeva extends Thread {
     public synchronized void pokreni() {
 
         stanjeDretve = 1;
-        this.brojacRada+=1;
+        this.brojacRada += 1;
         long pocetakRadaDretve = System.currentTimeMillis(); //biljezim pocetak rada dretve
+
         InputStream is = null;
         OutputStream os = null;
-        System.out.println(this.getName() + " | Pokrecem dretvu koja ce posluziti korisnika.| Brojac rada: "+ this.brojacRada + ". | Stanje dretve: " + this.getState());
+        StringBuilder primljenoOdKorisnika = new StringBuilder();
 
         try {
             is = server.getInputStream();
             os = server.getOutputStream();
 
-            String slanjeNaredbe = "SERVER KAZE OK!";
+            String slanjeKorisniku = "SERVER | Primio sam vas zahtjev. Obrada zahtjeva...";
 
-            os.write(slanjeNaredbe.getBytes());
+            os.write(slanjeKorisniku.getBytes());
             os.flush();
             server.shutdownOutput();
 
-            StringBuilder naredba = new StringBuilder();
             while (is.available() > 0) {
                 int znak = is.read();
                 if (znak == -1) {
                     break;
                 }
-                naredba.append((char) znak);
-            }
+                primljenoOdKorisnika.append((char) znak);
 
-            System.out.println(this.getName() + " | Dobivena naredba: " + naredba.toString());
+            }
+            System.out.println("SERVER | Primljena naredba od korisnika: " + primljenoOdKorisnika);
+            if (primljenoOdKorisnika.indexOf("START") != -1) {
+                System.out.println("Pokrecem server...");
+            }
 
         } catch (IOException ex) {
             System.out.println(this.getName() + " | GRESKA kod IO operacija!");
@@ -77,6 +83,9 @@ public class ObradaZahtjeva extends Thread {
                 System.out.println(this.getName() + " | GRESKA kod IO operacija 2");
             }
         }
+
+        System.out.println(this.getName() + " | Pokrecem dretvu koja ce posluziti korisnika.| Brojac rada: " + this.brojacRada + ". | Stanje dretve: " + this.getState());
+
         //po zavrsetku svih poslova dretve, saljem ju na spavanje
         long trajanjeRadaDretve = System.currentTimeMillis() - pocetakRadaDretve;
         try {
@@ -117,4 +126,10 @@ public class ObradaZahtjeva extends Thread {
         return this.brojacRada;
     }
 
+    public boolean provjeraAdmina(String username, String password) {
+        if (username.equals(konfig.dajPostavku("adminKorLozinka")) && password.equals(konfig.dajPostavku("adminKorLozinka"))) {
+            return true;
+        }
+        return false;
+    }
 }

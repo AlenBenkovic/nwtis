@@ -69,7 +69,7 @@ public class ServerSustava {
         ObradaZahtjeva[] dretve = new ObradaZahtjeva[brojDretvi];
 
         for (int i = 0; i < brojDretvi; i++) {
-            dretve[i] = new ObradaZahtjeva(tg, "alebenkov_" + i);
+            dretve[i] = new ObradaZahtjeva(tg, "alebenkov_" + i, konfig);
             System.out.println("SERVER | Kreiram dretvu " + dretve[i].getName() + " " + dretve[i].getState());
         }
 
@@ -81,7 +81,25 @@ public class ServerSustava {
                 System.out.println("SERVER | Zahtjev primljen, trazim slobodnu dretvu...");
                 int sd = dajSlobodnuDretvu(dretve);
                 if (sd == -1) {
-                    this.posaljiPorukuKorisniku("ERROR 80: Nema slobodne dretve.");
+                    OutputStream os = null;
+                    try {
+
+                        os = this.klijent.getOutputStream();
+                        String slanjeNaredbe = "Nema slobodne dretve!";
+
+                        os.write(slanjeNaredbe.getBytes());
+                        os.flush();
+                        this.klijent.shutdownOutput();
+
+                    } finally {
+                        try {
+                            if (os != null) {
+                                os.close();
+                            }
+                        } catch (IOException ex) {
+                            System.out.println(" | GRESKA kod IO operacija 2");
+                        }
+                    }
                     System.out.println("SERVER | ERROR 80: Nema slobodne dretve.");
                 } else {
 
@@ -131,29 +149,6 @@ public class ServerSustava {
 
     private void ucitajSerijaliziranuEvidenciju(String datEvid) {
         //TODO napravite sami
-    }
-    
-    private void posaljiPorukuKorisniku (String poruka) throws IOException{
-         OutputStream os = null;
-                    try {
-
-                        os = this.klijent.getOutputStream();
-                        String slanjeNaredbe = "Nema slobodne dretve!";
-
-                        os.write(slanjeNaredbe.getBytes());
-                        os.flush();
-                        this.klijent.shutdownOutput();
-
-                    } finally {
-                        try {
-                            if (os != null) {
-                                os.close();
-                            }
-                        } catch (IOException ex) {
-                            System.out.println(" | GRESKA kod IO operacija 2");
-                        }
-                    }
-        
     }
 
 }
