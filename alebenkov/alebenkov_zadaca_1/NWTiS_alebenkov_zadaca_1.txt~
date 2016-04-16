@@ -3,7 +3,7 @@
 port=8000
 evidDatoteka=DZ_1_evidencija.bin
 intervalSerijalizacije=60
-adminKorIme=lalaa
+adminKorIme=lala
 adminKorLozinka=1456
 brojDretvi=2
 brojX=2

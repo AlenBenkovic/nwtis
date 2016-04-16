@@ -4,6 +4,8 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.Socket;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 import org.foi.nwtis.alebenkov.konfiguracije.Konfiguracija;
 
 /**
@@ -16,6 +18,10 @@ public class ObradaZahtjeva extends Thread {
     private int stanjeDretve = 0; //0-slobodna, 1-zauzeta
     private int brojacRada = 0; //brojim koliko je puta dretva posluzila klijenta
     Konfiguracija konfig = null;
+    private String adminRegex = "^USER ([a-zA-Z0-9_]+)\\; PASSWD ([a-zA-Z0-9_]+)\\; (START|STOP|PAUSE|STAT|NEW)\\; *$";
+    private Pattern p;
+    private Matcher m;
+    private boolean status;
 
     public ObradaZahtjeva(ThreadGroup group, String name, Konfiguracija konfig) {
         super(group, name);
@@ -36,7 +42,6 @@ public class ObradaZahtjeva extends Thread {
     }
 
     public synchronized void pokreni() {
-
         stanjeDretve = 1;
         this.brojacRada += 1;
         long pocetakRadaDretve = System.currentTimeMillis(); //biljezim pocetak rada dretve
@@ -44,16 +49,11 @@ public class ObradaZahtjeva extends Thread {
         InputStream is = null;
         OutputStream os = null;
         StringBuilder primljenoOdKorisnika = new StringBuilder();
+        String slanjeKorisniku = null;
 
         try {
             is = server.getInputStream();
             os = server.getOutputStream();
-
-            String slanjeKorisniku = "SERVER | Primio sam vas zahtjev. Obrada zahtjeva...";
-
-            os.write(slanjeKorisniku.getBytes());
-            os.flush();
-            server.shutdownOutput();
 
             while (is.available() > 0) {
                 int znak = is.read();
@@ -64,8 +64,26 @@ public class ObradaZahtjeva extends Thread {
 
             }
             System.out.println("SERVER | Primljena naredba od korisnika: " + primljenoOdKorisnika);
-            if (primljenoOdKorisnika.indexOf("START") != -1) {
-                System.out.println("Pokrecem server...");
+            if (primljenoOdKorisnika.indexOf("PASSWD") != -1) { //ako sadrži password znaic da se radi o adminu
+                p = Pattern.compile(adminRegex);
+                m = p.matcher(primljenoOdKorisnika);
+                status = m.matches(); //1-korisnik, 2-lozinka, 3-naredba
+                if (status) {
+                    System.out.println("SERVER | Primio sam adminov zahtjev. Provjeravam njegove podatke...");
+                     slanjeKorisniku = "Pozdrav, " + m.group(1);
+                    if (provjeraAdmina(m.group(1), m.group(2))) {
+                        slanjeKorisniku = "SERVER | Vasi podaci su OK!";
+                    } else {
+                        slanjeKorisniku = "SERVER | Neispravni korisnicki podaci za prijavu!";
+                    }
+                } else {
+                    slanjeKorisniku = "ERROR: Neispravna naredba.";
+                }
+                os.write(slanjeKorisniku.getBytes());
+                os.flush();
+                server.shutdownOutput();
+            } else if (primljenoOdKorisnika.indexOf("-user") != -1) {
+                System.out.println("SERVER | Primam podatke od korisnika.");
             }
 
         } catch (IOException ex) {
@@ -127,7 +145,7 @@ public class ObradaZahtjeva extends Thread {
     }
 
     public boolean provjeraAdmina(String username, String password) {
-        if (username.equals(konfig.dajPostavku("adminKorLozinka")) && password.equals(konfig.dajPostavku("adminKorLozinka"))) {
+        if (username.equals(konfig.dajPostavku("adminKorIme")) && password.equals(konfig.dajPostavku("adminKorLozinka"))) {
             return true;
         }
         return false;
