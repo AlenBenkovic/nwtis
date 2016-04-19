@@ -70,22 +70,47 @@ public class ObradaZahtjeva extends Thread {
                 status = m.matches(); //1-korisnik, 2-lozinka, 3-naredba
                 if (status) {
                     System.out.println("SERVER | Primio sam adminov zahtjev. Provjeravam njegove podatke...");
-                     slanjeKorisniku = "Pozdrav, " + m.group(1);
                     if (provjeraAdmina(m.group(1), m.group(2))) {
-                        slanjeKorisniku = "SERVER | Vasi podaci su OK!";
+                        slanjeKorisniku = "Pozdrav, " + m.group(1) + "\n";
+                        os.write(slanjeKorisniku.getBytes());
+                        os.flush();
+                        if (primljenoOdKorisnika.indexOf("PAUSE") != -1) {
+                            if (!ServerSustava.provjeraPauziran()) {
+                                ServerSustava.pauziraj(true);
+                                slanjeKorisniku = "SERVER | OK\n";
+                            } else {
+                                slanjeKorisniku = "SERVER | ERROR 01: Server je vec pauziran.\n";
+                            }
+                            os.write(slanjeKorisniku.getBytes());
+                            os.flush();
+                        } else if (primljenoOdKorisnika.indexOf("START") != -1) {
+                            if (ServerSustava.provjeraPauziran()) {
+                                ServerSustava.pauziraj(false);
+                                slanjeKorisniku = "SERVER | OK\n";
+                            } else {
+                                slanjeKorisniku = "SERVER | ERROR 02: Server je vec pokrenut.\n";
+                            }
+                            os.write(slanjeKorisniku.getBytes());
+                            os.flush();
+                        }
                     } else {
-                        slanjeKorisniku = "SERVER | Neispravni korisnicki podaci za prijavu!";
+                        slanjeKorisniku = "SERVER | ERROR 00: Neispravno korisniko ime ili lozinka.\n";
+                        os.write(slanjeKorisniku.getBytes());
+                        os.flush();
                     }
                 } else {
-                    slanjeKorisniku = "ERROR: Neispravna naredba.";
+                    slanjeKorisniku = "SERVER | ERROR: Neispravni format naredbe.\n";
+                    os.write(slanjeKorisniku.getBytes());
+                    os.flush();
                 }
+                //tu je bilo kraj zapisa
+
+            } else if (ServerSustava.provjeraPauziran()) {
+                slanjeKorisniku = "SERVER | ERROR: Server je pauziran i ne prima nove naredbe.\n";
                 os.write(slanjeKorisniku.getBytes());
                 os.flush();
-                server.shutdownOutput();
-            } else if (primljenoOdKorisnika.indexOf("-user") != -1) {
-                System.out.println("SERVER | Primam podatke od korisnika.");
             }
-
+            server.shutdownOutput();
         } catch (IOException ex) {
             System.out.println(this.getName() + " | GRESKA kod IO operacija!");
         } finally {

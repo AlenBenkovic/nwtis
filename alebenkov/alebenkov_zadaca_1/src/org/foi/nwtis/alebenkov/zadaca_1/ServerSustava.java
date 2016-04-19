@@ -19,6 +19,7 @@ public class ServerSustava {
     private static String datoteka; //konfig datoteka
     private static boolean load = false; //datoteka sa serijaliziranim podacima
     private static boolean zaustavljen = false; //za provjeru stanja servera
+    private static boolean pauziran = false;
     private Socket klijent;
 
     /**
@@ -149,6 +150,14 @@ public class ServerSustava {
 
     private void ucitajSerijaliziranuEvidenciju(String datEvid) {
         //TODO napravite sami
+    }
+    
+    public static boolean provjeraPauziran() {
+        return pauziran;
+    }
+    
+     public static synchronized void pauziraj(boolean pauziran) {
+        ServerSustava.pauziran = pauziran;
     }
 
 }
