@@ -55,7 +55,7 @@ public class AdministratorSustava {
                 odgovor.append((char) character);
             }
             
-            System.out.println("ADMIN | Odgovor sa servera: " + odgovor);
+            System.out.println(odgovor);
         } catch (IOException ex) {
             System.out.println("ADMIN | Ne mogu se spojiti sa serverom. Prekidam.");
         } finally {

@@ -7,8 +7,8 @@ import java.util.Arrays;
  */
 public class potapanjeBrodova {
 
-    private final int brojX;
-    private final int brojY;
+    private final int brojX;//velicina ploce
+    private final int brojY;//velicina ploce
     private final int brojIgraca;
     private final int brojBrodova;
     private final int[][] poljeBrodova;
@@ -62,6 +62,8 @@ public class potapanjeBrodova {
             return false;
         }
     }
+    
+    
     
 
 }

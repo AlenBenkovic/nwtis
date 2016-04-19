@@ -64,14 +64,14 @@ public class ObradaZahtjeva extends Thread {
 
             }
             System.out.println("SERVER | Primljena naredba od korisnika: " + primljenoOdKorisnika);
-            if (primljenoOdKorisnika.indexOf("PASSWD") != -1) { //ako sadrži password znaic da se radi o adminu
+            if (primljenoOdKorisnika.indexOf("PASSWD") != -1) { //OBRADA ADMIN ZAHTJEVA
                 p = Pattern.compile(adminRegex);
                 m = p.matcher(primljenoOdKorisnika);
                 status = m.matches(); //1-korisnik, 2-lozinka, 3-naredba
                 if (status) {
                     System.out.println("SERVER | Primio sam adminov zahtjev. Provjeravam njegove podatke...");
                     if (provjeraAdmina(m.group(1), m.group(2))) {
-                        slanjeKorisniku = "Pozdrav, " + m.group(1) + "\n";
+                        slanjeKorisniku = "SERVER | Pozdrav, " + m.group(1) + "\n";
                         os.write(slanjeKorisniku.getBytes());
                         os.flush();
                         if (primljenoOdKorisnika.indexOf("PAUSE") != -1) {
@@ -81,8 +81,7 @@ public class ObradaZahtjeva extends Thread {
                             } else {
                                 slanjeKorisniku = "SERVER | ERROR 01: Server je vec pauziran.\n";
                             }
-                            os.write(slanjeKorisniku.getBytes());
-                            os.flush();
+
                         } else if (primljenoOdKorisnika.indexOf("START") != -1) {
                             if (ServerSustava.provjeraPauziran()) {
                                 ServerSustava.pauziraj(false);
@@ -90,26 +89,27 @@ public class ObradaZahtjeva extends Thread {
                             } else {
                                 slanjeKorisniku = "SERVER | ERROR 02: Server je vec pokrenut.\n";
                             }
-                            os.write(slanjeKorisniku.getBytes());
-                            os.flush();
+
+                        } else if (primljenoOdKorisnika.indexOf("NEW") != -1) {
+                            int brojIgraca = Integer.parseInt(konfig.dajPostavku("brojIgraca"));
+                            potapanjeBrodova igra = new potapanjeBrodova(brojIgraca);
+                            igra.kreirajBrodove();
+                            //igra.pogodiBrod(2, 0, 0);
+                            slanjeKorisniku = "SERVER | OK\n";
                         }
                     } else {
                         slanjeKorisniku = "SERVER | ERROR 00: Neispravno korisniko ime ili lozinka.\n";
-                        os.write(slanjeKorisniku.getBytes());
-                        os.flush();
+
                     }
                 } else {
                     slanjeKorisniku = "SERVER | ERROR: Neispravni format naredbe.\n";
-                    os.write(slanjeKorisniku.getBytes());
-                    os.flush();
                 }
-                //tu je bilo kraj zapisa
 
             } else if (ServerSustava.provjeraPauziran()) {
                 slanjeKorisniku = "SERVER | ERROR: Server je pauziran i ne prima nove naredbe.\n";
-                os.write(slanjeKorisniku.getBytes());
-                os.flush();
             }
+            os.write(slanjeKorisniku.getBytes());
+            os.flush();
             server.shutdownOutput();
         } catch (IOException ex) {
             System.out.println(this.getName() + " | GRESKA kod IO operacija!");

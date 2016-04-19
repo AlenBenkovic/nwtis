@@ -53,10 +53,7 @@ public class ServerSustava {
             }
         }
         if (this.load == false) { //ako ne postoji zapis o staroj igri kreiram novu
-            int brojIgraca = Integer.parseInt(konfig.dajPostavku("brojIgraca"));
-            potapanjeBrodova igra = new potapanjeBrodova(brojIgraca);
-            igra.kreirajBrodove();
-            igra.pogodiBrod(2, 0, 0);
+            System.out.println("Potapanje brodova v.0.0.1");
         } else { //ako postoji stara igra ucitavam nju
             System.out.println("SERVER | Ucitavam staru igru...");
         }
