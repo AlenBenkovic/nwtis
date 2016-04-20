@@ -10,8 +10,10 @@ public class potapanjeBrodova {
     private final int brojX;//velicina ploce
     private final int brojY;//velicina ploce
     private final int brojIgraca;
+    private int trenutniBrojIgraca = 0;
     private final int brojBrodova;
     private final int[][] poljeBrodova;
+    private final int idIgre = 1 + (int) (Math.random() * ((100 - 1) + 1));
 
     public potapanjeBrodova(int brojIgraca) {
         this.brojX = 3 + (int) (Math.random() * ((10 - 3) + 1)); //http://stackoverflow.com/questions/363681/generating-random-integers-in-a-specific-range;
@@ -20,7 +22,7 @@ public class potapanjeBrodova {
         this.brojIgraca = brojIgraca;
         this.poljeBrodova = new int[brojX][brojY];
     }
-    
+
     public potapanjeBrodova(int x, int y, int brojIgraca, int brojBrodova) {
         this.brojX = x;
         this.brojY = y;
@@ -50,11 +52,10 @@ public class potapanjeBrodova {
     }
 
     public boolean pogodiBrod(int idIgraca, int x, int y) {
-        if (this.brojX<=x | this.brojY<=y){
+        if (this.brojX <= x | this.brojY <= y) {
             System.out.println("Neispravne koordinate!");
             return false;
-        }
-        else if (this.poljeBrodova[x][y] == idIgraca) {
+        } else if (this.poljeBrodova[x][y] == idIgraca) {
             System.out.println("POGODAK!");
             return true;
         } else {
@@ -64,6 +65,30 @@ public class potapanjeBrodova {
     }
     
     
+    public boolean provjeraSlobodnihMjesta(){
+        if (trenutniBrojIgraca < brojIgraca){
+            return true;
+        } else return false;
+    }
     
+    public int dohvatiIdIgre(){
+        return this.idIgre;
+    }
+
+    public class igrac {
+
+        String ime;
+        int id;
+        int idIgre = dohvatiIdIgre();
+
+        public igrac(String ime) {
+            this.ime = ime;
+            if (trenutniBrojIgraca < brojIgraca) {
+                id = trenutniBrojIgraca + 1;
+                trenutniBrojIgraca = this.id;
+            }
+
+        }
+    }
 
 }

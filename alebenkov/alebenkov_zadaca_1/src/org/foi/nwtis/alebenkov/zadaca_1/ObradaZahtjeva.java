@@ -19,6 +19,7 @@ public class ObradaZahtjeva extends Thread {
     private int brojacRada = 0; //brojim koliko je puta dretva posluzila klijenta
     Konfiguracija konfig = null;
     private String adminRegex = "^USER ([a-zA-Z0-9_]+)\\; PASSWD ([a-zA-Z0-9_]+)\\; (START|STOP|PAUSE|STAT|NEW)\\; *$";
+    private String userRegex = "napravi ovo!!";
     private Pattern p;
     private Matcher m;
     private boolean status;
@@ -42,6 +43,8 @@ public class ObradaZahtjeva extends Thread {
     }
 
     public synchronized void pokreni() {
+        int brojIgraca = Integer.parseInt(konfig.dajPostavku("brojIgraca"));
+        potapanjeBrodova igra = new potapanjeBrodova(brojIgraca);
         stanjeDretve = 1;
         this.brojacRada += 1;
         long pocetakRadaDretve = System.currentTimeMillis(); //biljezim pocetak rada dretve
@@ -64,7 +67,9 @@ public class ObradaZahtjeva extends Thread {
 
             }
             System.out.println("SERVER | Primljena naredba od korisnika: " + primljenoOdKorisnika);
-            if (primljenoOdKorisnika.indexOf("PASSWD") != -1) { //OBRADA ADMIN ZAHTJEVA
+            if (primljenoOdKorisnika.toString().isEmpty()) {
+                slanjeKorisniku = "SERVER | ERROR: Nisam zaprimio nikakvu naredbu.\n";
+            } else if (primljenoOdKorisnika.indexOf("PASSWD") != -1) { //OBRADA ADMIN ZAHTJEVA
                 p = Pattern.compile(adminRegex);
                 m = p.matcher(primljenoOdKorisnika);
                 status = m.matches(); //1-korisnik, 2-lozinka, 3-naredba
@@ -91,10 +96,8 @@ public class ObradaZahtjeva extends Thread {
                             }
 
                         } else if (primljenoOdKorisnika.indexOf("NEW") != -1) {
-                            int brojIgraca = Integer.parseInt(konfig.dajPostavku("brojIgraca"));
-                            potapanjeBrodova igra = new potapanjeBrodova(brojIgraca);
+
                             igra.kreirajBrodove();
-                            //igra.pogodiBrod(2, 0, 0);
                             slanjeKorisniku = "SERVER | OK\n";
                         }
                     } else {
@@ -105,6 +108,24 @@ public class ObradaZahtjeva extends Thread {
                     slanjeKorisniku = "SERVER | ERROR: Neispravni format naredbe.\n";
                 }
 
+            } else if (primljenoOdKorisnika.indexOf("USER") != -1) {
+                p = Pattern.compile(userRegex);
+                m = p.matcher(primljenoOdKorisnika);
+                status = m.matches(); //1-korisnik, 2-lozinka, 3-naredba
+                if (status) {
+                    if (primljenoOdKorisnika.indexOf("PLAY") != -1) {
+                        if (igra.provjeraSlobodnihMjesta()) {
+                            potapanjeBrodova.igrac igrac = igra.new igrac("Ivana");//SREDI OVO
+                        } else {
+                            slanjeKorisniku = "SERVER | ERROR10: Nema slobodnih mjesta za igru.\n";
+                        }
+                    } else if (primljenoOdKorisnika.indexOf("[") != -1) {
+                        igra.pogodiBrod(2, 0, 0); //SREDI OVO
+
+                    } else if (primljenoOdKorisnika.indexOf("STAT") != -1) {
+
+                    }
+                }
             } else if (ServerSustava.provjeraPauziran()) {
                 slanjeKorisniku = "SERVER | ERROR: Server je pauziran i ne prima nove naredbe.\n";
             }
