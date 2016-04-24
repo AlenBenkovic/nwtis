@@ -49,7 +49,7 @@ public class Zadaca_alebenkov_1 {
                 break;
             case "-admin":
                 System.out.println("Admin trazis...");
-                String rAdmin = "^-admin -s (\\d{1,3}\\.\\d{1,3}\\.\\d{1,3}\\.\\d{1,3}) -port ([8-9]\\d{3}) -u ([a-zA-Z0-9_]+) -p ([a-zA-Z0-9_]+) (|PAUSE|START|STOP|STAT|NEW) *$";
+                String rAdmin = "^-admin -s ([^\\s]+) -port (|[8-9]\\d{3}|localhost) -u ([a-zA-Z0-9_]+) -p ([a-zA-Z0-9_]+) (-(|pause|start|stop|stat|new)) *$";
                 p = Pattern.compile(rAdmin);
                 m = p.matcher(naredba);
                 status = m.matches();
