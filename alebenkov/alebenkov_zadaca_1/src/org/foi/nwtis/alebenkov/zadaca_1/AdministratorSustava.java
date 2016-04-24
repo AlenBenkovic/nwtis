@@ -33,7 +33,7 @@ public class AdministratorSustava {
     }
 
     public void pokreniAdminSustava() {
-        System.out.println("Pokrecem administratora s naredbama: " + server + ":" + port + " Korisnik:" + korisnik + " pass: " + lozinka + " " + naredba);
+        System.out.println("Pokrecem administratora s naredbama: " + server + ":" + port + " Korisnik:" + korisnik + " pass: " + lozinka + " " + naredba.toUpperCase());
         Socket admin = null;
         InputStream is = null;
         OutputStream os = null;
