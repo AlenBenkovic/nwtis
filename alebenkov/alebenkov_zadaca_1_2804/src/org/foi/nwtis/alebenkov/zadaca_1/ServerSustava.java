@@ -52,11 +52,11 @@ public class ServerSustava {
                 System.out.println("Greska prilikom preuzimanja konfiguracije " + ex.getMessage());
             }
         }
-        /*if (this.load == false) { //ako ne postoji zapis o staroj igri kreiram novu
+        if (this.load == false) { //ako ne postoji zapis o staroj igri kreiram novu
             System.out.println("Potapanje brodova v.0.0.1");
         } else { //ako postoji stara igra ucitavam nju
             System.out.println("SERVER | Ucitavam staru igru...");
-        }*/
+        }
 
         int brojDretvi = Integer.parseInt(konfig.dajPostavku("brojDretvi"));
         int port = Integer.parseInt(konfig.dajPostavku("port"));
