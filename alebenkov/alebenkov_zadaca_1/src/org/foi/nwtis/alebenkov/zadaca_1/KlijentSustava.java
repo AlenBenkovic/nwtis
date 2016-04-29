@@ -6,6 +6,7 @@ import java.io.OutputStream;
 import java.net.Socket;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import java.util.regex.Matcher;
 
 /**
  *
@@ -15,11 +16,22 @@ public class KlijentSustava {
 
     private int port;
     private String serverIP;
+    private String korisnik;
+    private int x;
+    private int y;
+    //private String rUser = "^-user -s (\\d{1,3}\\.\\d{1,3}\\.\\d{1,3}\\.\\d{1,3}) -port ([8-9]\\d{3}) -u ([a-zA-Z0-9_]+) (\\[(\\d+)\\,(\\d+)\\]|-stat)";
+    private boolean stat = false; //ukoliko se koristi konstruktor bez koordinata stavljam na true
 
-    public KlijentSustava(String server, int port) {
+    public KlijentSustava(String server, int port, String korisnik, boolean stat) {
+        System.out.println("SA NAREDBOM STAT");
         this.port = port;
         this.serverIP = server;
-
+        this.korisnik = korisnik;
+        this.stat = stat; 
+    }
+    
+    public KlijentSustava(Matcher m) {
+        
     }
 
     public void PokreniKlijentSustava() {
@@ -27,6 +39,7 @@ public class KlijentSustava {
         Socket server = null;
         InputStream is = null;
         OutputStream os = null;
+        String command;
         StringBuilder response;
         int character;
         try {
@@ -35,7 +48,12 @@ public class KlijentSustava {
             is = server.getInputStream();
             os = server.getOutputStream();
 
-            String command = "USER Lala; [4,2];";
+            if(stat){
+                command = "USER Lala; STAT;";
+            } else {
+                command = "USER Lala; ["+x+","+y+"];";
+            }
+            
 
             os.write(command.getBytes());
             os.flush();

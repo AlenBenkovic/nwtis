@@ -73,22 +73,15 @@ public class Zadaca_alebenkov_1 {
                 break;
             case "-user":
                 System.out.println("User trazis...");
-                String rUser = "^-user -s (\\d{1,3}\\.\\d{1,3}\\.\\d{1,3}\\.\\d{1,3}) -port ([8-9]\\d{3})";
+                //regexr.com
+                String rUser = "^-user -s ([^\\s]+) -port ([8-9]\\d{3}) -u ([a-zA-Z0-9_]+)( -x ((100)|[1-9]\\d?) -y ((100)|[1-9]\\d?)| -stat)?";
                 p = Pattern.compile(rUser);
                 m = p.matcher(naredba);
                 status = m.matches();
                 if (status) {
-                    int port = Integer.parseInt(m.group(2));
-                    String server = m.group(1);
-                    try {
-                        KlijentSustava klijent = new KlijentSustava(server, port);
-                        klijent.PokreniKlijentSustava();
-                    } catch (Exception ex) {
-                        System.out.println("Greska na serveru: " + ex.getMessage());
-                    }
+                    //
                 } else {
                     System.out.println("Neispravni argumenti");
-                    return;
                 }
 
                 break;
