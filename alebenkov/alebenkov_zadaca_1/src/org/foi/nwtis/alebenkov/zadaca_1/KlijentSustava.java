@@ -35,7 +35,7 @@ public class KlijentSustava {
             is = server.getInputStream();
             os = server.getOutputStream();
 
-            String command = "USER Lala; PLAY;";
+            String command = "USER Lala; [4,2];";
 
             os.write(command.getBytes());
             os.flush();

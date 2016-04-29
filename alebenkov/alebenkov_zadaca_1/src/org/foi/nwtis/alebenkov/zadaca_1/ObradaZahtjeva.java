@@ -73,6 +73,7 @@ public class ObradaZahtjeva extends Thread {
             if (naredba.toString().isEmpty()) {//ukoliko kojim slucajem nisam primio naredbu..
                 out.write("SERVER | ERROR: Nisam zaprimio nikakvu naredbu.\n");
             } else if (naredba.indexOf("PASSWD") != -1) { //ako jesam provjeravam radi li se o adminu i radim obradu admin naredbi
+                //LOGIKA ADMIN
                 p = Pattern.compile(adminRegex);
                 m = p.matcher(naredba);
                 status = m.matches(); //1-korisnik, 2-lozinka, 3-naredba
@@ -80,24 +81,27 @@ public class ObradaZahtjeva extends Thread {
                     System.out.println("SERVER | Primio sam adminov zahtjev. Provjeravam njegove podatke...");
                     if (provjeraAdmina(m.group(1), m.group(2))) {//provjeravam adminove podatke i ako je sve ok nastavljam s obradom
                         out.write("SERVER | Pozdrav, " + m.group(1) + "\n");
-                        
-                        if(naredba.indexOf("PAUSE") != -1){
-                            if(!ServerSustava.provjeraPauziran()){
+
+                        if (naredba.indexOf("PAUSE") != -1) {
+                            if (!ServerSustava.provjeraPauziran()) {
                                 ServerSustava.pauziraj(true);
                                 out.write("SERVER | OK\n");
                             } else {
                                 out.write("SERVER | ERROR 01: Server je vec pauziran.\n");
                             }
-                        } else if (naredba.indexOf("START") != -1){
-                            if(ServerSustava.provjeraPauziran()){
+                        } else if (naredba.indexOf("START") != -1) {
+                            if (ServerSustava.provjeraPauziran()) {
                                 ServerSustava.pauziraj(false);
                                 out.write("SERVER | OK\n");
                             } else {
                                 out.write("SERVER | ERROR 02: Server je vec pokrenut.\n");
-                            }  
+                            }
                         } else if (naredba.indexOf("NEW") != -1) {
                             igra.kreirajBrodove();
                             out.write("SERVER | OK\n");
+                        } else if (naredba.indexOf("STAT") != -1) {
+                            //implementiraj ovo!
+                            out.write("SERVER | Not implemented yet!\n");
                         }
                     } else {
                         out.write("SERVER | ERROR 00: Neispravno korisnicko ime ili lozinka.\n");
@@ -105,17 +109,29 @@ public class ObradaZahtjeva extends Thread {
                 } else {
                     out.write("SERVER | ERROR: Neispravni format naredbe.\n");
                 }
-            } else if (ServerSustava.provjeraPauziran()){//ukoliko se ne radi o admin korisniku, provjeravam je li server pauziran
+                //KRAJ LOGIKE ADMINA
+            } else if (ServerSustava.provjeraPauziran()) {//ukoliko se ne radi o admin korisniku, provjeravam je li server pauziran
                 out.write("SERVER | ERROR: Server je pauziran i ne prima nove naredbe.\n");
-            } else if (naredba.indexOf("USER") != -1){
-                out.write("User is not implemented yet!");
+            } else if (naredba.indexOf("USER") != -1) {
+                out.write("USER is not implemented yet!");
+                //LOGIKA USERA
+                if(naredba.indexOf("PLAY") != -1){
+                    out.write("PLAY option is not implemented yet! |USER\n");
+                } else if (naredba.indexOf("[") != -1){
+                    out.write("[] option is not implemented yet! |USER\n");
+                } else if (naredba.indexOf("STAT") != -1){
+                    out.write("STAT option is not implemented yet! |USER\n");
+                } else {
+                    out.write("SERVER | ERROR: Neispravni format naredbe.\n");
+                }
+                //KRAJ LOGIKE USERA
             }
 
             out.flush();
             server.shutdownOutput();
 
         } catch (IOException ex) {
-            System.out.println("ERROR 01 | IOException: "+ ex.getMessage());
+            System.out.println("ERROR 01 | IOException: " + ex.getMessage());
         } finally {
             try {
                 if (in != null) {
@@ -128,7 +144,7 @@ public class ObradaZahtjeva extends Thread {
                     server.close();
                 }
             } catch (IOException ex) {
-                System.out.println("ERROR 02 | IOException: "+ ex.getMessage());
+                System.out.println("ERROR 02 | IOException: " + ex.getMessage());
             }
         }
 
