@@ -99,8 +99,8 @@ public class ObradaZahtjeva extends Thread {
                             igra.kreirajBrodove();
                             out.write("SERVER | OK\n");
                         } else if (naredba.indexOf("STAT") != -1) {
-                            //implementiraj ovo!
                             out.write("SERVER | Not implemented yet!\n");
+                            igra.prikazSvihBrodova();
                         }
                     } else {
                         out.write("SERVER | ERROR 00: Neispravno korisnicko ime ili lozinka.\n");
@@ -140,14 +140,18 @@ public class ObradaZahtjeva extends Thread {
                         int idIgraca = igra.dohvatiIdIgraca(ime);
                         if (idIgraca == -1) {
                             out.write("SERVER | Niste prijavljeni za igranje!");
-                        } else if (igra.brojBrodovaIgraca(idIgraca)==0) {//ako nema vise brodova 
+                        } else if (igra.brojBrodovaIgraca(idIgraca) == 0) {//ako nema vise brodova 
                             out.write("SERVER | OK 3");
+                        } else if (igra.neprijateljiUnisteni(idIgraca)) {
+                            out.write("SERVER | OK 9");
                         } else if ((igra.brojPotezaIgraca(idIgraca) - igra.minBrojPoteza()) == 0) {
                             igra.povecajBrojPoteza(idIgraca);
                             if (igra.pogodiBrod(idIgraca, x - 1, y - 1)) {
                                 out.write("SERVER | OK 1");
                                 igra.povecajBrojPogodaka(idIgraca);
                                 int idPogedjenogProtovnika = igra.vrijednostPolja(x - 1, y - 1); //u samom polju se nalazi ID igraca ciji je broj pogodjen
+                                igra.potopiBrod(x - 1, y - 1);
+                                System.out.println("ID POGODJENOG: " + idPogedjenogProtovnika);
                                 igra.smanjiBrojBrodova(idPogedjenogProtovnika); //odma smanjujem broj brodova pogodjenog igraca
                             } else {
                                 out.write("SERVER | OK 0");

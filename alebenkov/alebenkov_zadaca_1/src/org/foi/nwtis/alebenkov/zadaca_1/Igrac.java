@@ -53,7 +53,7 @@ public class Igrac {
     }
     
     public void smanjiBrojBrodova(){
-        this.brojBrodova-=1;
+        this.brojBrodova = this.brojBrodova-1;
     }
     
     public int dohvatiBrojPogodaka(){

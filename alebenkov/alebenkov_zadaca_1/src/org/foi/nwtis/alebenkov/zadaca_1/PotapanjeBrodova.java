@@ -49,17 +49,21 @@ public class PotapanjeBrodova {
         }
         System.out.println("Polje brodova: " + Arrays.deepToString(this.poljeBrodova));
     }
+    
 
     public boolean pogodiBrod(int idIgraca, int x, int y) {
         if (this.brojX <= x | this.brojY <= y) {
             System.out.println("Neispravne koordinate!");
             return false;
         } else if (this.poljeBrodova[x][y] != idIgraca & this.poljeBrodova[x][y] != 0) {
-            this.poljeBrodova[x][y] = 0;
             return true;
         } else {
             return false;
         }
+    }
+
+    public void potopiBrod(int x, int y) {//ovo mi sluzi samo kako bi mogao pokupiti id igraca ciji je brod prethodno pogodjen
+        this.poljeBrodova[x][y] = 0;
     }
 
     public int vrijednostPolja(int x, int y) {
@@ -151,6 +155,19 @@ public class PotapanjeBrodova {
         }
     }
 
+    
+    public int pobjednik(){
+        int pobjednikID=-1;
+        int maxBrojPogodaka=-1;
+        for (int i = 0; i < trenutniBrojIgraca; i++) {
+            if (igraci[i].dohvatiBrojPogodaka()>maxBrojPogodaka) {
+                maxBrojPogodaka = igraci[i].dohvatiBrojPogodaka();
+                pobjednikID = i+1;
+            }
+        }
+        return pobjednikID;
+    }
+
     public void smanjiBrojBrodova(int id) {
         for (int i = 0; i < trenutniBrojIgraca; i++) {
             if (igraci[i].dohvatiId() == id) {
@@ -164,8 +181,8 @@ public class PotapanjeBrodova {
         for (int i = 0; i < trenutniBrojIgraca; i++) {
             if (igraci[i].dohvatiId() == id) {
                 int igracPoteza = igraci[i].dohvatiBrojPoteza();
-                for (int j = 0; i < trenutniBrojIgraca; i++) {
-                    if (igraci[i].dohvatiBrojPoteza() < igracPoteza) {
+                for (int j = 0; j < trenutniBrojIgraca; j++) {
+                    if (igraci[j].dohvatiBrojPoteza() < igracPoteza) {
                         brojIgraca++;
                     }
                 }
@@ -182,6 +199,22 @@ public class PotapanjeBrodova {
             }
         }
         return brojBrodova;
+    }
+    
+     public boolean neprijateljiUnisteni(int id) {
+        boolean neprijateljiUnisteni = false;
+        for (int i = 0; i < trenutniBrojIgraca; i++) {
+            if (igraci[i].dohvatiId() != id) {
+                if(igraci[i].dohvatiBrojBrodova()>0){
+                    neprijateljiUnisteni = false;
+                } else neprijateljiUnisteni = true;
+            }
+        }
+        return neprijateljiUnisteni;
+    }
+
+    public void prikazSvihBrodova() {
+        System.out.println("Polje brodova: " + Arrays.deepToString(this.poljeBrodova));
     }
 
 }
