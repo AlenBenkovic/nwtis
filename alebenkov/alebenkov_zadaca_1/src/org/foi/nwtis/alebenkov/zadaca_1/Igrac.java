@@ -11,24 +11,53 @@ import java.util.UUID;
  *
  * @author abenkovic
  */
-
 public class Igrac {
 
     private String ime;
     private int idIgraca;
     private UUID idIgre;
+    private int brojPoteza = 0;
+    private int brojPogodaka = 0;
+    private int brojBrodova = 0;
 
-    public Igrac(String ime, int idIgraca, UUID idIgre) {
+    public Igrac(String ime, int idIgraca, UUID idIgre, int brojBrodova) {
         this.ime = ime;
         this.idIgraca = idIgraca;
         this.idIgre = idIgre;
-        System.out.println("SERVER | Kreiram igraca: "+ ime + " |ID: " + this.idIgraca + " |ID IGRE: "+ this.idIgre);
+        this.brojBrodova = brojBrodova;
+        System.out.println("SERVER | Kreiram igraca: " + ime + " |ID: " + this.idIgraca + " |ID IGRE: " + this.idIgre);
     }
-    
-    public String dajIme(){
+
+    public String dajIme() {
         return ime;
     }
+
+    public int dohvatiId() {
+        return idIgraca;
+    }
+
+    public void povecajBrojPoteza() {
+        brojPoteza += 1;
+    }
+
+    public void povecajBrojPogodaka() {
+        brojPogodaka += 1;
+    }
+
+    public int dohvatiBrojPoteza() {
+        return brojPoteza;
+    }
     
+    public int dohvatiBrojBrodova(){
+        return brojBrodova;
+    }
     
+    public void smanjiBrojBrodova(){
+        this.brojBrodova-=1;
+    }
+    
+    public int dohvatiBrojPogodaka(){
+        return brojPogodaka;
+    }
 
 }

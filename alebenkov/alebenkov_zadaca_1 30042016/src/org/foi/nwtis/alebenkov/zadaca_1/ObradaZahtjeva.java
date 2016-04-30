@@ -48,7 +48,7 @@ public class ObradaZahtjeva extends Thread {
         stanjeDretve = 1;
         this.brojacRada += 1;
         long pocetakRadaDretve = System.currentTimeMillis(); //biljezim pocetak rada dretve
-
+       
         System.out.println(this.getName() + " | Pokrecem dretvu koja ce posluziti korisnika.| Brojac rada: " + this.brojacRada + ". | Stanje dretve: " + this.getState());
 
         //GLAVNA LOGIKA
@@ -115,11 +115,8 @@ public class ObradaZahtjeva extends Thread {
                 //LOGIKA USERA
                 if (naredba.indexOf("PLAY") != -1) {
                     out.write("PLAY option is not implemented yet! |USER\n");
-                    Matcher mIme = provjeraUser(naredba, 1);
-                    if (mIme == null) {
-                        out.write("Parametri ne odgovaraju! |USER\n");
-                    } else if (igra.provjeraSlobodnihMjesta()) {
-                        if (igra.igracPrijava(mIme.group(1))) {
+                    if (igra.provjeraSlobodnihMjesta()) {
+                        if(igra.igracPrijava("Ivana")){
                             out.write("Uspjesno ste prijavljeni!");
                         } else {
                             out.write("Igrac sa istim imenom vec postoji!");
@@ -127,40 +124,8 @@ public class ObradaZahtjeva extends Thread {
                     } else {
                         out.write("SERVER | ERROR10: Nema slobodnih mjesta za igru ili igra nije kreirana.\n");
                     }
-
                 } else if (naredba.indexOf("[") != -1) {
-                    Matcher mxy = provjeraUser(naredba, 2);
-                    if (mxy == null) {
-                        out.write("Parametri ne odgovaraju! |USER\n");
-                    } else {
-                        String ime = mxy.group(1);
-                        int x = Integer.parseInt(mxy.group(2));
-                        int y = Integer.parseInt(mxy.group(4));
-
-                        int idIgraca = igra.dohvatiIdIgraca(ime);
-                        if (idIgraca == -1) {
-                            out.write("SERVER | Niste prijavljeni za igranje!");
-                        } else if (igra.brojBrodovaIgraca(idIgraca)==0) {//ako nema vise brodova 
-                            out.write("SERVER | OK 3");
-                        } else if ((igra.brojPotezaIgraca(idIgraca) - igra.minBrojPoteza()) == 0) {
-                            igra.povecajBrojPoteza(idIgraca);
-                            if (igra.pogodiBrod(idIgraca, x - 1, y - 1)) {
-                                out.write("SERVER | OK 1");
-                                igra.povecajBrojPogodaka(idIgraca);
-                                int idPogedjenogProtovnika = igra.vrijednostPolja(x - 1, y - 1); //u samom polju se nalazi ID igraca ciji je broj pogodjen
-                                igra.smanjiBrojBrodova(idPogedjenogProtovnika); //odma smanjujem broj brodova pogodjenog igraca
-                            } else {
-                                out.write("SERVER | OK 0");
-                            }
-                        } else if ((igra.brojPotezaIgraca(idIgraca) - igra.minBrojPoteza()) != 0) {
-                            out.write("SERVER | OK 2 (" + igra.brojIgracaCekanje(idIgraca) + ")");
-                        } else {
-                            out.write("SERVER | ERROR 10");
-                        }
-
-                        System.out.println(idIgraca + " " + ime + " X=" + x + ", Y=" + y);
-                    }
-
+                    out.write("[] option is not implemented yet! |USER\n");
                 } else if (naredba.indexOf("STAT") != -1) {
                     out.write("STAT option is not implemented yet! |USER\n");
                     igra.pregledPrijavljenihIgraca();
@@ -237,26 +202,5 @@ public class ObradaZahtjeva extends Thread {
             return true;
         }
         return false;
-    }
-
-    public Matcher provjeraUser(StringBuilder p, int i) {
-        String regex = null;
-        if (i == 1) {
-            regex = "^USER ([^\\\\s]+); PLAY;";
-        } else if (i == 2) {
-            regex = "^USER ([^\\\\s]+); \\[((10)|[1-9]),(10|[1-9])\\];";
-        } else if (i == 3) {
-            regex = "^USER ([^\\\\s]+); STAT;";
-        }
-
-        Pattern pattern = Pattern.compile(regex);
-        Matcher m = pattern.matcher(p);
-        boolean status = m.matches();
-        if (status) {
-            return m;
-        } else {
-            System.out.println("ERROR | Parametri ne odgovaraju!");
-            return null;
-        }
     }
 }

@@ -20,7 +20,8 @@ public class KlijentSustava {
     private String korisnik;
     private int x;
     private int y;
-    private boolean stat = false;
+    //private String rUser = "^-user -s (\\d{1,3}\\.\\d{1,3}\\.\\d{1,3}\\.\\d{1,3}) -port ([8-9]\\d{3}) -u ([a-zA-Z0-9_]+) (\\[(\\d+)\\,(\\d+)\\]|-stat)";
+    private boolean stat = false; //ukoliko se koristi konstruktor bez koordinata stavljam na true
     private boolean xy = false;
     private final Matcher mParametri;
 
@@ -95,7 +96,7 @@ public class KlijentSustava {
     }
 
     public Matcher provjeraParametara(String p) {
-        String regex = "^-user -s ([^\\s]+) -port ([8-9]\\d{3}) -u ([a-zA-Z0-9_]+)( -x ((10)|[1-9]\\d?) -y ((10)|[1-9]\\d?)| -stat)?";
+        String regex = "^-user -s ([^\\s]+) -port ([8-9]\\d{3}) -u ([a-zA-Z0-9_]+)( -x ((10)|[3-9]\\d?) -y ((10)|[3-9]\\d?)| -stat)?";
         Pattern pattern = Pattern.compile(regex);
         Matcher m = pattern.matcher(p);
         boolean status = m.matches();

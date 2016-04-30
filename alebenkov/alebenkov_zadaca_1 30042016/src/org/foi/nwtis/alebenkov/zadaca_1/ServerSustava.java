@@ -59,10 +59,7 @@ public class ServerSustava {
         }*/
 
         int brojIgraca = Integer.parseInt(konfig.dajPostavku("brojIgraca"));
-        int x = Integer.parseInt(konfig.dajPostavku("brojX"));
-        int y = Integer.parseInt(konfig.dajPostavku("brojY"));
-        int brojBrodova = Integer.parseInt(konfig.dajPostavku("brojBrodova"));
-        PotapanjeBrodova igra = new PotapanjeBrodova(brojIgraca, x, y, brojBrodova);
+        PotapanjeBrodova igra = new PotapanjeBrodova(brojIgraca);
         
         int brojDretvi = Integer.parseInt(konfig.dajPostavku("brojDretvi"));
         int port = Integer.parseInt(konfig.dajPostavku("port"));
