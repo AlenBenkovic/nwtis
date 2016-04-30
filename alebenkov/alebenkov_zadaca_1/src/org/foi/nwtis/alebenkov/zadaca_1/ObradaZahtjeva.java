@@ -4,8 +4,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStreamWriter;
 import java.net.Socket;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import org.foi.nwtis.alebenkov.konfiguracije.Konfiguracija;
@@ -25,10 +23,12 @@ public class ObradaZahtjeva extends Thread {
     private Pattern p;
     private Matcher m;
     private boolean status;
+    private PotapanjeBrodova igra;
 
-    public ObradaZahtjeva(ThreadGroup group, String name, Konfiguracija konfig) {
+    public ObradaZahtjeva(ThreadGroup group, String name, Konfiguracija konfig, PotapanjeBrodova igra) {
         super(group, name);
         this.konfig = konfig;
+        this.igra = igra;
     }
 
     @Override
@@ -48,8 +48,7 @@ public class ObradaZahtjeva extends Thread {
         stanjeDretve = 1;
         this.brojacRada += 1;
         long pocetakRadaDretve = System.currentTimeMillis(); //biljezim pocetak rada dretve
-        int brojIgraca = Integer.parseInt(konfig.dajPostavku("brojIgraca"));
-        potapanjeBrodova igra = new potapanjeBrodova(brojIgraca);
+       
         System.out.println(this.getName() + " | Pokrecem dretvu koja ce posluziti korisnika.| Brojac rada: " + this.brojacRada + ". | Stanje dretve: " + this.getState());
 
         //GLAVNA LOGIKA
@@ -114,12 +113,22 @@ public class ObradaZahtjeva extends Thread {
                 out.write("SERVER | ERROR: Server je pauziran i ne prima nove naredbe.\n");
             } else if (naredba.indexOf("USER") != -1) {
                 //LOGIKA USERA
-                if(naredba.indexOf("PLAY") != -1){
+                if (naredba.indexOf("PLAY") != -1) {
                     out.write("PLAY option is not implemented yet! |USER\n");
-                } else if (naredba.indexOf("[") != -1){
+                    if (igra.provjeraSlobodnihMjesta()) {
+                        if(igra.igracPrijava("Ivana")){
+                            out.write("Uspjesno ste prijavljeni!");
+                        } else {
+                            out.write("Igrac sa istim imenom vec postoji!");
+                        }
+                    } else {
+                        out.write("SERVER | ERROR10: Nema slobodnih mjesta za igru ili igra nije kreirana.\n");
+                    }
+                } else if (naredba.indexOf("[") != -1) {
                     out.write("[] option is not implemented yet! |USER\n");
-                } else if (naredba.indexOf("STAT") != -1){
+                } else if (naredba.indexOf("STAT") != -1) {
                     out.write("STAT option is not implemented yet! |USER\n");
+                    igra.pregledPrijavljenihIgraca();
                 } else {
                     out.write("SERVER | ERROR: Neispravni format naredbe.\n");
                 }
@@ -143,7 +152,7 @@ public class ObradaZahtjeva extends Thread {
                     server.close();
                 }
             } catch (IOException ex) {
-                System.out.println("ERROR 02 | IOException: " + ex.getMessage());
+                System.out.println("ERROR 02 | IOException: " + ex.getMessage() + ex.toString());
             }
         }
 

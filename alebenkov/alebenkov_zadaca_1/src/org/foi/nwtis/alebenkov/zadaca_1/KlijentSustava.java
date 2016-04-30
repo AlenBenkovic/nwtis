@@ -50,8 +50,8 @@ public class KlijentSustava {
         InputStream is = null;
         OutputStream os = null;
         String command;
-        StringBuilder response;
-        int character;
+        StringBuilder odgovor;
+        int znak;
         System.out.println("STAT: " +stat);
         try {
             System.out.println("Spajam se na server " + this.server + ":" + port);
@@ -60,24 +60,24 @@ public class KlijentSustava {
             os = server.getOutputStream();
 
             if (stat) {
-                command = "USER Lala; STAT;";
+                command = "USER "+korisnik+"; STAT;";
             } else if(xy) {
-                command = "USER Lala; [" + x + "," + y + "];";
+                command = "USER "+korisnik+"; [" + x + "," + y + "];";
             } else {
-                command = "USER Lala; PLAY;";
+                command = "USER "+korisnik+"; PLAY;";
             }
 
             os.write(command.getBytes());
             os.flush();
             server.shutdownOutput();
 
-            response = new StringBuilder();
-            while ((character = is.read()) != -1) {
-                response.append((char) character);
+            odgovor = new StringBuilder();
+            while ((znak = is.read()) != -1) {
+                odgovor.append((char) znak);
             }
-            System.out.println("SERVER | " + response);
+            System.out.println(odgovor);
         } catch (IOException ex) {
-            System.out.println("Server is not responding. Exiting now.");
+            System.out.println("Ne mogu se spojiti na server.");
         } finally {
             try {
                 if (is != null) {
@@ -96,7 +96,7 @@ public class KlijentSustava {
     }
 
     public Matcher provjeraParametara(String p) {
-        String regex = "^-user -s ([^\\s]+) -port ([8-9]\\d{3}) -u ([a-zA-Z0-9_]+)( -x ((100)|[1-9]\\d?) -y ((100)|[1-9]\\d?)| -stat)?";
+        String regex = "^-user -s ([^\\s]+) -port ([8-9]\\d{3}) -u ([a-zA-Z0-9_]+)( -x ((10)|[3-9]\\d?) -y ((10)|[3-9]\\d?)| -stat)?";
         Pattern pattern = Pattern.compile(regex);
         Matcher m = pattern.matcher(p);
         boolean status = m.matches();

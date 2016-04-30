@@ -1,11 +1,12 @@
 package org.foi.nwtis.alebenkov.zadaca_1;
 
 import java.util.Arrays;
+import java.util.UUID;
 
 /**
  * @author alen benkovic
  */
-public class potapanjeBrodova {
+public class PotapanjeBrodova {
 
     private final int brojX;//velicina ploce
     private final int brojY;//velicina ploce
@@ -13,25 +14,29 @@ public class potapanjeBrodova {
     private int trenutniBrojIgraca = 0;
     private final int brojBrodova;
     private final int[][] poljeBrodova;
-    private final int idIgre = 1 + (int) (Math.random() * ((100 - 1) + 1));
+    private final UUID idIgre = UUID.randomUUID();
+    private Igrac[] igraci;
+    private boolean igraKreirana = false; //sluzi kako se igraci ne bi prijavljivali prije nego sto igra pocne
 
-    public potapanjeBrodova(int brojIgraca) {
+    public PotapanjeBrodova(int brojIgraca) {
         this.brojX = 3 + (int) (Math.random() * ((10 - 3) + 1)); //http://stackoverflow.com/questions/363681/generating-random-integers-in-a-specific-range;
         this.brojY = 3 + (int) (Math.random() * ((10 - 3) + 1));
         this.brojBrodova = 2 + (int) (Math.random() * ((5 - 2) + 1));
         this.brojIgraca = brojIgraca;
         this.poljeBrodova = new int[brojX][brojY];
+        this.igraci = new Igrac[brojIgraca];
+        System.out.println("Kreiram novu igru sa ID igre: " + idIgre);
     }
 
-    public potapanjeBrodova(int x, int y, int brojIgraca, int brojBrodova) {
+    /*public PotapanjeBrodova(int x, int y, int brojIgraca, int brojBrodova) {
         this.brojX = x;
         this.brojY = y;
         this.brojIgraca = brojIgraca;
         this.brojBrodova = brojBrodova;
         this.poljeBrodova = new int[brojX][brojY];
-    }
-
+    }*/
     public void kreirajBrodove() {
+        igraKreirana = true;
         System.out.println("Kreiram novu igru...");
         System.out.println("Ploca velicine " + this.brojX + " X " + this.brojY);
         System.out.println("Broj IGRACA:" + this.brojIgraca);
@@ -63,32 +68,41 @@ public class potapanjeBrodova {
             return false;
         }
     }
-    
-    
-    public boolean provjeraSlobodnihMjesta(){
-        if (trenutniBrojIgraca < brojIgraca){
-            return true;
-        } else return false;
+
+    public boolean provjeraSlobodnihMjesta() {
+        if (trenutniBrojIgraca < brojIgraca) {
+            return igraKreirana;//ukoliko igra nije kreirana vraca false
+        } else {
+            return false;
+        }
     }
-    
-    public int dohvatiIdIgre(){
+
+    public UUID dohvatiIdIgre() {
         return this.idIgre;
     }
 
-    public class igrac {
-
-        String ime;
-        int id;
-        int idIgre = dohvatiIdIgre();
-
-        public igrac(String ime) {
-            this.ime = ime;
-            if (trenutniBrojIgraca < brojIgraca) {
-                id = trenutniBrojIgraca + 1;
-                trenutniBrojIgraca = this.id;
+    public boolean igracPrijava(String ime) {
+        boolean prijava = false;
+        if (trenutniBrojIgraca == 0) {
+            igraci[trenutniBrojIgraca] = new Igrac(ime, trenutniBrojIgraca + 1, idIgre);
+            this.trenutniBrojIgraca+=1;
+            prijava = true;
+        } else {
+            for (int i = 0; i < trenutniBrojIgraca; i++) {
+                if (igraci[i].dajIme() != ime) {
+                    igraci[trenutniBrojIgraca] = new Igrac(ime, trenutniBrojIgraca + 1, idIgre);
+                    this.trenutniBrojIgraca += 1;
+                    prijava = true;
+                }
             }
 
         }
+
+        return prijava;
+    }
+
+    public void pregledPrijavljenihIgraca() {
+        System.out.println("Polje brodova: " + Arrays.deepToString(this.igraci));
     }
 
 }

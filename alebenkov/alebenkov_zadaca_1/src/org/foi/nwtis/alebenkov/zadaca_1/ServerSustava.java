@@ -58,6 +58,9 @@ public class ServerSustava {
             System.out.println("SERVER | Ucitavam staru igru...");
         }*/
 
+        int brojIgraca = Integer.parseInt(konfig.dajPostavku("brojIgraca"));
+        PotapanjeBrodova igra = new PotapanjeBrodova(brojIgraca);
+        
         int brojDretvi = Integer.parseInt(konfig.dajPostavku("brojDretvi"));
         int port = Integer.parseInt(konfig.dajPostavku("port"));
         System.out.println("SERVER | Broj dretvi: " + brojDretvi + " | Port: " + port);
@@ -67,7 +70,7 @@ public class ServerSustava {
         ObradaZahtjeva[] dretve = new ObradaZahtjeva[brojDretvi];
 
         for (int i = 0; i < brojDretvi; i++) {
-            dretve[i] = new ObradaZahtjeva(tg, "alebenkov_" + i, konfig);
+            dretve[i] = new ObradaZahtjeva(tg, "alebenkov_" + i, konfig, igra);
             System.out.println("SERVER | Kreiram dretvu " + dretve[i].getName() + " " + dretve[i].getState());
         }
 
@@ -83,7 +86,7 @@ public class ServerSustava {
                     try {
 
                         os = this.klijent.getOutputStream();
-                        String slanjeNaredbe = "Nema slobodne dretve!";
+                        String slanjeNaredbe = "SERVER | ERROR 80: Nema slobodne dretve.";
 
                         os.write(slanjeNaredbe.getBytes());
                         os.flush();
@@ -148,12 +151,12 @@ public class ServerSustava {
     private void ucitajSerijaliziranuEvidenciju(String datEvid) {
         //TODO napravite sami
     }
-    
+
     public static boolean provjeraPauziran() {
         return pauziran;
     }
-    
-     public static synchronized void pauziraj(boolean pauziran) {
+
+    public static synchronized void pauziraj(boolean pauziran) {
         ServerSustava.pauziran = pauziran;
     }
 
