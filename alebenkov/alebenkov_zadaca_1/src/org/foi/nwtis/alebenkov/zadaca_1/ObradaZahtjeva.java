@@ -113,7 +113,6 @@ public class ObradaZahtjeva extends Thread {
             } else if (ServerSustava.provjeraPauziran()) {//ukoliko se ne radi o admin korisniku, provjeravam je li server pauziran
                 out.write("SERVER | ERROR: Server je pauziran i ne prima nove naredbe.\n");
             } else if (naredba.indexOf("USER") != -1) {
-                out.write("USER is not implemented yet!");
                 //LOGIKA USERA
                 if(naredba.indexOf("PLAY") != -1){
                     out.write("PLAY option is not implemented yet! |USER\n");

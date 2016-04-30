@@ -49,39 +49,23 @@ public class Zadaca_alebenkov_1 {
                 break;
             case "-admin":
                 System.out.println("Admin trazis...");
-                String rAdmin = "^-admin -s ([^\\s]+) -port (|[8-9]\\d{3}|localhost) -u ([a-zA-Z0-9_]+) -p ([a-zA-Z0-9_]+) -(|pause|start|stop|stat|new) *$";
-                p = Pattern.compile(rAdmin);
-                m = p.matcher(naredba);
-                status = m.matches();
-                if (status) {
-                    String server = m.group(1);
-                    int port = Integer.parseInt(m.group(2));
-                    String korisnik = m.group(3);
-                    String lozinka = m.group(4);
-                    String naredbaAdmin = m.group(5);
-                    try {
-                        AdministratorSustava admin = new AdministratorSustava(port, server, korisnik, lozinka, naredbaAdmin);
-                        admin.pokreniAdminSustava();
+                try {
+                    AdministratorSustava admin = new AdministratorSustava(naredba);
+                    admin.pokreniAdminSustava();
 
-                    } catch (Exception ex) {
-                        System.out.println("Greska na serveru: " + ex.getMessage());
-                    }
-                } else {
-                    System.out.println("Neispravni argumenti");
-                    return;
+                } catch (Exception ex) {
+                    System.out.println("Greska na serveru: " + ex.getMessage());
                 }
+
                 break;
             case "-user":
                 System.out.println("User trazis...");
-                //regexr.com
-                String rUser = "^-user -s ([^\\s]+) -port ([8-9]\\d{3}) -u ([a-zA-Z0-9_]+)( -x ((100)|[1-9]\\d?) -y ((100)|[1-9]\\d?)| -stat)?";
-                p = Pattern.compile(rUser);
-                m = p.matcher(naredba);
-                status = m.matches();
-                if (status) {
-                    //
-                } else {
-                    System.out.println("Neispravni argumenti");
+                try {
+                    KlijentSustava klijent = new KlijentSustava(naredba);
+                    klijent.PokreniKlijentSustava();
+
+                } catch (Exception ex) {
+                    System.out.println("Greska na serveru: " + ex.getMessage());
                 }
 
                 break;
