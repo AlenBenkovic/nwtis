@@ -21,6 +21,7 @@ public class ServerSustava {
     private static boolean zaustavljen = false; //za provjeru stanja servera
     private static boolean pauziran = false;
     private Socket klijent;
+    private static boolean igraKreirana = false;
 
     /**
      *
@@ -161,6 +162,14 @@ public class ServerSustava {
 
     public static synchronized void pauziraj(boolean pauziran) {
         ServerSustava.pauziran = pauziran;
+    }
+    
+    public static boolean provjeraIgraKreirana(){
+        return igraKreirana;
+    }
+    
+    public static void igraKreirana(){
+        igraKreirana = true;
     }
 
 }

@@ -18,12 +18,12 @@ public class ObradaZahtjeva extends Thread {
     private int stanjeDretve = 0; //0-slobodna, 1-zauzeta
     private int brojacRada = 0; //brojim koliko je puta dretva posluzila klijenta
     Konfiguracija konfig = null;
-    private String adminRegex = "^USER ([a-zA-Z0-9_]+)\\; PASSWD ([a-zA-Z0-9_]+)\\; (START|STOP|PAUSE|STAT|NEW)\\; *$";
-    private String userRegex = "napravi ovo!!";
     private Pattern p;
     private Matcher m;
     private boolean status;
     private PotapanjeBrodova igra;
+    InputStream in = null;
+    OutputStreamWriter out = null;
 
     public ObradaZahtjeva(ThreadGroup group, String name, Konfiguracija konfig, PotapanjeBrodova igra) {
         super(group, name);
@@ -52,8 +52,6 @@ public class ObradaZahtjeva extends Thread {
         System.out.println(this.getName() + " | Pokrecem dretvu koja ce posluziti korisnika.| Brojac rada: " + this.brojacRada + ". | Stanje dretve: " + this.getState());
 
         //GLAVNA LOGIKA
-        InputStream in = null;
-        OutputStreamWriter out = null;
         StringBuilder naredba = null;
         int c;
 
@@ -72,108 +70,58 @@ public class ObradaZahtjeva extends Thread {
             if (naredba.toString().isEmpty()) {//ukoliko kojim slucajem nisam primio naredbu..
                 out.write("SERVER | ERROR: Nisam zaprimio nikakvu naredbu.\n");
             } else if (naredba.indexOf("PASSWD") != -1) { //ako jesam provjeravam radi li se o adminu i radim obradu admin naredbi
-                //LOGIKA ADMIN
-                p = Pattern.compile(adminRegex);
-                m = p.matcher(naredba);
-                status = m.matches(); //1-korisnik, 2-lozinka, 3-naredba
-                if (status) {
-                    System.out.println("SERVER | Primio sam adminov zahtjev. Provjeravam njegove podatke...");
-                    if (provjeraAdmina(m.group(1), m.group(2))) {//provjeravam adminove podatke i ako je sve ok nastavljam s obradom
-                        out.write("SERVER | Pozdrav, " + m.group(1) + "\n");
 
-                        if (naredba.indexOf("PAUSE") != -1) {
-                            if (!ServerSustava.provjeraPauziran()) {
-                                ServerSustava.pauziraj(true);
-                                out.write("SERVER | OK\n");
-                            } else {
-                                out.write("SERVER | ERROR 01: Server je vec pauziran.\n");
-                            }
-                        } else if (naredba.indexOf("START") != -1) {
-                            if (ServerSustava.provjeraPauziran()) {
-                                ServerSustava.pauziraj(false);
-                                out.write("SERVER | OK\n");
-                            } else {
-                                out.write("SERVER | ERROR 02: Server je vec pokrenut.\n");
-                            }
-                        } else if (naredba.indexOf("NEW") != -1) {
-                            igra.kreirajBrodove();
-                            out.write("SERVER | OK\n");
-                        } else if (naredba.indexOf("STAT") != -1) {
-                            out.write("SERVER | Not implemented yet!\n");
-                            igra.prikazSvihBrodova();
+                //LOGIKA ADMIN
+                Matcher mA = provjeraRegex(naredba, 1);
+                if (mA == null) {
+                    out.write("SERVER | ERROR: Neispravni format naredbe.\n");
+                } else {
+                    System.out.println("SERVER | Primio sam adminov zahtjev. Provjeravam njegove podatke...");
+                    if (adminPrijava(mA.group(1), mA.group(2))) {//provjeravam adminove podatke i ako je sve ok nastavljam s obradom
+                        out.write("SERVER | Pozdrav, " + mA.group(1) + "\n");
+
+                        if (mA.group(3).contains("PAUSE")) {
+                            adminObradaPause();
+                        } else if (mA.group(3).contains("START")) {
+                            adminObradaStart();
+                        } else if (mA.group(3).contains("NEW")) {
+                            adminObradaNew();
+                        } else if (mA.group(3).contains("STAT")) {
+                            adminObradaStat();
+                        } else if (mA.group(3).contains("STOP")) {
+                            adminObradaStop();
                         }
                     } else {
                         out.write("SERVER | ERROR 00: Neispravno korisnicko ime ili lozinka.\n");
                     }
-                } else {
-                    out.write("SERVER | ERROR: Neispravni format naredbe.\n");
                 }
+
                 //KRAJ LOGIKE ADMINA
+                //LOGIKA USERA
             } else if (ServerSustava.provjeraPauziran()) {//ukoliko se ne radi o admin korisniku, provjeravam je li server pauziran
                 out.write("SERVER | ERROR: Server je pauziran i ne prima nove naredbe.\n");
             } else if (naredba.indexOf("USER") != -1) {
-                //LOGIKA USERA
-                if (naredba.indexOf("PLAY") != -1) {
-                    out.write("PLAY option is not implemented yet! |USER\n");
-                    Matcher mIme = provjeraUser(naredba, 1);
-                    if (mIme == null) {
-                        out.write("Parametri ne odgovaraju! |USER\n");
-                    } else if (igra.provjeraSlobodnihMjesta()) {
-                        if (igra.igracPrijava(mIme.group(1))) {
-                            out.write("Uspjesno ste prijavljeni!");
-                        } else {
-                            out.write("Igrac sa istim imenom vec postoji!");
-                        }
-                    } else {
-                        out.write("SERVER | ERROR10: Nema slobodnih mjesta za igru ili igra nije kreirana.\n");
-                    }
 
-                } else if (naredba.indexOf("[") != -1) {
-                    Matcher mxy = provjeraUser(naredba, 2);
-                    if (mxy == null) {
-                        out.write("Parametri ne odgovaraju! |USER\n");
-                    } else {
-                        String ime = mxy.group(1);
-                        int x = Integer.parseInt(mxy.group(2));
-                        int y = Integer.parseInt(mxy.group(4));
-
-                        int idIgraca = igra.dohvatiIdIgraca(ime);
-                        if (idIgraca == -1) {
-                            out.write("SERVER | Niste prijavljeni za igranje!");
-                        } else if (igra.brojBrodovaIgraca(idIgraca) == 0) {//ako nema vise brodova 
-                            out.write("SERVER | OK 3");
-                        } else if (igra.neprijateljiUnisteni(idIgraca)) {
-                            out.write("SERVER | OK 9");
-                        } else if ((igra.brojPotezaIgraca(idIgraca) - igra.minBrojPoteza()) == 0) {
-                            igra.povecajBrojPoteza(idIgraca);
-                            if (igra.pogodiBrod(idIgraca, x - 1, y - 1)) {
-                                out.write("SERVER | OK 1");
-                                igra.povecajBrojPogodaka(idIgraca);
-                                int idPogedjenogProtovnika = igra.vrijednostPolja(x - 1, y - 1); //u samom polju se nalazi ID igraca ciji je broj pogodjen
-                                igra.potopiBrod(x - 1, y - 1);
-                                System.out.println("ID POGODJENOG: " + idPogedjenogProtovnika);
-                                igra.smanjiBrojBrodova(idPogedjenogProtovnika); //odma smanjujem broj brodova pogodjenog igraca
-                            } else {
-                                out.write("SERVER | OK 0");
-                            }
-                        } else if ((igra.brojPotezaIgraca(idIgraca) - igra.minBrojPoteza()) != 0) {
-                            out.write("SERVER | OK 2 (" + igra.brojIgracaCekanje(idIgraca) + ")");
-                        } else {
-                            out.write("SERVER | ERROR 10");
-                        }
-
-                        System.out.println(idIgraca + " " + ime + " X=" + x + ", Y=" + y);
-                    }
-
-                } else if (naredba.indexOf("STAT") != -1) {
-                    out.write("STAT option is not implemented yet! |USER\n");
-                    igra.pregledPrijavljenihIgraca();
-                } else {
+                Matcher mU = provjeraRegex(naredba, 2);
+                if (mU == null) {
                     out.write("SERVER | ERROR: Neispravni format naredbe.\n");
-                }
-                //KRAJ LOGIKE USERA
-            }
+                } else {
+                    System.out.println("SERVER | Primio sam korisnicki zahtjev. Provjeravam njegove parametre...");
+                    if (mU.group(2).contains("PLAY")) {
+                        userObradaPlay(mU.group(1));
+                    } else if (naredba.indexOf("[") != -1) {
+                        String imeIgraca = mU.group(1);
+                        int xIgraca = Integer.parseInt(mU.group(3));
+                        int yIgraca = Integer.parseInt(mU.group(5));
 
+                        userObradaIgraj(imeIgraca, xIgraca, yIgraca);
+                    } else if (mU.group(2).contains("STAT")) {
+                        userObradaStat();
+                    }
+
+                }
+            }
+            //KRAJ LOGIKE USERA
             out.flush();
             server.shutdownOutput();
 
@@ -236,21 +184,19 @@ public class ObradaZahtjeva extends Thread {
         return this.brojacRada;
     }
 
-    public boolean provjeraAdmina(String username, String password) {
+    public boolean adminPrijava(String username, String password) {
         if (username.equals(konfig.dajPostavku("adminKorIme")) && password.equals(konfig.dajPostavku("adminKorLozinka"))) {
             return true;
         }
         return false;
     }
 
-    public Matcher provjeraUser(StringBuilder p, int i) {
+    public Matcher provjeraRegex(StringBuilder p, int i) {
         String regex = null;
         if (i == 1) {
-            regex = "^USER ([^\\\\s]+); PLAY;";
+            regex = "^USER ([a-zA-Z0-9_]+)\\; PASSWD ([a-zA-Z0-9_]+)\\; (START|STOP|PAUSE|STAT|NEW)\\; *$"; //za admina
         } else if (i == 2) {
-            regex = "^USER ([^\\\\s]+); \\[((10)|[1-9]),(10|[1-9])\\];";
-        } else if (i == 3) {
-            regex = "^USER ([^\\\\s]+); STAT;";
+            regex = "^USER ([^\\\\s]+); (PLAY|\\[((10)|[1-9]),(10|[1-9])\\]|STAT);"; //za usera
         }
 
         Pattern pattern = Pattern.compile(regex);
@@ -263,4 +209,106 @@ public class ObradaZahtjeva extends Thread {
             return null;
         }
     }
+
+    private void adminObradaPause() throws IOException {
+        if (!ServerSustava.provjeraPauziran()) {
+            ServerSustava.pauziraj(true);
+            this.out.write("SERVER | OK\n");
+        } else {
+            this.out.write("SERVER | ERROR 01: Server je vec pauziran.\n");
+        }
+    }
+
+    private void adminObradaStart() throws IOException {
+        if (ServerSustava.provjeraPauziran()) {
+            ServerSustava.pauziraj(false);
+            out.write("SERVER | OK\n");
+        } else {
+            out.write("SERVER | ERROR 02: Server je vec pokrenut.\n");
+        }
+    }
+
+    private void adminObradaNew() throws IOException {
+        if (!ServerSustava.provjeraIgraKreirana()) {
+            igra.kreirajBrodove();
+            ServerSustava.igraKreirana();
+            out.write("SERVER | OK\n");
+        } else {
+            out.write("ERROR | Igra je vec kreirana.\n");
+        }
+
+    }
+
+    private void adminObradaStop() throws IOException {
+        out.write("SERVER | STOP Not implemented yet!\n");
+    }
+
+    private void adminObradaStat() throws IOException {
+        out.write("SERVER | STAT Not implemented yet!\n");
+    }
+
+    private void userObradaPlay(String ime) throws IOException {
+        if (ServerSustava.provjeraIgraKreirana()) {
+            if (igra.provjeraSlobodnihMjesta()) {
+                if (igra.igracPrijava(ime)) {
+                    out.write("Uspjesno ste prijavljeni!");
+                } else {
+                    out.write("Igrac sa istim imenom vec postoji!");
+                }
+            } else {
+                out.write("SERVER | ERROR10: Nema slobodnih mjesta za igru.\n");
+            }
+        } else {
+            out.write("ERROR | Igra jos nije kreirana!");
+        }
+
+    }
+
+    private void userObradaIgraj(String imeIgraca, int xIgraca, int yIgraca) throws IOException {
+        if (ServerSustava.provjeraIgraKreirana()) {
+            if (igra.dohvatiIdIgreKorisnika(imeIgraca) != -1) {
+                String ime = imeIgraca;
+                int x = xIgraca;
+                int y = yIgraca;
+
+                int idIgraca = igra.dohvatiIdIgraca(ime);
+                if (idIgraca == -1) {
+                    out.write("SERVER | Niste prijavljeni za igranje!");
+                } else if (igra.brojBrodovaIgraca(idIgraca) == 0) {//ako nema vise brodova 
+                    out.write("SERVER | OK 3");
+                } else if (igra.neprijateljiUnisteni(idIgraca)) {
+                    out.write("SERVER | OK 9");
+                } else if ((igra.brojPotezaIgraca(idIgraca) - igra.minBrojPoteza()) == 0) {
+                    igra.povecajBrojPoteza(idIgraca);
+                    if (igra.pogodiBrod(idIgraca, x - 1, y - 1)) {
+                        out.write("SERVER | OK 1");
+                        igra.povecajBrojPogodaka(idIgraca);
+                        int idPogedjenogProtovnika = igra.vrijednostPolja(x - 1, y - 1); //u samom polju se nalazi ID igraca ciji je broj pogodjen
+                        igra.potopiBrod(x - 1, y - 1);
+                        System.out.println("ID POGODJENOG: " + idPogedjenogProtovnika);
+                        igra.smanjiBrojBrodova(idPogedjenogProtovnika); //odma smanjujem broj brodova pogodjenog igraca
+                    } else {
+                        out.write("SERVER | OK 0");
+                    }
+                } else if ((igra.brojPotezaIgraca(idIgraca) - igra.minBrojPoteza()) != 0) {
+                    out.write("SERVER | OK 2 (" + igra.brojIgracaCekanje(idIgraca) + ")");
+                } else {
+                    out.write("SERVER | ERROR 10");
+                }
+
+                System.out.println(idIgraca + " " + ime + " X=" + x + ", Y=" + y);
+
+            } else {
+                out.write("ERROR | Niste prijavljeni za igranje.");
+            }
+        } else {
+            out.write("ERROR | Igra jos nije pocela!");
+        }
+
+    }
+
+    private void userObradaStat() throws IOException {
+        out.write("SERVER | STAT for user is not implemented yet!\n");
+    }
+
 }

@@ -1,7 +1,6 @@
 package org.foi.nwtis.alebenkov.zadaca_1;
 
 import java.util.Arrays;
-import java.util.UUID;
 
 /**
  * @author alen benkovic
@@ -14,7 +13,7 @@ public class PotapanjeBrodova {
     private int trenutniBrojIgraca = 0;
     private final int brojBrodova;
     private final int[][] poljeBrodova;
-    private final UUID idIgre = UUID.randomUUID();
+    private final int idIgre;
     private Igrac[] igraci;
     private boolean igraKreirana = false; //sluzi kako se igraci ne bi prijavljivali prije nego sto igra pocne
 
@@ -26,6 +25,7 @@ public class PotapanjeBrodova {
         this.brojIgraca = brojIgraca;
         this.poljeBrodova = new int[brojX][brojY];
         this.igraci = new Igrac[brojIgraca];
+        this.idIgre = 1 + (int) (Math.random() * ((1000 - 1) + 1));
         System.out.println("Kreiram novu igru sa ID igre: " + idIgre);
     }
 
@@ -49,7 +49,6 @@ public class PotapanjeBrodova {
         }
         System.out.println("Polje brodova: " + Arrays.deepToString(this.poljeBrodova));
     }
-    
 
     public boolean pogodiBrod(int idIgraca, int x, int y) {
         if (this.brojX <= x | this.brojY <= y) {
@@ -72,14 +71,26 @@ public class PotapanjeBrodova {
 
     public boolean provjeraSlobodnihMjesta() {
         if (trenutniBrojIgraca < brojIgraca) {
-            return igraKreirana;//ukoliko igra nije kreirana vraca false
+            return true;
         } else {
             return false;
         }
     }
 
-    public UUID dohvatiIdIgre() {
+    public int dohvatiIdIgre() {
         return this.idIgre;
+    }
+
+    public int dohvatiIdIgreKorisnika(String ime) {
+        int idIgre = -1;
+        if (trenutniBrojIgraca != 0) {
+            for (int i = 0; i < trenutniBrojIgraca; i++) {
+                if (igraci[i].dajIme().equals(ime)) {
+                    idIgre = igraci[i].dohvatiIdIgre();
+                }
+            }
+        }
+        return idIgre;
     }
 
     public boolean igracPrijava(String ime) {
@@ -155,14 +166,13 @@ public class PotapanjeBrodova {
         }
     }
 
-    
-    public int pobjednik(){
-        int pobjednikID=-1;
-        int maxBrojPogodaka=-1;
+    public int pobjednik() {
+        int pobjednikID = -1;
+        int maxBrojPogodaka = -1;
         for (int i = 0; i < trenutniBrojIgraca; i++) {
-            if (igraci[i].dohvatiBrojPogodaka()>maxBrojPogodaka) {
+            if (igraci[i].dohvatiBrojPogodaka() > maxBrojPogodaka) {
                 maxBrojPogodaka = igraci[i].dohvatiBrojPogodaka();
-                pobjednikID = i+1;
+                pobjednikID = i + 1;
             }
         }
         return pobjednikID;
@@ -200,14 +210,16 @@ public class PotapanjeBrodova {
         }
         return brojBrodova;
     }
-    
-     public boolean neprijateljiUnisteni(int id) {
+
+    public boolean neprijateljiUnisteni(int id) {
         boolean neprijateljiUnisteni = false;
         for (int i = 0; i < trenutniBrojIgraca; i++) {
             if (igraci[i].dohvatiId() != id) {
-                if(igraci[i].dohvatiBrojBrodova()>0){
+                if (igraci[i].dohvatiBrojBrodova() > 0) {
                     neprijateljiUnisteni = false;
-                } else neprijateljiUnisteni = true;
+                } else {
+                    neprijateljiUnisteni = true;
+                }
             }
         }
         return neprijateljiUnisteni;

@@ -15,12 +15,12 @@ public class Igrac {
 
     private String ime;
     private int idIgraca;
-    private UUID idIgre;
+    private int idIgre;
     private int brojPoteza = 0;
     private int brojPogodaka = 0;
     private int brojBrodova = 0;
 
-    public Igrac(String ime, int idIgraca, UUID idIgre, int brojBrodova) {
+    public Igrac(String ime, int idIgraca, int idIgre, int brojBrodova) {
         this.ime = ime;
         this.idIgraca = idIgraca;
         this.idIgre = idIgre;
@@ -58,6 +58,10 @@ public class Igrac {
     
     public int dohvatiBrojPogodaka(){
         return brojPogodaka;
+    }
+    
+    public int dohvatiIdIgre(){
+        return idIgre;
     }
 
 }
