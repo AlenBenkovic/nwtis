@@ -5,13 +5,13 @@
  */
 package org.foi.nwtis.alebenkov.zadaca_1;
 
-import java.io.Serializable;
+import java.util.UUID;
 
 /**
  *
  * @author abenkovic
  */
-public class Igrac implements Serializable {
+public class Igrac {
 
     private String ime;
     private int idIgraca;
@@ -47,20 +47,20 @@ public class Igrac implements Serializable {
     public int dohvatiBrojPoteza() {
         return brojPoteza;
     }
-
-    public int dohvatiBrojBrodova() {
+    
+    public int dohvatiBrojBrodova(){
         return brojBrodova;
     }
-
-    public void smanjiBrojBrodova() {
-        this.brojBrodova = this.brojBrodova - 1;
+    
+    public void smanjiBrojBrodova(){
+        this.brojBrodova = this.brojBrodova-1;
     }
-
-    public int dohvatiBrojPogodaka() {
+    
+    public int dohvatiBrojPogodaka(){
         return brojPogodaka;
     }
-
-    public int dohvatiIdIgre() {
+    
+    public int dohvatiIdIgre(){
         return idIgre;
     }
 

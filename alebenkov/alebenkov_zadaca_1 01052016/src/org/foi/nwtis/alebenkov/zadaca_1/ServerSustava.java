@@ -22,8 +22,6 @@ public class ServerSustava {
     private static boolean pauziran = false;
     private Socket klijent;
     private static boolean igraKreirana = false;
-    private Evidencija evid;
-    private PotapanjeBrodova igra;
 
     /**
      *
@@ -55,27 +53,18 @@ public class ServerSustava {
                 System.out.println("Greska prilikom preuzimanja konfiguracije " + ex.getMessage());
             }
         }
-
-        if (this.load == false) { //ako ne postoji zapis o staroj igri kreiram novu
-            int brojIgraca = Integer.parseInt(konfig.dajPostavku("brojIgraca"));
-            int x = Integer.parseInt(konfig.dajPostavku("brojX"));
-            int y = Integer.parseInt(konfig.dajPostavku("brojY"));
-            int brojBrodova = Integer.parseInt(konfig.dajPostavku("brojBrodova"));
-            igra = new PotapanjeBrodova(brojIgraca, x, y, brojBrodova);
-            evid = new Evidencija(igra);
-            SerijalizatorEvidencije se = new SerijalizatorEvidencije(konfig, evid);
-            se.start(); //pokrecem serijalizaciju evidencije svakih n sekundi
-
+        /*if (this.load == false) { //ako ne postoji zapis o staroj igri kreiram novu
+            System.out.println("Potapanje brodova v.0.0.1");
         } else { //ako postoji stara igra ucitavam nju
             System.out.println("SERVER | Ucitavam staru igru...");
-            SerijalizatorEvidencije se = new SerijalizatorEvidencije(konfig);
-            this.evid = se.ucitajEvidenciju();
-            igra = evid.dohvatiSpremljenuIgru();
-            se.spremiTrenutnoStanje(evid);
-            se.start();
+        }*/
 
-        }
-
+        int brojIgraca = Integer.parseInt(konfig.dajPostavku("brojIgraca"));
+        int x = Integer.parseInt(konfig.dajPostavku("brojX"));
+        int y = Integer.parseInt(konfig.dajPostavku("brojY"));
+        int brojBrodova = Integer.parseInt(konfig.dajPostavku("brojBrodova"));
+        PotapanjeBrodova igra = new PotapanjeBrodova(brojIgraca, x, y, brojBrodova);
+        
         int brojDretvi = Integer.parseInt(konfig.dajPostavku("brojDretvi"));
         int port = Integer.parseInt(konfig.dajPostavku("port"));
         System.out.println("SERVER | Broj dretvi: " + brojDretvi + " | Port: " + port);
@@ -174,12 +163,12 @@ public class ServerSustava {
     public static synchronized void pauziraj(boolean pauziran) {
         ServerSustava.pauziran = pauziran;
     }
-
-    public static boolean provjeraIgraKreirana() {
+    
+    public static boolean provjeraIgraKreirana(){
         return igraKreirana;
     }
-
-    public static void igraKreirana() {
+    
+    public static void igraKreirana(){
         igraKreirana = true;
     }
 

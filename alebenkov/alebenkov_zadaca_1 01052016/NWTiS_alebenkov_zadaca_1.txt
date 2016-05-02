@@ -2,7 +2,7 @@
 #Thu Mar 18 12:00:00 CET 2016
 port=8000
 evidDatoteka=DZ_1_evidencija.bin
-intervalSerijalizacije=2
+intervalSerijalizacije=60
 adminKorIme=lala
 adminKorLozinka=1213
 brojDretvi=2

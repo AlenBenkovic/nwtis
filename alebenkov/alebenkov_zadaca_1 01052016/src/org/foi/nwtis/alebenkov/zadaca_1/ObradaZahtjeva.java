@@ -244,7 +244,7 @@ public class ObradaZahtjeva extends Thread {
     }
 
     private void adminObradaStat() throws IOException {
-        igra.prikazSvihBrodova();
+        out.write("SERVER | STAT Not implemented yet!\n");
     }
 
     private void userObradaPlay(String ime) throws IOException {

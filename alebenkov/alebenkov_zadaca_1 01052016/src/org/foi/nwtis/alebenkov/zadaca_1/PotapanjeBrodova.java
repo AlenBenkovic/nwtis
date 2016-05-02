@@ -1,12 +1,11 @@
 package org.foi.nwtis.alebenkov.zadaca_1;
 
-import java.io.Serializable;
 import java.util.Arrays;
 
 /**
  * @author alen benkovic
  */
-public class PotapanjeBrodova implements Serializable{
+public class PotapanjeBrodova {
 
     private final int brojX;//velicina ploce
     private final int brojY;//velicina ploce
