@@ -22,13 +22,15 @@ public class ObradaZahtjeva extends Thread {
     private Matcher m;
     private boolean status;
     private PotapanjeBrodova igra;
+    private Evidencija evid;
     InputStream in = null;
     OutputStreamWriter out = null;
 
-    public ObradaZahtjeva(ThreadGroup group, String name, Konfiguracija konfig, PotapanjeBrodova igra) {
+    public ObradaZahtjeva(ThreadGroup group, String name, Konfiguracija konfig, PotapanjeBrodova igra, Evidencija evid) {
         super(group, name);
         this.konfig = konfig;
         this.igra = igra;
+        this.evid = evid;
     }
 
     @Override

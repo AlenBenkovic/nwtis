@@ -42,7 +42,6 @@ public class SerijalizatorEvidencije extends Thread {
 
         while (!zaustavi) {
             long poc = System.currentTimeMillis();
-            System.out.println("SERVER | Serijaliziram evidenciju.");
             if(this.evid != null){
                 spremiEvidenciju();
             }else {

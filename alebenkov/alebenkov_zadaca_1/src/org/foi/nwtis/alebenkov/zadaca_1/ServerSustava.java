@@ -63,6 +63,7 @@ public class ServerSustava {
             int brojBrodova = Integer.parseInt(konfig.dajPostavku("brojBrodova"));
             igra = new PotapanjeBrodova(brojIgraca, x, y, brojBrodova);
             evid = new Evidencija(igra);
+            evid.dodajZapis("tests", "testttt", "testtttttt");
             SerijalizatorEvidencije se = new SerijalizatorEvidencije(konfig, evid);
             se.start(); //pokrecem serijalizaciju evidencije svakih n sekundi
 
@@ -71,6 +72,7 @@ public class ServerSustava {
             SerijalizatorEvidencije se = new SerijalizatorEvidencije(konfig);
             this.evid = se.ucitajEvidenciju();
             igra = evid.dohvatiSpremljenuIgru();
+            evid.prikazEvidencije();
             se.spremiTrenutnoStanje(evid);
             se.start();
 
@@ -85,7 +87,7 @@ public class ServerSustava {
         ObradaZahtjeva[] dretve = new ObradaZahtjeva[brojDretvi];
 
         for (int i = 0; i < brojDretvi; i++) {
-            dretve[i] = new ObradaZahtjeva(tg, "alebenkov_" + i, konfig, igra);
+            dretve[i] = new ObradaZahtjeva(tg, "alebenkov_" + i, konfig, igra, evid);
             System.out.println("SERVER | Kreiram dretvu " + dretve[i].getName() + " " + dretve[i].getState());
         }
 
