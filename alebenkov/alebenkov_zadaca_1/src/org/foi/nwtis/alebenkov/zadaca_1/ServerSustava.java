@@ -5,6 +5,8 @@ import java.io.IOException;
 import java.io.OutputStream;
 import java.net.ServerSocket;
 import java.net.Socket;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 import org.foi.nwtis.alebenkov.konfiguracije.Konfiguracija;
 import org.foi.nwtis.alebenkov.konfiguracije.KonfiguracijaApstraktna;
 import org.foi.nwtis.alebenkov.konfiguracije.NemaKonfiguracije;
@@ -16,31 +18,42 @@ import org.foi.nwtis.alebenkov.konfiguracije.NemaKonfiguracije;
  */
 public class ServerSustava {
 
-    private static String datoteka; //konfig datoteka
-    private static boolean load = false; //datoteka sa serijaliziranim podacima
-    private static boolean zaustavljen = false; //za provjeru stanja servera
-    private static boolean pauziran = false;
+    private final String datoteka;
+    private final Matcher mParametri;
+    private boolean load = false; //datoteka sa serijaliziranim podacima
+    private static boolean zaustavljen = false; //za zaustavljanje rada servera
+    private static boolean pauziran = false; //za pauziranje rada servera
     private Socket klijent;
-    private static boolean igraKreirana = false;
     private Evidencija evid;
     private PotapanjeBrodova igra;
 
     /**
+     * Konstruktor servera.
      *
-     * @param datoteka - naziv konfiguracijske datoteke
-     * @param load - parametar za ucitavanje datoteke sa serijaliziranim
-     * podacima
-     *
+     * @param parametri
+     * @throws java.lang.Exception
      */
-    public ServerSustava(String datoteka, String load) {
-        this.datoteka = datoteka;
-        if (load != null) {
-            this.load = true;
+    public ServerSustava(String parametri) throws Exception {
+        this.mParametri = provjeraParametara(parametri);
+        if (this.mParametri == null) {
+            throw new Exception("Parametri servera ne odgovoraju!");
+        } else {
+            this.datoteka = mParametri.group(1);
+            if (mParametri.group(3) != null) {
+                this.load = true;
+            }
         }
-        System.out.println(datoteka);
-        System.out.println(this.load);
+
     }
 
+    /**
+     * Metoda za pokretanje samog servera. Ucitava datoteku sa postavkama
+     * Ucitava serijaliziranu evidenciju i spremljenu igru ako je potrebno, u
+     * suprotnom kreira novu igru sa zadanim postavkama Pokrece dretvu za
+     * serijalizaciju evidencije Kreira grupu dretvi za posluzivanje igraca
+     * Kreira server socket i ceka da se igrac spoji, te potom konekciju predaje
+     * dretvi na obradu
+     */
     public void pokreniServer() {
         System.out.println("Pokrecem server!");
         Konfiguracija konfig = null;
@@ -56,7 +69,8 @@ public class ServerSustava {
             }
         }
 
-        if (this.load == false) { //ako ne postoji zapis o staroj igri kreiram novu
+        //ako ne postoji zapis o staroj igri kreiram novu
+        if (this.load == false) {
             int brojIgraca = Integer.parseInt(konfig.dajPostavku("brojIgraca"));
             int x = Integer.parseInt(konfig.dajPostavku("brojX"));
             int y = Integer.parseInt(konfig.dajPostavku("brojY"));
@@ -67,41 +81,42 @@ public class ServerSustava {
             SerijalizatorEvidencije se = new SerijalizatorEvidencije(konfig, evid);
             se.start(); //pokrecem serijalizaciju evidencije svakih n sekundi
 
-        } else { //ako postoji stara igra ucitavam nju
+        } //ako postoji stara igra ucitavam nju
+        else {
             System.out.println("SERVER | Ucitavam staru igru...");
             SerijalizatorEvidencije se = new SerijalizatorEvidencije(konfig);
             this.evid = se.ucitajEvidenciju();
             igra = evid.dohvatiSpremljenuIgru();
             evid.prikazEvidencije();
-            se.spremiTrenutnoStanje(evid);
-            se.start();
+            // se.spremiTrenutnoStanje(evid);
+            //se.start();
 
         }
 
         int brojDretvi = Integer.parseInt(konfig.dajPostavku("brojDretvi"));
         int port = Integer.parseInt(konfig.dajPostavku("port"));
-        System.out.println("SERVER | Broj dretvi: " + brojDretvi + " | Port: " + port);
 
-        //kreiram grupu dretvi
+        //kreiram grupu za dretve
         ThreadGroup tg = new ThreadGroup("alebenkov");
         ObradaZahtjeva[] dretve = new ObradaZahtjeva[brojDretvi];
 
+        //kreiram dretve i spremam ih u grupu
         for (int i = 0; i < brojDretvi; i++) {
-            dretve[i] = new ObradaZahtjeva(tg, "alebenkov_" + i, konfig, igra, evid);
+            dretve[i] = new ObradaZahtjeva(tg, "alebenkov_" + i, konfig, evid);
             System.out.println("SERVER | Kreiram dretvu " + dretve[i].getName() + " " + dretve[i].getState());
         }
 
         try {
+            //kreiram server socket
             ServerSocket ss = new ServerSocket(port);
             //ss.setSoTimeout(10000); //da ne blokira kod citanja do kraja vec 1000
             while (!zaustavljen) {
-                this.klijent = ss.accept();
+                this.klijent = ss.accept(); //cekam da se igrac spoji
                 System.out.println("SERVER | Zahtjev primljen, trazim slobodnu dretvu...");
-                int sd = dajSlobodnuDretvu(dretve);
-                if (sd == -1) {
+                int sd = dajSlobodnuDretvu(dretve); //trazim slobodnu dretvu
+                if (sd == -1) { //ako nema slobodne dretve saljem igracu poruku
                     OutputStream os = null;
                     try {
-
                         os = this.klijent.getOutputStream();
                         String slanjeNaredbe = "SERVER | ERROR 80: Nema slobodne dretve.";
 
@@ -119,7 +134,7 @@ public class ServerSustava {
                         }
                     }
                     System.out.println("SERVER | ERROR 80: Nema slobodne dretve.");
-                } else {
+                } else {//ako postoji slobodna dretva radim sljedece:
 
                     if (dretve[sd].brojacRada() > 0) {//ako je dretva do sada radila ona radim interrupt nad njom kako bi nastavila
                         System.out.println("SERVER | Ponovno pokrecem dretvu " + dretve[sd].getName());
@@ -128,7 +143,9 @@ public class ServerSustava {
                         System.out.println("SERVER | Pokrecem dretvu " + dretve[sd].getName());
                         dretve[sd].start(); //pokrecem prvu slobodnu dretvu
                     }
-                    dretve[sd].setSocket(this.klijent);
+                    dretve[sd].setSocket(this.klijent); //saljem dretvi podatke o socketu klijenta/igraca
+                    dretve[sd].setIgra(igra);
+                    dretve[sd].setEvidencija(evid);
 
                 }
 
@@ -138,8 +155,13 @@ public class ServerSustava {
         }
     }
 
-    //gledam koja mi je dretva slobodna i ako ih ima više slobodnih gledam koliko je koja radila
-    //tako da sve budu jednako zastupljene
+    /**
+     * Metoda za dobivanje slobodne dretve koja je najmanje radila, kruzno
+     * posluzivanje
+     *
+     * @param dretve grupa dretvi od kojih se odabire najmanje koristena dretva
+     * @return ID slobodne dretve
+     */
     private int dajSlobodnuDretvu(ObradaZahtjeva[] dretve) {
         int slobodnaDretvaID = -1;
         int najmanjiBrojac = 9999;
@@ -165,24 +187,37 @@ public class ServerSustava {
         return slobodnaDretvaID;
     }
 
-    private void ucitajSerijaliziranuEvidenciju(String datEvid) {
-        //TODO napravite sami
-    }
-
+    /**
+     *
+     * @return true ako je server pauziran, inace false
+     */
     public static boolean provjeraPauziran() {
         return pauziran;
     }
 
-    public static synchronized void pauziraj(boolean pauziran) {
+    /**
+     * Metoda za pauziranje servera
+     *
+     * @param pauziran
+     */
+    public static synchronized void SetPauziraj(boolean pauziran) {
         ServerSustava.pauziran = pauziran;
     }
 
-    public static boolean provjeraIgraKreirana() {
-        return igraKreirana;
-    }
-
-    public static void igraKreirana() {
-        igraKreirana = true;
+    /**
+     * @param p dobivena naredba koja ide na daljnju provjeru
+     * @return Matcher ili null ukoliko su neispravni parametri
+     */
+    private Matcher provjeraParametara(String p) {
+        String regex = "^-server -konf ([^\\s]+\\.(?i)(txt|xml))( +-load)?"; //dozvoljeno: -server -konf -datoteka(.xml | .txt) [-load]
+        Pattern pattern = Pattern.compile(regex);
+        Matcher m = pattern.matcher(p);
+        boolean status = m.matches();
+        if (status) {
+            return m;
+        } else {
+            return null;
+        }
     }
 
 }

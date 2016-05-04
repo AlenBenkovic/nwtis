@@ -26,7 +26,7 @@ public class ObradaZahtjeva extends Thread {
     InputStream in = null;
     OutputStreamWriter out = null;
 
-    public ObradaZahtjeva(ThreadGroup group, String name, Konfiguracija konfig, PotapanjeBrodova igra, Evidencija evid) {
+    public ObradaZahtjeva(ThreadGroup group, String name, Konfiguracija konfig, Evidencija evid) {
         super(group, name);
         this.konfig = konfig;
         this.igra = igra;
@@ -214,7 +214,7 @@ public class ObradaZahtjeva extends Thread {
 
     private void adminObradaPause() throws IOException {
         if (!ServerSustava.provjeraPauziran()) {
-            ServerSustava.pauziraj(true);
+            ServerSustava.SetPauziraj(true);
             this.out.write("SERVER | OK\n");
         } else {
             this.out.write("SERVER | ERROR 01: Server je vec pauziran.\n");
@@ -223,7 +223,7 @@ public class ObradaZahtjeva extends Thread {
 
     private void adminObradaStart() throws IOException {
         if (ServerSustava.provjeraPauziran()) {
-            ServerSustava.pauziraj(false);
+            ServerSustava.SetPauziraj(false);
             out.write("SERVER | OK\n");
         } else {
             out.write("SERVER | ERROR 02: Server je vec pokrenut.\n");
@@ -231,9 +231,11 @@ public class ObradaZahtjeva extends Thread {
     }
 
     private void adminObradaNew() throws IOException {
-        if (!ServerSustava.provjeraIgraKreirana()) {
+        if (!igra.igraKreirana()) {
             igra.kreirajBrodove();
-            ServerSustava.igraKreirana();
+            evid.spremiStanjeIgre(igra);
+            evid.prikazEvidencije();
+            //ServerSustava.igraKreirana();
             out.write("SERVER | OK\n");
         } else {
             out.write("ERROR | Igra je vec kreirana.\n");
@@ -250,7 +252,7 @@ public class ObradaZahtjeva extends Thread {
     }
 
     private void userObradaPlay(String ime) throws IOException {
-        if (ServerSustava.provjeraIgraKreirana()) {
+        if (igra.igraKreirana()) {
             if (igra.provjeraSlobodnihMjesta()) {
                 if (igra.igracPrijava(ime)) {
                     out.write("Uspjesno ste prijavljeni!");
@@ -267,7 +269,7 @@ public class ObradaZahtjeva extends Thread {
     }
 
     private void userObradaIgraj(String imeIgraca, int xIgraca, int yIgraca) throws IOException {
-        if (ServerSustava.provjeraIgraKreirana()) {
+        if (igra.igraKreirana()) {
             if (igra.dohvatiIdIgreKorisnika(imeIgraca) != -1) {
                 String ime = imeIgraca;
                 int x = xIgraca;
@@ -285,10 +287,10 @@ public class ObradaZahtjeva extends Thread {
                     if (igra.pogodiBrod(idIgraca, x - 1, y - 1)) {
                         out.write("SERVER | OK 1");
                         igra.povecajBrojPogodaka(idIgraca);
-                        int idPogedjenogProtovnika = igra.vrijednostPolja(x - 1, y - 1); //u samom polju se nalazi ID igraca ciji je broj pogodjen
+                        int idPogedjenogProtivnika = igra.vrijednostPolja(x - 1, y - 1); //u samom polju se nalazi ID igraca ciji je broj pogodjen
                         igra.potopiBrod(x - 1, y - 1);
-                        System.out.println("ID POGODJENOG: " + idPogedjenogProtovnika);
-                        igra.smanjiBrojBrodova(idPogedjenogProtovnika); //odma smanjujem broj brodova pogodjenog igraca
+                        System.out.println("ID POGODJENOG: " + idPogedjenogProtivnika);
+                        igra.smanjiBrojBrodova(idPogedjenogProtivnika); //odma smanjujem broj brodova pogodjenog igraca
                     } else {
                         out.write("SERVER | OK 0");
                     }
@@ -312,5 +314,15 @@ public class ObradaZahtjeva extends Thread {
     private void userObradaStat() throws IOException {
         out.write("SERVER | STAT for user is not implemented yet!\n");
     }
+    
+    public void setIgra(PotapanjeBrodova igra) {
+        this.igra = igra;
+    }
+    
+    public void setEvidencija(Evidencija evid) {
+        this.evid = evid;
+    }
+    
+    
 
 }

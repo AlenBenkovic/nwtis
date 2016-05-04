@@ -29,13 +29,19 @@ public class Evidencija implements Serializable {
     public void dodajZapis(String ipAdresa, String zahtjev, String odgovor) {
         EvidencijaZapis ez = new EvidencijaZapis(ipAdresa, zahtjev, odgovor);
     }
+    
+    public void spremiStanjeIgre(PotapanjeBrodova igra){
+        this.igra = igra;
+    }
 
     public void prikazEvidencije() {
         for (int j = 0; j < this.evidencija.size(); j++) {
             EvidencijaZapis ev = evidencija.get(j);
             System.out.println("Vrijeme: " + ev.vrijeme + "| IP adresa: " + ev.ipAdresa + "| Zahtjev: " + ev.zahtjev + "| Odgovor: " + ev.odgovor);
+            System.out.println("Igre kreirana:"+ igra.igraKreirana());
         }
     }
+    
 
     public PotapanjeBrodova dohvatiSpremljenuIgru() {
         return igra;

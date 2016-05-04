@@ -30,7 +30,7 @@ public class AdministratorSustava {
     public AdministratorSustava(String parametri) throws Exception {
         this.mParametri = provjeraParametara(parametri);
         if (this.mParametri == null) {
-            throw new Exception("ERROR | Parametri servera ne odgovoraju!");
+            throw new Exception("Parametri servera ne odgovoraju!");
         } else {
             this.server = mParametri.group(1);
             this.port = Integer.parseInt(mParametri.group(2));
@@ -89,7 +89,6 @@ public class AdministratorSustava {
         if (status) {
             return m;
         } else {
-            System.out.println("ERROR | Parametri ne odgovaraju!");
             return null;
         }
     }

@@ -4,20 +4,28 @@ import java.io.Serializable;
 import java.util.Arrays;
 
 /**
+ * Klasa same igre. Sadrzi sve relevantne informacije o igri
  * @author alen benkovic
  */
-public class PotapanjeBrodova implements Serializable{
+public class PotapanjeBrodova implements Serializable {
 
     private final int brojX;//velicina ploce
     private final int brojY;//velicina ploce
-    private final int brojIgraca;
-    private int trenutniBrojIgraca = 0;
-    private final int brojBrodova;
-    private final int[][] poljeBrodova;
+    private final int brojIgraca;//ukupan broj igraca koji igra
+    private int trenutniBrojIgraca = 0;//trenutni broj igraca koji je prijavljen za igru
+    private final int brojBrodova;//broj brodova po igracu
+    private final int[][] poljeBrodova;//polje u koje se spremaju svi brodovi svih igraca
     private final int idIgre;
-    private Igrac[] igraci;
-    private boolean igraKreirana = false; //sluzi kako se igraci ne bi prijavljivali prije nego sto igra pocne
+    private Igrac[] igraci; //polje u koje se spremaju svi igraci
+    private static boolean igraKreirana = false; //sluzi kako se igraci ne bi prijavljivali prije nego sto igra pocne
 
+    /**
+     * Konstruktor klase PotapanjeBrodova.
+     * @param brojIgraca maksimalni broj igraca koji igraju
+     * @param x velicina ploce
+     * @param y velicina ploce
+     * @param brojBrodova broj brodova po igracu
+     */
     public PotapanjeBrodova(int brojIgraca, int x, int y, int brojBrodova) {
         this.brojX = x;
         this.brojY = y;
@@ -26,16 +34,20 @@ public class PotapanjeBrodova implements Serializable{
         this.brojIgraca = brojIgraca;
         this.poljeBrodova = new int[brojX][brojY];
         this.igraci = new Igrac[brojIgraca];
-        this.idIgre = 1 + (int) (Math.random() * ((1000 - 1) + 1));
-        System.out.println("Kreiram novu igru sa ID igre: " + idIgre);
+        this.idIgre = 1 + (int) (Math.random() * ((1000 - 1) + 1)); //generiram nasumicni broj. Ovdje bi puno bolje bilo koristiti recimo UUID
+        System.out.println("IGRA | Kreiram novu igru sa ID igre: " + idIgre);
     }
 
+    /**
+     *Metoda za kreiranje same ploce te postavljanje brodova na nasumicne pozicije.
+     * Svaki broj na ploci predstavlja ID igraca
+     */
     public void kreirajBrodove() {
         igraKreirana = true;
-        System.out.println("Kreiram novu igru...");
-        System.out.println("Ploca velicine " + this.brojX + " X " + this.brojY);
-        System.out.println("Broj IGRACA:" + this.brojIgraca);
-        System.out.println("Broj BRODOVA:" + this.brojBrodova);
+        System.out.println("IGRA | Kreiram novu igru...");
+        System.out.println("IGRA | Ploca velicine " + this.brojX + " X " + this.brojY);
+        System.out.println("IGRA | Broj IGRACA:" + this.brojIgraca);
+        System.out.println("IGRA | Broj BRODOVA:" + this.brojBrodova);
 
         for (int i = 1; i <= this.brojIgraca; i++) {
             for (int j = 0; j < this.brojBrodova; j++) {//spremam brodove na razlicite lokacije
@@ -48,28 +60,51 @@ public class PotapanjeBrodova implements Serializable{
                 }
             }
         }
-        System.out.println("Polje brodova: " + Arrays.deepToString(this.poljeBrodova));
+        System.out.println("IGRA | Polje brodova: " + Arrays.deepToString(this.poljeBrodova));
     }
 
+    /**
+     * Metoda koja provjerava je li igrac pogodio brod
+     * @param idIgraca
+     * @param x koordinata
+     * @param y koordinata
+     * @return true ukoliko je brod pogodjen, inace false
+     */
     public boolean pogodiBrod(int idIgraca, int x, int y) {
         if (this.brojX <= x | this.brojY <= y) {
-            System.out.println("Neispravne koordinate!");
+            System.out.println("IGRA | Neispravne koordinate!");
             return false;
-        } else if (this.poljeBrodova[x][y] != idIgraca & this.poljeBrodova[x][y] != 0) {
+        } else if (this.poljeBrodova[x][y] != idIgraca & this.poljeBrodova[x][y] != 0) { 
             return true;
         } else {
             return false;
         }
     }
 
-    public void potopiBrod(int x, int y) {//ovo mi sluzi samo kako bi mogao pokupiti id igraca ciji je brod prethodno pogodjen
+    /**
+     * Metoda koja brise pogodjeni brod sa ploce
+     * @param x
+     * @param y
+     */
+    //ovo mi sluzi samo kako bi mogao pokupiti id igraca ciji je brod prethodno pogodjen (Ukoliko ga odma obrisem ne mogu uzeti vrijednost polja odnosno id)
+    public void potopiBrod(int x, int y) {
         this.poljeBrodova[x][y] = 0;
     }
 
+    /**
+     * Metoda koja uzima vrijednost ploce na odredjenoj koordinati
+     * @param x 
+     * @param y
+     * @return vrijenost polja na xy koordinati (int)
+     */
     public int vrijednostPolja(int x, int y) {
         return this.poljeBrodova[x][y];
     }
 
+    /**
+     * Metoda koja provjerava ima li slobodnih mjesta za igru
+     * @return true ukoliko ima slobodnih mjesta, inace false
+     */
     public boolean provjeraSlobodnihMjesta() {
         if (trenutniBrojIgraca < brojIgraca) {
             return true;
@@ -78,10 +113,19 @@ public class PotapanjeBrodova implements Serializable{
         }
     }
 
+    /**
+     * Metoda za dohvacanje ID igre
+     * @return id igre (int)
+     */
     public int dohvatiIdIgre() {
         return this.idIgre;
     }
 
+    /**
+     * Metoda koja dohvaca id igre zadanog igraca
+     * @param ime igrac za kojeg se trazi id igre
+     * @return id igre (int) za trazenog igraca
+     */
     public int dohvatiIdIgreKorisnika(String ime) {
         int idIgre = -1;
         if (trenutniBrojIgraca != 0) {
@@ -94,6 +138,11 @@ public class PotapanjeBrodova implements Serializable{
         return idIgre;
     }
 
+    /**
+     * Metoda za prijavu igraca za igru. Kreira objekt igraca i sprema ga u polje igraci.
+     * @param ime
+     * @return true ukoliko se igrac uspjesno prijavio, inace false
+     */
     public boolean igracPrijava(String ime) {
         boolean prijava = false;
         if (trenutniBrojIgraca == 0) {
@@ -117,10 +166,11 @@ public class PotapanjeBrodova implements Serializable{
         return prijava;
     }
 
-    public void pregledPrijavljenihIgraca() {
-        System.out.println("Prijavljeni igraci: " + igraci.toString());
-    }
 
+    /**
+     * Vraca najmanji broj poteza svih igraca
+     * @return najmanji broj poteza (int)
+     */
     public int minBrojPoteza() {
         int min = 9999;
         for (int i = 0; i < trenutniBrojIgraca; i++) {
@@ -131,6 +181,11 @@ public class PotapanjeBrodova implements Serializable{
         return min;
     }
 
+    /**
+     * Dohvat id igraca
+     * @param ime trazenog igraca
+     * @return id igraca (int)
+     */
     public int dohvatiIdIgraca(String ime) {
         int id = -1;
         for (int i = 0; i < trenutniBrojIgraca; i++) {
@@ -141,6 +196,11 @@ public class PotapanjeBrodova implements Serializable{
         return id + 1;
     }
 
+    /**
+     * Vraca ukupan broj poteza za trazenog igraca
+     * @param id igraca
+     * @return ukupan broj poteza za trazenog igraca (int)
+     */
     public int brojPotezaIgraca(int id) {
         int brojPoteza = -1;
         for (int i = 0; i < trenutniBrojIgraca; i++) {
@@ -151,6 +211,10 @@ public class PotapanjeBrodova implements Serializable{
         return brojPoteza;
     }
 
+    /**
+     * Povecava ukupan broj poteza nakon pokusaja za odredjenog igraca
+     * @param id
+     */
     public void povecajBrojPoteza(int id) {
         for (int i = 0; i < trenutniBrojIgraca; i++) {
             if (igraci[i].dohvatiId() == id) {
@@ -159,6 +223,10 @@ public class PotapanjeBrodova implements Serializable{
         }
     }
 
+    /**
+     * Metoda koja pove
+     * @param id
+     */
     public void povecajBrojPogodaka(int id) {
         for (int i = 0; i < trenutniBrojIgraca; i++) {
             if (igraci[i].dohvatiId() == id) {
@@ -167,6 +235,10 @@ public class PotapanjeBrodova implements Serializable{
         }
     }
 
+    /**
+     * Provjera tko je pobjednik
+     * @return id pobjednika (int)
+     */
     public int pobjednik() {
         int pobjednikID = -1;
         int maxBrojPogodaka = -1;
@@ -179,6 +251,10 @@ public class PotapanjeBrodova implements Serializable{
         return pobjednikID;
     }
 
+    /**
+     * Smanjuje broj brodova odredjenog igraca
+     * @param id igraca ciji je brod pogodjen
+     */
     public void smanjiBrojBrodova(int id) {
         for (int i = 0; i < trenutniBrojIgraca; i++) {
             if (igraci[i].dohvatiId() == id) {
@@ -187,6 +263,11 @@ public class PotapanjeBrodova implements Serializable{
         }
     }
 
+    /**
+     * Provjerava koliko ima igraca koji moraju odigrati prije igraca za kojeg se trazi provjera
+     * @param id igraca za kojeg se trazi provjera
+     * @return broj igraca koji jos moraju odigrati (int)
+     */
     public int brojIgracaCekanje(int id) {//broj igraca koji se cekaju da odigraju
         int brojIgraca = 0;
         for (int i = 0; i < trenutniBrojIgraca; i++) {
@@ -202,6 +283,11 @@ public class PotapanjeBrodova implements Serializable{
         return brojIgraca;
     }
 
+    /**
+     * Provjerava koliko odredjeni igrac jos ima brodova
+     * @param id igraca za kojeg se trazi provjera
+     * @return ukupan broj brodova odredjenog igraca (int)
+     */
     public int brojBrodovaIgraca(int id) {
         int brojBrodova = -1;
         for (int i = 0; i < trenutniBrojIgraca; i++) {
@@ -212,6 +298,11 @@ public class PotapanjeBrodova implements Serializable{
         return brojBrodova;
     }
 
+    /**
+     * Provjerava jesu li svi neprijatelji unisteni
+     * @param id igraca za kojeg se trazi provjera
+     * @return true ukoliko su svi neprijatelji unisteni, inace false
+     */
     public boolean neprijateljiUnisteni(int id) {
         boolean neprijateljiUnisteni = false;
         for (int i = 0; i < trenutniBrojIgraca; i++) {
@@ -226,8 +317,19 @@ public class PotapanjeBrodova implements Serializable{
         return neprijateljiUnisteni;
     }
 
+    /**
+     * Sluzi za prikaz svih brodova na ploci
+     */
     public void prikazSvihBrodova() {
         System.out.println("Polje brodova: " + Arrays.deepToString(this.poljeBrodova));
+    }
+
+    /**
+     * Provjera je li igra kreirana
+     * @return true ukoliko je igra kreirana
+     */
+    public boolean igraKreirana() {//test obrisi
+        return igraKreirana;
     }
 
 }

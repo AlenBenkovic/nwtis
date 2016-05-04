@@ -63,11 +63,12 @@ public class SerijalizatorEvidencije extends Thread {
             String dat = konfig.dajPostavku("evidDatoteka");
             FileOutputStream fileOut = new FileOutputStream(dat);
             ObjectOutputStream out = new ObjectOutputStream(fileOut);
+            
             out.writeObject(evid);
             out.close();
             fileOut.close();
             System.out.println("SERVER | Serijalizirana evidencija spremljena u " + dat);
-
+            evid.prikazEvidencije();
         } catch (IOException ex){
             System.out.println("ERRPR | " + ex.getMessage());
         }

@@ -4,10 +4,19 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 /**
+ * Glavna klasa projekta
+ *
  * @author Alen Benkovic
+ *
  */
 public class Zadaca_alebenkov_1 {
 
+    /**
+     * Konstruktor glavne klase. Prima naredbu i ovisno o parametrima kreira
+     * objekte i poziva metode
+     *
+     * @param args prima parametre iz konzole
+     */
     public static void main(String[] args) {
 
         Pattern p; //spremam u njega odredjeni regex izraz ovisno o caseu
@@ -15,7 +24,7 @@ public class Zadaca_alebenkov_1 {
         boolean status; //spremam status provjere izraza
 
         if (args.length == 0) {//ako ne postoje argumenti prekidam program
-            System.out.println("Niste unjeli ni jedan argument! Izlazim.");
+            System.out.println("ERROR | Niste unjeli ni jedan argument! Izlazim.\n");
             return;
         }
 
@@ -30,50 +39,39 @@ public class Zadaca_alebenkov_1 {
 
         switch (args[0]) {//uzimam prvi argument i provjeravam o kojem se slucaju radi
             case "-server":
-                System.out.println("Server trazis...");
-                String rServer = "^-server -konf ([^\\s]+\\.(?i)(txt|xml))( +-load)?"; //dozvoljeno: -server -konf -datoteka(.xml | .txt) [-load]
-                p = Pattern.compile(rServer); //kompajliram regex izraz za usporedjivanje
-                m = p.matcher(naredba); //usporedjujem regex sa dobivenom naredbom, grupa 1=datoteka.txt, 2=txt, 3=-load
-                status = m.matches(); //spremam status usporedbe, true, false
-                if (status) {
-                    try {
-                        ServerSustava server = new ServerSustava(m.group(1), m.group(3)); //kreiram server i saljem mu paremetre naziv konfig datoteke i da li treba ucitati datoteku sa serijalizirnim podacima
-                        server.pokreniServer(); //pokrecem server
-                    } catch (Exception ex) {
-                        System.out.println("Greska na serveru: " + ex.getMessage());
-                    }
-                } else {
-                    System.out.println("Neispravni argumenti");
-                    return;
+                try {
+                    ServerSustava server = new ServerSustava(naredba); //kreiram server i saljem mu paremetre naziv konfig datoteke i da li treba ucitati datoteku sa serijalizirnim podacima
+                    server.pokreniServer(); //pokrecem server
+                } catch (Exception ex) {
+                    System.out.println("ERROR | Greska na serveru: " + ex.getMessage()+"\n");
                 }
+
                 break;
             case "-admin":
-                System.out.println("Admin trazis...");
                 try {
                     AdministratorSustava admin = new AdministratorSustava(naredba);
                     admin.pokreniAdminSustava();
 
                 } catch (Exception ex) {
-                    System.out.println("Greska na serveru: " + ex.getMessage());
+                    System.out.println("ERROR | Greska na serveru: " + ex.getMessage()+"\n");
                 }
 
                 break;
             case "-user":
-                System.out.println("User trazis...");
                 try {
                     KlijentSustava klijent = new KlijentSustava(naredba);
                     klijent.PokreniKlijentSustava();
 
                 } catch (Exception ex) {
-                    System.out.println("Greska na serveru: " + ex.getMessage());
+                    System.out.println("ERROR | Greska na serveru: " + ex.getMessage()+"\n");
                 }
 
                 break;
             case "-show":
-                System.out.println("Show trazis...");
+                System.out.println("Show is not implemented yet!");
                 break;
             default:
-                System.out.println("Neispravan unos argumenata!");
+                System.out.println("ERROR | Neispravan unos argumenata!");
                 break;
         }
 
