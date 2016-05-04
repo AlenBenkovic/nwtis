@@ -16,20 +16,29 @@ import java.util.logging.Logger;
 import org.foi.nwtis.alebenkov.konfiguracije.Konfiguracija;
 
 /**
- *
- * @author abenkovic
+ * Klasa za serijalizaciju evidencije
+ * @author Alen Benkovic
  */
 public class SerijalizatorEvidencije extends Thread {
 
-    private boolean zaustavi = false;
+    private boolean zaustavi = false; //ukoliko treba prekinuti serijalizaciju
     private Konfiguracija konfig;
     private Evidencija evid = null;
 
+    /**
+     * Konstruktor koji se koristi kad ne postoji serijalizirana evidencija
+     * @param konfig
+     * @param evid
+     */
     public SerijalizatorEvidencije(Konfiguracija konfig, Evidencija evid) {
         this.konfig = konfig;
         this.evid = evid;
     }
     
+    /**
+     * Konstruktor koji se koristi kada se ucitava serijalizirana evidencija
+     * @param konfig
+     */
     public SerijalizatorEvidencije(Konfiguracija konfig) {
         this.konfig = konfig;
     }
@@ -42,7 +51,7 @@ public class SerijalizatorEvidencije extends Thread {
 
         while (!zaustavi) {
             long poc = System.currentTimeMillis();
-            if(this.evid != null){
+            if(this.evid != null){//ako sam preko konstruktora primio novokreiranu evidenciju, spremam ju u datoteku
                 spremiEvidenciju();
             }else {
                 System.out.println("ERROR| Evidencija jos nije kreirana..");
@@ -57,6 +66,9 @@ public class SerijalizatorEvidencije extends Thread {
 
     }
 
+    /**
+     * Spremanje evidencije u datoteku
+     */
     public void spremiEvidenciju() {
 
         try {
@@ -74,6 +86,10 @@ public class SerijalizatorEvidencije extends Thread {
         }
     }
 
+    /**
+     * Ucitavanje evidencije iz datoteke
+     * @return evidenciju iz datoteke (Evidencija)
+     */
     public Evidencija ucitajEvidenciju() {
         Evidencija e = null;
         try {
@@ -83,6 +99,7 @@ public class SerijalizatorEvidencije extends Thread {
             e = (Evidencija) in.readObject();
             in.close();
             fileIn.close();
+            this.evid = e;
 
             System.out.println("SERVER | Deserijalizirana evidencija ucitana.");
 
@@ -95,10 +112,6 @@ public class SerijalizatorEvidencije extends Thread {
         }
         return e;
 
-    }
-
-    public void spremiTrenutnoStanje(Evidencija evid) {
-        this.evid = evid;
     }
 
 }

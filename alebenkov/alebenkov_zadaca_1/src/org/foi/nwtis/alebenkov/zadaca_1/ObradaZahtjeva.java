@@ -26,7 +26,7 @@ public class ObradaZahtjeva extends Thread {
     InputStream in = null;
     OutputStreamWriter out = null;
 
-    public ObradaZahtjeva(ThreadGroup group, String name, Konfiguracija konfig, Evidencija evid) {
+    public ObradaZahtjeva(ThreadGroup group, String name, Konfiguracija konfig, PotapanjeBrodova igra, Evidencija evid) {
         super(group, name);
         this.konfig = konfig;
         this.igra = igra;
@@ -233,9 +233,7 @@ public class ObradaZahtjeva extends Thread {
     private void adminObradaNew() throws IOException {
         if (!igra.igraKreirana()) {
             igra.kreirajBrodove();
-            evid.spremiStanjeIgre(igra);
-            evid.prikazEvidencije();
-            //ServerSustava.igraKreirana();
+            evid.prikazEvidencije(); //samo radi provjere
             out.write("SERVER | OK\n");
         } else {
             out.write("ERROR | Igra je vec kreirana.\n");

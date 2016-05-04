@@ -12,12 +12,12 @@ public class PotapanjeBrodova implements Serializable {
     private final int brojX;//velicina ploce
     private final int brojY;//velicina ploce
     private final int brojIgraca;//ukupan broj igraca koji igra
-    private int trenutniBrojIgraca = 0;//trenutni broj igraca koji je prijavljen za igru
+    private int trenutniBrojIgraca;//trenutni broj igraca koji je prijavljen za igru
     private final int brojBrodova;//broj brodova po igracu
     private final int[][] poljeBrodova;//polje u koje se spremaju svi brodovi svih igraca
     private final int idIgre;
     private Igrac[] igraci; //polje u koje se spremaju svi igraci
-    private static boolean igraKreirana = false; //sluzi kako se igraci ne bi prijavljivali prije nego sto igra pocne
+    private boolean igraKreirana = false; //sluzi kako se igraci ne bi prijavljivali prije nego sto igra pocne
 
     /**
      * Konstruktor klase PotapanjeBrodova.
@@ -27,6 +27,8 @@ public class PotapanjeBrodova implements Serializable {
      * @param brojBrodova broj brodova po igracu
      */
     public PotapanjeBrodova(int brojIgraca, int x, int y, int brojBrodova) {
+        this.trenutniBrojIgraca = 0;
+        this.igraKreirana = false;
         this.brojX = x;
         this.brojY = y;
         this.brojBrodova = brojBrodova;

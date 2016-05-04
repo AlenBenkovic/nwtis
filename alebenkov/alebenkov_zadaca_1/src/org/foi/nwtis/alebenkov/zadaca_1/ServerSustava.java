@@ -88,8 +88,8 @@ public class ServerSustava {
             this.evid = se.ucitajEvidenciju();
             igra = evid.dohvatiSpremljenuIgru();
             evid.prikazEvidencije();
-            // se.spremiTrenutnoStanje(evid);
-            //se.start();
+            //se.spremiTrenutnoStanje(evid);
+            se.start();
 
         }
 
@@ -102,7 +102,7 @@ public class ServerSustava {
 
         //kreiram dretve i spremam ih u grupu
         for (int i = 0; i < brojDretvi; i++) {
-            dretve[i] = new ObradaZahtjeva(tg, "alebenkov_" + i, konfig, evid);
+            dretve[i] = new ObradaZahtjeva(tg, "alebenkov_" + i, konfig, igra, evid);
             System.out.println("SERVER | Kreiram dretvu " + dretve[i].getName() + " " + dretve[i].getState());
         }
 
@@ -144,8 +144,6 @@ public class ServerSustava {
                         dretve[sd].start(); //pokrecem prvu slobodnu dretvu
                     }
                     dretve[sd].setSocket(this.klijent); //saljem dretvi podatke o socketu klijenta/igraca
-                    dretve[sd].setIgra(igra);
-                    dretve[sd].setEvidencija(evid);
 
                 }
 
