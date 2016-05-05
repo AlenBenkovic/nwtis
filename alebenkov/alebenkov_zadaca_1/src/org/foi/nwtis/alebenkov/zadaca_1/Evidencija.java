@@ -14,15 +14,17 @@ import org.foi.nwtis.alebenkov.konfiguracije.Konfiguracija;
 
 /**
  * Klasa zaduzena sa evidenciju igre koja se moze serijalizirati
+ *
  * @author Alen Benkovic
  */
 public class Evidencija implements Serializable {
 
-    private PotapanjeBrodova igra; 
+    private PotapanjeBrodova igra;
     private ArrayList<EvidencijaZapis> evidencija = new ArrayList(); //ovdje spremam zapise o radu servera
 
     /**
      * Konstruktor klase
+     *
      * @param igra igra koja se sprema u datoteku i vodi evidencija
      */
     public Evidencija(PotapanjeBrodova igra) {
@@ -31,28 +33,32 @@ public class Evidencija implements Serializable {
     }
 
     /**
-     * Metoda koja kreira novi objekt klase EvidencijaZapis za svaki zapis koji primim
-     * @param ipAdresa adresa sa koje je dosao zahtjev
-     * @param zahtjev naredba igraca
-     * @param odgovor odgovor servera
+     * Metoda koja kreira novi objekt klase EvidencijaZapis za svaki zapis koji
+     * primim
+     *
+     * @param imeIgraca
+     * @param x koordinata pozicije koja se gadja
+     * @param y koordinata pozicije koja se gadja
+     * @param biljeska dodatna biljeska
      */
-    public void dodajZapis(String ipAdresa, String zahtjev, String odgovor) {
-        EvidencijaZapis ez = new EvidencijaZapis(ipAdresa, zahtjev, odgovor);
+    public synchronized void dodajZapis(String imeIgraca, int x, int y, String biljeska) { //metoda je synchronized kako bi se provodilo medjusobno iskljucivanje dretvi
+        EvidencijaZapis ez = new EvidencijaZapis(imeIgraca, x, y, biljeska);
     }
-    
+
     /**
      * Ispisuje korisne informacije same evidencije na ekran
      */
     public void prikazEvidencije() {
         for (int j = 0; j < this.evidencija.size(); j++) {
             EvidencijaZapis ev = evidencija.get(j);
-            System.out.println("Vrijeme: " + ev.vrijeme + "| IP adresa: " + ev.ipAdresa + "| Zahtjev: " + ev.zahtjev + "| Odgovor: " + ev.odgovor);
-            System.out.println("Igre kreirana:"+ igra.igraKreirana());
+            System.out.println("Vrijeme: " + ev.vrijeme + "| Ime igraca: " + ev.imeIgraca + "| Gadjana lokacija: " + ev.x + "," + ev.y + "| Biljeska: " + ev.biljeska );
+            System.out.println("Igre kreirana:" + igra.igraKreirana());
         }
     }
-    
+
     /**
      * Vraca spremljenu igru iz datoteke
+     *
      * @return igra (PotapanjeBrodova)
      */
     public PotapanjeBrodova dohvatiSpremljenuIgru() {
@@ -65,23 +71,27 @@ public class Evidencija implements Serializable {
     public class EvidencijaZapis implements Serializable {
 
         private String vrijeme;
-        private String ipAdresa;
-        private String zahtjev;
-        private String odgovor;
+        private String imeIgraca;
+        private int x;
+        private int y;
+        private String biljeska;
 
         /**
          * Konstruktor klase za spremanje zapisa.
-         * @param ipAdresa adresa igraca
-         * @param zahtjev zahtjev igraca
-         * @param odgovor odgovor servera
+         *
+         * @param imeIgraca
+         * @param x koordinata pozicije koja se gadja
+         * @param y koordinata pozicije koja se gadja
+         * @param biljeska dodatna biljeska
          */
-        public EvidencijaZapis(String ipAdresa, String zahtjev, String odgovor) {
+        public EvidencijaZapis(String imeIgraca, int x, int y, String biljeska) {
             Date trenutnoVrijeme = new Date();
             SimpleDateFormat sdf = new SimpleDateFormat("dd-M-yyyy H:mm:ss");
             this.vrijeme = sdf.format(trenutnoVrijeme);
-            this.ipAdresa = ipAdresa;
-            this.zahtjev = zahtjev;
-            this.odgovor = odgovor;
+            this.imeIgraca = imeIgraca;
+            this.x = x;
+            this.y = y;
+            this.biljeska = biljeska;
             evidencija.add(this);
         }
 

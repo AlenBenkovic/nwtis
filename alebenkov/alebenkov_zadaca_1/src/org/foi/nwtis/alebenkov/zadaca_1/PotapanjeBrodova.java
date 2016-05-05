@@ -62,7 +62,7 @@ public class PotapanjeBrodova implements Serializable {
                 }
             }
         }
-        System.out.println("IGRA | Polje brodova: " + Arrays.deepToString(this.poljeBrodova));
+        this.prikazSvihBrodova();
     }
 
     /**
@@ -197,6 +197,21 @@ public class PotapanjeBrodova implements Serializable {
         }
         return id + 1;
     }
+    
+     /**
+     * Dohvat imena igraca
+     * @param id trazenog igraca
+     * @return ime igraca (String)
+     */
+    public String dohvatiImeIgraca(int id) {
+        String ime = null;
+        for (int i = 0; i < trenutniBrojIgraca; i++) {
+            if(igraci[i].dohvatiId() == id) {
+                ime = igraci[i].dajIme();
+            }
+        }
+        return ime;
+    }
 
     /**
      * Vraca ukupan broj poteza za trazenog igraca
@@ -323,8 +338,33 @@ public class PotapanjeBrodova implements Serializable {
      * Sluzi za prikaz svih brodova na ploci
      */
     public void prikazSvihBrodova() {
-        System.out.println("Polje brodova: " + Arrays.deepToString(this.poljeBrodova));
+        System.out.println("IGRA | Polje brodova: " + Arrays.deepToString(this.poljeBrodova));
+        for (int i = 0; i<poljeBrodova.length; i++){
+            
+            for (int j = 0; j<poljeBrodova[0].length; j++ ){
+                System.out.print(poljeBrodova[i][j] + "\t");
+            }
+            System.out.print("\n");
+        }
     }
+    
+    /**
+     * Sluzi za prikaz pogodjenog broda na ploci
+     */
+    public void prikazPogodjenogBroda(int x, int y) {
+        for (int i = 0; i<poljeBrodova.length; i++){
+            for (int j = 0; j<poljeBrodova[0].length; j++ ){
+                if( i == x && j == y){
+                    System.out.print("X\t");
+                }else {
+                    System.out.print(poljeBrodova[i][j] + "\t");
+                }
+                
+            }
+            System.out.print("\n");
+        }
+    }
+    
 
     /**
      * Provjera je li igra kreirana

@@ -77,7 +77,6 @@ public class ServerSustava {
             int brojBrodova = Integer.parseInt(konfig.dajPostavku("brojBrodova"));
             igra = new PotapanjeBrodova(brojIgraca, x, y, brojBrodova);
             evid = new Evidencija(igra);
-            evid.dodajZapis("tests", "testttt", "testtttttt");
             SerijalizatorEvidencije se = new SerijalizatorEvidencije(konfig, evid);
             se.start(); //pokrecem serijalizaciju evidencije svakih n sekundi
 
@@ -206,7 +205,7 @@ public class ServerSustava {
      * @param p dobivena naredba koja ide na daljnju provjeru
      * @return Matcher ili null ukoliko su neispravni parametri
      */
-    private Matcher provjeraParametara(String p) {
+    public Matcher provjeraParametara(String p) {
         String regex = "^-server -konf ([^\\s]+\\.(?i)(txt|xml))( +-load)?"; //dozvoljeno: -server -konf -datoteka(.xml | .txt) [-load]
         Pattern pattern = Pattern.compile(regex);
         Matcher m = pattern.matcher(p);
