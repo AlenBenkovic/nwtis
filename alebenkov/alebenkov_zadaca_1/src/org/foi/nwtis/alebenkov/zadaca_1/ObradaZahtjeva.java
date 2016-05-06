@@ -4,12 +4,15 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStreamWriter;
 import java.net.Socket;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import org.foi.nwtis.alebenkov.konfiguracije.Konfiguracija;
 
 /**
- * Klasa za obradu zahtjeva 
+ * Klasa za obradu zahtjeva
+ *
  * @author Alen Benkovic
  */
 public class ObradaZahtjeva extends Thread {
@@ -25,6 +28,7 @@ public class ObradaZahtjeva extends Thread {
 
     /**
      * Konstruktor klase
+     *
      * @param group grupa dretvi kojoj dretva pripada
      * @param name ime dretve
      * @param konfig konfiguracija iz datoteke
@@ -41,7 +45,7 @@ public class ObradaZahtjeva extends Thread {
     @Override
     public void interrupt() {
         stanjeDretve = 1; //kod ponovnog pozivanja dretve, oznacavam ju kao zauzetu
-        super.interrupt(); 
+        super.interrupt();
     }
 
     @Override
@@ -52,16 +56,15 @@ public class ObradaZahtjeva extends Thread {
     }
 
     /**
-     * Pokrece rad dretve. Prima zahtjev igraca.
-     * Provjerava ga. Obradjuje i salje odgovor.
+     * Pokrece rad dretve. Prima zahtjev igraca. Provjerava ga. Obradjuje i
+     * salje odgovor.
      */
     public synchronized void pokreni() {
-        stanjeDretve = 1; 
+        stanjeDretve = 1;
         this.brojacRada += 1;
         long pocetakRadaDretve = System.currentTimeMillis(); //biljezim pocetak rada dretve
 
         System.out.println(this.getName() + " | Pokrecem dretvu koja ce posluziti korisnika.| Brojac rada: " + this.brojacRada + ". | Stanje dretve: " + this.getState());
-        
 
         //GLAVNA LOGIKA
         StringBuilder naredba = null;
@@ -117,8 +120,8 @@ public class ObradaZahtjeva extends Thread {
                 Matcher mU = provjeraRegex(naredba, 2);
                 if (mU == null) {
                     out.write("SERVER | ERROR: Neispravni format naredbe.\n");
-                } else {
-                    System.out.println("SERVER | Primio sam korisnicki zahtjev. Provjeravam njegove parametre...");
+                } else //System.out.println("SERVER | Primio sam korisnicki zahtjev. Provjeravam njegove parametre...");
+                {
                     if (mU.group(2).contains("PLAY")) {
                         userObradaPlay(mU.group(1));
                     } else if (naredba.indexOf("[") != -1) {
@@ -130,7 +133,6 @@ public class ObradaZahtjeva extends Thread {
                     } else if (mU.group(2).contains("STAT")) {
                         userObradaStat();
                     }
-
                 }
             }
             //KRAJ LOGIKE USERA
@@ -150,7 +152,7 @@ public class ObradaZahtjeva extends Thread {
                 if (server != null) {
                     server.close();
                 }
-              
+
             } catch (IOException ex) {
                 System.out.println("ERROR 02 | IOException: " + ex.getMessage() + ex.toString());
             }
@@ -277,18 +279,41 @@ public class ObradaZahtjeva extends Thread {
     }
 
     private void adminObradaStop() throws IOException {
-        out.write("SERVER | STOP Not implemented yet!\n");
+        ServerSustava.zaustaviSerijalizaciju();
+        out.write("SERVER | OK\n");
+        System.out.println("SERVER | Prekidam serijalizaciju evidencije i spremam trenutno stanje.");
     }
 
     private void adminObradaStat() throws IOException {
-        igra.prikazSvihBrodova();
+        ArrayList<Evidencija.EvidencijaZapis> evidencija = evid.dohvatiZapise();
+        for (int j = 0; j < evidencija.size(); j++) {
+            Evidencija.EvidencijaZapis ev = evidencija.get(j);
+            out.write("-------------------------------------\n"
+                    + "| Vrijeme: " + ev.getVrijeme() + "| Ime igraca: " + ev.getImeIgraca()
+                    + "\n| Gadjana lokacija: " + ev.getX() + "," + ev.getY() + " | Status: " + ev.getBiljeska() + ""
+                    + "\n -------------------------------------\n");
+            int[][] poljeBrodova = igra.getPoljeBrodova();
+            for (int i = 0; i < poljeBrodova.length; i++) {
+                for (int k = 0; k < poljeBrodova[0].length; k++) {
+                    if (i == ev.getX() - 1 && k == ev.getY() - 1) {
+                        out.write("X\t");
+                    } else {
+                        out.write(poljeBrodova[i][k] + "\t");
+                    }
+
+                }
+                out.write("\n");
+            }
+        }
     }
 
     private void userObradaPlay(String ime) throws IOException {
         if (igra.igraKreirana()) {
             if (igra.provjeraSlobodnihMjesta()) {
                 if (igra.igracPrijava(ime)) {
-                    out.write("Uspjesno ste prijavljeni!");
+                    int[][] kord = igra.koordinateBrodovaIgraca(igra.dohvatiIdIgraca(ime)); //uzimam koordinate njegovih brodova
+                    out.write("OK. \nVelicina ploce: " + igra.velicinaPloce() + ". Broj igraca: " + igra.getBrojIgraca() + ". Broj brodova: " + igra.getBrojBrodova() + ".\n Koordinate vasih brodova: " + Arrays.deepToString(kord));
+
                 } else {
                     out.write("Igrac sa istim imenom vec postoji!");
                 }
@@ -324,10 +349,10 @@ public class ObradaZahtjeva extends Thread {
                         igra.povecajBrojPogodaka(idIgraca);
                         int idPogedjenogProtivnika = igra.vrijednostPolja(x - 1, y - 1); //u samom polju se nalazi ID igraca ciji je broj pogodjen
                         igra.potopiBrod(x - 1, y - 1);
-                        igra.prikazPogodjenogBroda(x-1, y-1);
+                        igra.prikazPogodjenogBroda(x - 1, y - 1);
                         System.out.println("ID POGODJENOG: " + idPogedjenogProtivnika);
                         igra.smanjiBrojBrodova(idPogedjenogProtivnika); //odma smanjujem broj brodova pogodjenog igraca
-                        System.out.println("IGRA | POGODAK! | Igrac " + ime + " (id: " + idIgraca + ") pogodio brod igraca " + igra.dohvatiImeIgraca(idPogedjenogProtivnika)+ " (id: " + idPogedjenogProtivnika + ")");
+                        System.out.println("IGRA | POGODAK! | Igrac " + ime + " (id: " + idIgraca + ") pogodio brod igraca " + igra.dohvatiImeIgraca(idPogedjenogProtivnika) + " (id: " + idPogedjenogProtivnika + ")");
                         evid.dodajZapis(ime, x, y, "POGODAK! Pogodjen igrac: " + igra.dohvatiImeIgraca(idPogedjenogProtivnika) + " (id: " + idPogedjenogProtivnika + ")");
                     } else {
                         out.write("SERVER | OK 0");
@@ -354,23 +379,5 @@ public class ObradaZahtjeva extends Thread {
     private void userObradaStat() throws IOException {
         out.write("SERVER | STAT for user is not implemented yet!\n");
     }
-    
-    /**
-     *
-     * @param igra
-     */
-    public void setIgra(PotapanjeBrodova igra) {
-        this.igra = igra;
-    }
-    
-    /**
-     *
-     * @param evid
-     */
-    public void setEvidencija(Evidencija evid) {
-        this.evid = evid;
-    }
-    
-    
 
 }

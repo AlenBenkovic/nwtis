@@ -82,7 +82,7 @@ public class SerijalizatorEvidencije extends Thread {
             System.out.println("SERVER | Serijalizirana evidencija spremljena u " + dat);
             evid.prikazEvidencije();
         } catch (IOException ex){
-            System.out.println("ERRPR | " + ex.getMessage());
+            System.out.println("ERROR | " + ex.getMessage());
         }
     }
 
@@ -112,6 +112,10 @@ public class SerijalizatorEvidencije extends Thread {
         }
         return e;
 
+    }
+    
+    public void zaustaviSerijalizacijuEvidencije(){
+        this.zaustavi = true;
     }
 
 }

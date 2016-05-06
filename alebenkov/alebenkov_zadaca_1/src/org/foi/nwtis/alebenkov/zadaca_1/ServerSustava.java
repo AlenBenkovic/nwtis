@@ -26,6 +26,7 @@ public class ServerSustava {
     private Socket klijent;
     private Evidencija evid;
     private PotapanjeBrodova igra;
+    private static SerijalizatorEvidencije se;
 
     /**
      * Konstruktor servera.
@@ -77,18 +78,18 @@ public class ServerSustava {
             int brojBrodova = Integer.parseInt(konfig.dajPostavku("brojBrodova"));
             igra = new PotapanjeBrodova(brojIgraca, x, y, brojBrodova);
             evid = new Evidencija(igra);
-            SerijalizatorEvidencije se = new SerijalizatorEvidencije(konfig, evid);
+            se = new SerijalizatorEvidencije(konfig, evid);
             se.start(); //pokrecem serijalizaciju evidencije svakih n sekundi
 
         } //ako postoji stara igra ucitavam nju
         else {
             System.out.println("SERVER | Ucitavam staru igru...");
-            SerijalizatorEvidencije se = new SerijalizatorEvidencije(konfig);
+            se = new SerijalizatorEvidencije(konfig);
             this.evid = se.ucitajEvidenciju();
             igra = evid.dohvatiSpremljenuIgru();
             evid.prikazEvidencije();
-            //se.spremiTrenutnoStanje(evid);
             se.start();
+           
 
         }
 
@@ -215,6 +216,14 @@ public class ServerSustava {
         } else {
             return null;
         }
+    }
+    
+    /**
+     * Metoda za zaustavljanje serijalizacije evidencije i njeno spremanje nakon zaustavljanja
+     */
+    public static void zaustaviSerijalizaciju(){
+        se.zaustaviSerijalizacijuEvidencije();
+        se.spremiEvidenciju();
     }
 
 }

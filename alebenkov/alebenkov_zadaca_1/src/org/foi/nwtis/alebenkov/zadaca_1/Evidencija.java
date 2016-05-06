@@ -55,6 +55,10 @@ public class Evidencija implements Serializable {
             System.out.println("Igre kreirana:" + igra.igraKreirana());
         }
     }
+    
+    public ArrayList<EvidencijaZapis> dohvatiZapise(){
+        return this.evidencija;
+    }
 
     /**
      * Vraca spremljenu igru iz datoteke
@@ -94,6 +98,27 @@ public class Evidencija implements Serializable {
             this.biljeska = biljeska;
             evidencija.add(this);
         }
+
+        public String getVrijeme() {
+            return vrijeme;
+        }
+
+        public String getImeIgraca() {
+            return imeIgraca;
+        }
+
+        public int getX() {
+            return x;
+        }
+
+        public int getY() {
+            return y;
+        }
+
+        public String getBiljeska() {
+            return biljeska;
+        }
+        
 
     }
 
