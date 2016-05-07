@@ -1,7 +1,6 @@
 package org.foi.nwtis.alebenkov.zadaca_1;
 
 import java.io.Serializable;
-import java.util.Arrays;
 
 /**
  * Klasa same igre. Sadrzi sve relevantne informacije o igri

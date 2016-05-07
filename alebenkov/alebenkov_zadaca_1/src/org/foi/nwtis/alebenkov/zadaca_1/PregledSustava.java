@@ -5,7 +5,6 @@
  */
 package org.foi.nwtis.alebenkov.zadaca_1;
 
-import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
@@ -16,8 +15,6 @@ import java.util.logging.Logger;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import org.foi.nwtis.alebenkov.konfiguracije.Konfiguracija;
-import org.foi.nwtis.alebenkov.konfiguracije.KonfiguracijaApstraktna;
-import org.foi.nwtis.alebenkov.konfiguracije.NemaKonfiguracije;
 
 /**
  * Klasa za prikaz serijaliziranih podataka evidencije
