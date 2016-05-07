@@ -131,7 +131,7 @@ public class ObradaZahtjeva extends Thread {
 
                         userObradaIgraj(imeIgraca, xIgraca, yIgraca);
                     } else if (mU.group(2).contains("STAT")) {
-                        userObradaStat();
+                        userObradaStat(mU.group(1));
                     }
                 }
             }
@@ -292,7 +292,7 @@ public class ObradaZahtjeva extends Thread {
                     + "| Vrijeme: " + ev.getVrijeme() + "| Ime igraca: " + ev.getImeIgraca()
                     + "\n| Gadjana lokacija: " + ev.getX() + "," + ev.getY() + " | Status: " + ev.getBiljeska() + ""
                     + "\n -------------------------------------\n");
-            int[][] poljeBrodova = igra.getPoljeBrodova();
+            int[][] poljeBrodova = ev.getPoljeBrodova();
             for (int i = 0; i < poljeBrodova.length; i++) {
                 for (int k = 0; k < poljeBrodova[0].length; k++) {
                     if (i == ev.getX() - 1 && k == ev.getY() - 1) {
@@ -338,10 +338,10 @@ public class ObradaZahtjeva extends Thread {
                     out.write("SERVER | Niste prijavljeni za igranje!");
                 } else if (igra.brojBrodovaIgraca(idIgraca) == 0) {//ako nema vise brodova 
                     out.write("SERVER | OK 3");
-                    evid.dodajZapis(ime, x, y, "Igrac nema vise svojih brodova.");
+                    evid.dodajZapis(ime, x, y, igra.getPoljeBrodova(), "Igrac nema vise svojih brodova.");
                 } else if (igra.neprijateljiUnisteni(idIgraca)) {
                     out.write("SERVER | OK 9");
-                    evid.dodajZapis(ime, x, y, "Igrac je unistio sve protivnicke brodove!");
+                    evid.dodajZapis(ime, x, y, igra.getPoljeBrodova(), "Igrac je unistio sve protivnicke brodove!");
                 } else if ((igra.brojPotezaIgraca(idIgraca) - igra.minBrojPoteza()) == 0) {
                     igra.povecajBrojPoteza(idIgraca);
                     if (igra.pogodiBrod(idIgraca, x - 1, y - 1)) {
@@ -353,14 +353,14 @@ public class ObradaZahtjeva extends Thread {
                         System.out.println("ID POGODJENOG: " + idPogedjenogProtivnika);
                         igra.smanjiBrojBrodova(idPogedjenogProtivnika); //odma smanjujem broj brodova pogodjenog igraca
                         System.out.println("IGRA | POGODAK! | Igrac " + ime + " (id: " + idIgraca + ") pogodio brod igraca " + igra.dohvatiImeIgraca(idPogedjenogProtivnika) + " (id: " + idPogedjenogProtivnika + ")");
-                        evid.dodajZapis(ime, x, y, "POGODAK! Pogodjen igrac: " + igra.dohvatiImeIgraca(idPogedjenogProtivnika) + " (id: " + idPogedjenogProtivnika + ")");
+                        evid.dodajZapis(ime, x, y, igra.getPoljeBrodova(), "POGODAK! Pogodjen igrac: " + igra.dohvatiImeIgraca(idPogedjenogProtivnika) + " (id: " + idPogedjenogProtivnika + ")");
                     } else {
                         out.write("SERVER | OK 0");
-                        evid.dodajZapis(ime, x, y, "PROMASAJ!");
+                        evid.dodajZapis(ime, x, y, igra.getPoljeBrodova(), "PROMASAJ!");
                     }
                 } else if ((igra.brojPotezaIgraca(idIgraca) - igra.minBrojPoteza()) != 0) {
                     out.write("SERVER | OK 2 (" + igra.brojIgracaCekanje(idIgraca) + ")");
-                    evid.dodajZapis(ime, x, y, "Igrac nije na redu za igranje. Broj igraca na cekanju: " + igra.brojIgracaCekanje(idIgraca));
+                    evid.dodajZapis(ime, x, y, igra.getPoljeBrodova(), "Igrac nije na redu za igranje. Broj igraca na cekanju: " + igra.brojIgracaCekanje(idIgraca));
                 } else {
                     out.write("SERVER | ERROR 10");
                 }
@@ -376,8 +376,31 @@ public class ObradaZahtjeva extends Thread {
 
     }
 
-    private void userObradaStat() throws IOException {
-        out.write("SERVER | STAT for user is not implemented yet!\n");
+    private void userObradaStat(String ime) throws IOException {
+        int idIgraca = igra.dohvatiIdIgraca(ime);
+        if (igra.neprijateljiUnisteni(idIgraca) || igra.brojBrodovaIgraca(idIgraca) == 0) {
+            ArrayList<Evidencija.EvidencijaZapis> evidencija = evid.dohvatiZapise();
+            for (int j = 0; j < evidencija.size(); j++) {
+                Evidencija.EvidencijaZapis ev = evidencija.get(j);
+                out.write("-------------------------------------\n"
+                        + "| Vrijeme: " + ev.getVrijeme() + "| Ime igraca: " + ev.getImeIgraca()
+                        + "\n| Gadjana lokacija: " + ev.getX() + "," + ev.getY() + " | Status: " + ev.getBiljeska() + ""
+                        + "\n -------------------------------------\n");
+                int[][] poljeBrodova = ev.getPoljeBrodova();
+                for (int i = 0; i < poljeBrodova.length; i++) {
+                    for (int k = 0; k < poljeBrodova[0].length; k++) {
+                        if (i == ev.getX() - 1 && k == ev.getY() - 1) {
+                            out.write("X\t");
+                        } else {
+                            out.write(poljeBrodova[i][k] + "\t");
+                        }
+
+                    }
+                    out.write("\n");
+                }
+            }
+
+        }
     }
 
 }

@@ -11,7 +11,7 @@ import java.io.Serializable;
  *
  * @author abenkovic
  */
-public class Igrac implements Serializable {
+public class Igrac implements Serializable{
 
     private String ime;
     private int idIgraca;

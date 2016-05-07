@@ -10,7 +10,6 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
-import org.foi.nwtis.alebenkov.konfiguracije.Konfiguracija;
 
 /**
  * Klasa zaduzena sa evidenciju igre koja se moze serijalizirati
@@ -39,10 +38,11 @@ public class Evidencija implements Serializable {
      * @param imeIgraca
      * @param x koordinata pozicije koja se gadja
      * @param y koordinata pozicije koja se gadja
+     * @param poljeBrodova trenutno stanje ploce
      * @param biljeska dodatna biljeska
      */
-    public synchronized void dodajZapis(String imeIgraca, int x, int y, String biljeska) { //metoda je synchronized kako bi se provodilo medjusobno iskljucivanje dretvi
-        EvidencijaZapis ez = new EvidencijaZapis(imeIgraca, x, y, biljeska);
+    public synchronized void dodajZapis(String imeIgraca, int x, int y, int[][] poljeBrodova, String biljeska) { //metoda je synchronized kako bi se provodilo medjusobno iskljucivanje dretvi
+        EvidencijaZapis ez = new EvidencijaZapis(imeIgraca, x, y, poljeBrodova, biljeska);
     }
 
     /**
@@ -51,12 +51,12 @@ public class Evidencija implements Serializable {
     public void prikazEvidencije() {
         for (int j = 0; j < this.evidencija.size(); j++) {
             EvidencijaZapis ev = evidencija.get(j);
-            System.out.println("Vrijeme: " + ev.vrijeme + "| Ime igraca: " + ev.imeIgraca + "| Gadjana lokacija: " + ev.x + "," + ev.y + "| Biljeska: " + ev.biljeska );
+            System.out.println("Vrijeme: " + ev.vrijeme + "| Ime igraca: " + ev.imeIgraca + "| Gadjana lokacija: " + ev.x + "," + ev.y + "| Biljeska: " + ev.biljeska);
             System.out.println("Igre kreirana:" + igra.igraKreirana());
         }
     }
-    
-    public ArrayList<EvidencijaZapis> dohvatiZapise(){
+
+    public ArrayList<EvidencijaZapis> dohvatiZapise() {
         return this.evidencija;
     }
 
@@ -74,11 +74,12 @@ public class Evidencija implements Serializable {
      */
     public class EvidencijaZapis implements Serializable {
 
-        private String vrijeme;
-        private String imeIgraca;
-        private int x;
-        private int y;
-        private String biljeska;
+        private final String vrijeme;
+        private final String imeIgraca;
+        private final int x;
+        private final int y;
+        private final String biljeska;
+        private  int[][] poljeBrodova;
 
         /**
          * Konstruktor klase za spremanje zapisa.
@@ -86,9 +87,10 @@ public class Evidencija implements Serializable {
          * @param imeIgraca
          * @param x koordinata pozicije koja se gadja
          * @param y koordinata pozicije koja se gadja
+         * @param poljeBrodova trenutno stanje ploce
          * @param biljeska dodatna biljeska
          */
-        public EvidencijaZapis(String imeIgraca, int x, int y, String biljeska) {
+        public EvidencijaZapis(String imeIgraca, int x, int y, int[][] poljeBrodova, String biljeska) {
             Date trenutnoVrijeme = new Date();
             SimpleDateFormat sdf = new SimpleDateFormat("dd-M-yyyy H:mm:ss");
             this.vrijeme = sdf.format(trenutnoVrijeme);
@@ -96,6 +98,13 @@ public class Evidencija implements Serializable {
             this.x = x;
             this.y = y;
             this.biljeska = biljeska;
+            this.poljeBrodova = new int[poljeBrodova.length][poljeBrodova[0].length];
+            System.out.println("DULJINA: " + poljeBrodova.length + "DULJ2: " + poljeBrodova[0].length);
+            for (int i=0; i<poljeBrodova.length; i++){ //za ovo vjerojatno postoji elegantnije rjesenje, probao sa arraycopy, copyof, clone ali ne radi :(
+                for(int j=0; j<poljeBrodova[i].length; j++){
+                    this.poljeBrodova[i][j] = poljeBrodova[i][j];
+                }
+            }
             evidencija.add(this);
         }
 
@@ -118,7 +127,10 @@ public class Evidencija implements Serializable {
         public String getBiljeska() {
             return biljeska;
         }
-        
+
+        public int[][] getPoljeBrodova() {
+            return poljeBrodova;
+        }
 
     }
 
