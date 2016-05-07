@@ -24,7 +24,7 @@ public class ServerSustava {
     private static boolean zaustavljen = false; //za zaustavljanje rada servera
     private static boolean pauziran = false; //za pauziranje rada servera
     private Socket klijent;
-    private Evidencija evid;
+    private static Evidencija evid;
     private PotapanjeBrodova igra;
     private static SerijalizatorEvidencije se;
 
@@ -60,13 +60,13 @@ public class ServerSustava {
         Konfiguracija konfig = null;
         File dat = new File(this.datoteka);
         if (!dat.exists()) { //provjeravam da li postoji datoteka konfiguracije
-            System.out.println("Datoteka konfiguracije ne postoji.");
+            evid.dodajServerZapis("Datoteka konfiguracije ne postoji.");
             return;
         } else {
             try {//ako postoji pokusavam preuzeti konfiguraciju i spremiti ju u memoriju
                 konfig = KonfiguracijaApstraktna.preuzmiKonfiguraciju(this.datoteka);
             } catch (NemaKonfiguracije ex) {
-                System.out.println("Greska prilikom preuzimanja konfiguracije " + ex.getMessage());
+                evid.dodajServerZapis("Greska prilikom preuzimanja konfiguracije " + ex.getMessage());
             }
         }
 
@@ -83,7 +83,7 @@ public class ServerSustava {
 
         } //ako postoji stara igra ucitavam nju
         else {
-            System.out.println("SERVER | Ucitavam staru igru...");
+            evid.dodajServerZapis("SERVER | Ucitavam staru igru...");
             se = new SerijalizatorEvidencije(konfig);
             this.evid = se.ucitajEvidenciju();
             igra = evid.dohvatiSpremljenuIgru();
@@ -103,7 +103,7 @@ public class ServerSustava {
         //kreiram dretve i spremam ih u grupu
         for (int i = 0; i < brojDretvi; i++) {
             dretve[i] = new ObradaZahtjeva(tg, "alebenkov_" + i, konfig, igra, evid);
-            System.out.println("SERVER | Kreiram dretvu " + dretve[i].getName() + " " + dretve[i].getState());
+            evid.dodajServerZapis("SERVER | Kreiram dretvu " + dretve[i].getName() + " " + dretve[i].getState());
         }
 
         try {
@@ -112,7 +112,7 @@ public class ServerSustava {
             //ss.setSoTimeout(10000); //da ne blokira kod citanja do kraja vec 1000
             while (!zaustavljen) {
                 this.klijent = ss.accept(); //cekam da se igrac spoji
-                System.out.println("SERVER | Zahtjev primljen, trazim slobodnu dretvu...");
+                evid.dodajServerZapis("SERVER | Zahtjev primljen, trazim slobodnu dretvu...");
                 int sd = dajSlobodnuDretvu(dretve); //trazim slobodnu dretvu
                 if (sd == -1) { //ako nema slobodne dretve saljem igracu poruku
                     OutputStream os = null;
@@ -130,17 +130,17 @@ public class ServerSustava {
                                 os.close();
                             }
                         } catch (IOException ex) {
-                            System.out.println(" | GRESKA kod IO operacija 2");
+                            evid.dodajServerZapis(" | GRESKA kod IO operacija 2");
                         }
                     }
-                    System.out.println("SERVER | ERROR 80: Nema slobodne dretve.");
+                    evid.dodajServerZapis("SERVER | ERROR 80: Nema slobodne dretve.");
                 } else {//ako postoji slobodna dretva radim sljedece:
 
                     if (dretve[sd].brojacRada() > 0) {//ako je dretva do sada radila ona radim interrupt nad njom kako bi nastavila
-                        System.out.println("SERVER | Ponovno pokrecem dretvu " + dretve[sd].getName());
+                        evid.dodajServerZapis("SERVER | Ponovno pokrecem dretvu " + dretve[sd].getName());
                         dretve[sd].interrupt();
                     } else {//ako nije onda ju pokrecem
-                        System.out.println("SERVER | Pokrecem dretvu " + dretve[sd].getName());
+                        evid.dodajServerZapis("SERVER | Pokrecem dretvu " + dretve[sd].getName());
                         dretve[sd].start(); //pokrecem prvu slobodnu dretvu
                     }
                     dretve[sd].setSocket(this.klijent); //saljem dretvi podatke o socketu klijenta/igraca
@@ -149,7 +149,7 @@ public class ServerSustava {
 
             }
         } catch (IOException ex) {
-            System.out.println("SERVER | Nastala greska prilikom rada socketa " + ex.getMessage());
+            evid.dodajServerZapis("SERVER | Nastala greska prilikom rada socketa " + ex.getMessage());
         }
     }
 
@@ -166,9 +166,10 @@ public class ServerSustava {
         //radim posebnu petlju za ispis stanja dretvi kako bi izbjegao komplikacije kod samog izbora
         for (int i = 0; i < dretve.length; i++) {
             if (dretve[i].stanjeDretve() == 0) {
-                System.out.println("SERVER | Dretva " + dretve[i].getName() + " je slobodna.");
+                evid.dodajServerZapis("SERVER | Dretva " + dretve[i].getName() + " je slobodna.");
+                
             } else if (dretve[i].stanjeDretve() == 1) {
-                System.out.println("SERVER | Dretva " + dretve[i].getName() + " je zauzeta.");
+                evid.dodajServerZapis("SERVER | Dretva " + dretve[i].getName() + " je zauzeta.");
             }
         }
         for (int i = 0; i < dretve.length; i++) {
@@ -224,6 +225,10 @@ public class ServerSustava {
     public static void zaustaviSerijalizaciju(){
         se.zaustaviSerijalizacijuEvidencije();
         se.spremiEvidenciju();
+    }
+
+    public static Evidencija getEvid() {
+        return evid;
     }
 
 }

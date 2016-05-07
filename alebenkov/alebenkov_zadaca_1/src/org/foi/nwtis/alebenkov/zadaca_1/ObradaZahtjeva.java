@@ -64,8 +64,8 @@ public class ObradaZahtjeva extends Thread {
         this.brojacRada += 1;
         long pocetakRadaDretve = System.currentTimeMillis(); //biljezim pocetak rada dretve
 
-        System.out.println(this.getName() + " | Pokrecem dretvu koja ce posluziti korisnika.| Brojac rada: " + this.brojacRada + ". | Stanje dretve: " + this.getState());
-
+        //System.out.println(this.getName() + " | Pokrecem dretvu koja ce posluziti korisnika.| Brojac rada: " + this.brojacRada + ". | Stanje dretve: " + this.getState());
+        evid.dodajServerZapis(this.getName() + " | Pokrecem dretvu koja ce posluziti korisnika.| Brojac rada: " + this.brojacRada + ". | Stanje dretve: " + this.getState());
         //GLAVNA LOGIKA
         StringBuilder naredba = null;
         int c;
@@ -80,7 +80,7 @@ public class ObradaZahtjeva extends Thread {
                 naredba.append((char) c);
             }
 
-            System.out.println("SERVER | Primljena naredba od korisnika: " + naredba);
+            evid.dodajServerZapis("SERVER | Primljena naredba od korisnika: " + naredba);
 
             if (naredba.toString().isEmpty()) {//ukoliko kojim slucajem nisam primio naredbu..
                 out.write("SERVER | ERROR: Nisam zaprimio nikakvu naredbu.\n");
@@ -121,8 +121,7 @@ public class ObradaZahtjeva extends Thread {
                 if (mU == null) {
                     out.write("SERVER | ERROR: Neispravni format naredbe.\n");
                 } else //System.out.println("SERVER | Primio sam korisnicki zahtjev. Provjeravam njegove parametre...");
-                {
-                    if (mU.group(2).contains("PLAY")) {
+                 if (mU.group(2).contains("PLAY")) {
                         userObradaPlay(mU.group(1));
                     } else if (naredba.indexOf("[") != -1) {
                         String imeIgraca = mU.group(1);
@@ -133,7 +132,6 @@ public class ObradaZahtjeva extends Thread {
                     } else if (mU.group(2).contains("STAT")) {
                         userObradaStat(mU.group(1));
                     }
-                }
             }
             //KRAJ LOGIKE USERA
             out.flush();
@@ -162,10 +160,10 @@ public class ObradaZahtjeva extends Thread {
         //po zavrsetku svih poslova dretve, saljem ju na spavanje
         long trajanjeRadaDretve = System.currentTimeMillis() - pocetakRadaDretve;
         try {
-            System.out.println(this.getName() + " | Saljem dretvu na spavanje");
+            evid.dodajServerZapis(this.getName() + " | Saljem dretvu na spavanje");
             sleep(5000 - trajanjeRadaDretve);
 
-            System.out.println(this.getName() + " | Dretva dosla sa spavanja");
+            evid.dodajServerZapis(this.getName() + " | Dretva dosla sa spavanja");
         } catch (InterruptedException ex) {
             System.out.println(this.getName() + " | Prekid dretve za vrijeme spavanja");
         }
@@ -176,7 +174,7 @@ public class ObradaZahtjeva extends Thread {
             try {
                 this.wait();
             } catch (InterruptedException ex) {
-                System.out.println(this.getName() + " | Dretva nastavlja s radom");
+                evid.dodajServerZapis(this.getName() + " | Dretva nastavlja s radom");
             }
         }
 
@@ -281,7 +279,7 @@ public class ObradaZahtjeva extends Thread {
     private void adminObradaStop() throws IOException {
         ServerSustava.zaustaviSerijalizaciju();
         out.write("SERVER | OK\n");
-        System.out.println("SERVER | Prekidam serijalizaciju evidencije i spremam trenutno stanje.");
+        evid.dodajServerZapis("SERVER | Prekidam serijalizaciju evidencije i spremam trenutno stanje.");
     }
 
     private void adminObradaStat() throws IOException {
@@ -382,10 +380,12 @@ public class ObradaZahtjeva extends Thread {
             ArrayList<Evidencija.EvidencijaZapis> evidencija = evid.dohvatiZapise();
             for (int j = 0; j < evidencija.size(); j++) {
                 Evidencija.EvidencijaZapis ev = evidencija.get(j);
-                out.write("-------------------------------------\n"
-                        + "| Vrijeme: " + ev.getVrijeme() + "| Ime igraca: " + ev.getImeIgraca()
-                        + "\n| Gadjana lokacija: " + ev.getX() + "," + ev.getY() + " | Status: " + ev.getBiljeska() + ""
-                        + "\n -------------------------------------\n");
+                if (ev.getImeIgraca() == ime) {
+                    out.write("-------------------------------------\n| TVOJ POTEZ:");
+                } else {
+                    out.write("-------------------------------------\n| PROTIVNICKI POTEZ (" + ev.getImeIgraca() + ") :\n");
+                }
+                
                 int[][] poljeBrodova = ev.getPoljeBrodova();
                 for (int i = 0; i < poljeBrodova.length; i++) {
                     for (int k = 0; k < poljeBrodova[0].length; k++) {
@@ -398,6 +398,7 @@ public class ObradaZahtjeva extends Thread {
                     }
                     out.write("\n");
                 }
+                out.write(" | Status: " + ev.getBiljeska() + "\n -------------------------------------\n");
             }
 
         }

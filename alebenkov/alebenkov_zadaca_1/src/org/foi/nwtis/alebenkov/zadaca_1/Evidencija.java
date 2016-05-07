@@ -8,7 +8,6 @@ package org.foi.nwtis.alebenkov.zadaca_1;
 import java.io.Serializable;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Date;
 
 /**
@@ -20,6 +19,7 @@ public class Evidencija implements Serializable {
 
     private PotapanjeBrodova igra;
     private ArrayList<EvidencijaZapis> evidencija = new ArrayList(); //ovdje spremam zapise o radu servera
+    private ArrayList<EvidencijaServeraZapis> evidencijaServera = new ArrayList();
 
     /**
      * Konstruktor klase
@@ -44,6 +44,14 @@ public class Evidencija implements Serializable {
     public synchronized void dodajZapis(String imeIgraca, int x, int y, int[][] poljeBrodova, String biljeska) { //metoda je synchronized kako bi se provodilo medjusobno iskljucivanje dretvi
         EvidencijaZapis ez = new EvidencijaZapis(imeIgraca, x, y, poljeBrodova, biljeska);
     }
+    
+    /**
+     * Kreira novi zapis u evidenciji o stanju servera
+     * @param biljeska
+     */
+    public synchronized void dodajServerZapis(String biljeska) { //za biljezenje rada dretvi
+        EvidencijaServeraZapis esz = new EvidencijaServeraZapis(biljeska);
+    }
 
     /**
      * Ispisuje korisne informacije same evidencije na ekran
@@ -56,8 +64,16 @@ public class Evidencija implements Serializable {
         }
     }
 
+    /**
+     *
+     * @return
+     */
     public ArrayList<EvidencijaZapis> dohvatiZapise() {
         return this.evidencija;
+    }
+
+    public ArrayList<EvidencijaServeraZapis> getEvidencijaServera() {
+        return evidencijaServera;
     }
 
     /**
@@ -70,7 +86,7 @@ public class Evidencija implements Serializable {
     }
 
     /**
-     * Klasa za pohranu zapisa o radu servera.
+     * Klasa za pohranu zapisa o igri.
      */
     public class EvidencijaZapis implements Serializable {
 
@@ -108,30 +124,85 @@ public class Evidencija implements Serializable {
             evidencija.add(this);
         }
 
+        /**
+         *
+         * @return
+         */
         public String getVrijeme() {
             return vrijeme;
         }
 
+        /**
+         *
+         * @return
+         */
         public String getImeIgraca() {
             return imeIgraca;
         }
 
+        /**
+         *
+         * @return
+         */
         public int getX() {
             return x;
         }
 
+        /**
+         *
+         * @return
+         */
         public int getY() {
             return y;
         }
 
+        /**
+         *
+         * @return
+         */
         public String getBiljeska() {
             return biljeska;
         }
 
+        /**
+         *
+         * @return
+         */
         public int[][] getPoljeBrodova() {
             return poljeBrodova;
         }
 
+    }
+    
+    /**
+     * Klasa za pohranu zapisa o stanju servera
+     */
+    public class EvidencijaServeraZapis implements Serializable {
+         private final String vrijeme;
+         private final String zapis;
+
+        /**
+         *
+         * @param zapis
+         */
+        public EvidencijaServeraZapis(String zapis) {
+            System.out.println(zapis); //prikaz na admin konzoli
+            Date trenutnoVrijeme = new Date();
+            SimpleDateFormat sdf = new SimpleDateFormat("dd-M-yyyy H:mm:ss");
+            this.vrijeme = sdf.format(trenutnoVrijeme);
+            this.zapis = zapis;
+            evidencijaServera.add(this);
+        }
+
+        public String getVrijeme() {
+            return vrijeme;
+        }
+
+        public String getZapis() {
+            return zapis;
+        }
+         
+         
     }
 
 }
