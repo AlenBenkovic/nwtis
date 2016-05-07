@@ -89,7 +89,7 @@ public class SerijalizatorEvidencije extends Thread {
      * Ucitavanje evidencije iz datoteke
      * @return evidenciju iz datoteke (Evidencija)
      */
-    public Evidencija ucitajEvidenciju() {
+    public synchronized Evidencija ucitajEvidenciju() {
         Evidencija e = null;
         try {
             String dat = konfig.dajPostavku("evidDatoteka");
@@ -112,6 +112,9 @@ public class SerijalizatorEvidencije extends Thread {
         return e;
     }
     
+    /**
+     * Metoda za zaustavljanje serijalizacije
+     */
     public void zaustaviSerijalizacijuEvidencije(){
         this.zaustavi = true;
     }

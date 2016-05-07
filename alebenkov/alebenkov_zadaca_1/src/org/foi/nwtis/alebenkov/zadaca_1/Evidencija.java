@@ -65,13 +65,17 @@ public class Evidencija implements Serializable {
     }
 
     /**
-     *
-     * @return
+     * Dohvat zapisa o igri
+     * @return zapisi o igri
      */
     public ArrayList<EvidencijaZapis> dohvatiZapise() {
         return this.evidencija;
     }
 
+    /**
+     * Dohvat zapisa o radu servera
+     * @return zapisi o serveru
+     */
     public ArrayList<EvidencijaServeraZapis> getEvidencijaServera() {
         return evidencijaServera;
     }
@@ -98,7 +102,7 @@ public class Evidencija implements Serializable {
         private  int[][] poljeBrodova;
 
         /**
-         * Konstruktor klase za spremanje zapisa.
+         * Konstruktor klase za spremanje zapisa o igri.
          *
          * @param imeIgraca
          * @param x koordinata pozicije koja se gadja
@@ -115,7 +119,6 @@ public class Evidencija implements Serializable {
             this.y = y;
             this.biljeska = biljeska;
             this.poljeBrodova = new int[poljeBrodova.length][poljeBrodova[0].length];
-            System.out.println("DULJINA: " + poljeBrodova.length + "DULJ2: " + poljeBrodova[0].length);
             for (int i=0; i<poljeBrodova.length; i++){ //za ovo vjerojatno postoji elegantnije rjesenje, probao sa arraycopy, copyof, clone ali ne radi :(
                 for(int j=0; j<poljeBrodova[i].length; j++){
                     this.poljeBrodova[i][j] = poljeBrodova[i][j];
@@ -182,8 +185,8 @@ public class Evidencija implements Serializable {
          private final String zapis;
 
         /**
-         *
-         * @param zapis
+         * Konstruktor klase
+         * @param zapis za spremanje u evidenciju rada servera
          */
         public EvidencijaServeraZapis(String zapis) {
             System.out.println(zapis); //prikaz na admin konzoli
@@ -194,10 +197,18 @@ public class Evidencija implements Serializable {
             evidencijaServera.add(this);
         }
 
+        /**
+         *
+         * @return
+         */
         public String getVrijeme() {
             return vrijeme;
         }
 
+        /**
+         *
+         * @return
+         */
         public String getZapis() {
             return zapis;
         }

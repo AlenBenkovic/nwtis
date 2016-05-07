@@ -8,5 +8,5 @@ adminKorLozinka=1213
 brojDretvi=2
 brojX=3
 brojY=3
-brojIgraca=2
+brojIgraca=3
 brojBrodova=2

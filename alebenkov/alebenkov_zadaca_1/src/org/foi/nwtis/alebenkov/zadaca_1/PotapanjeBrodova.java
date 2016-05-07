@@ -207,7 +207,9 @@ public class PotapanjeBrodova implements Serializable {
         int min = 9999;
         for (int i = 0; i < trenutniBrojIgraca; i++) {
             if (igraci[i].dohvatiBrojPoteza() < min) {
-                min = igraci[i].dohvatiBrojPoteza();
+                if(igraci[i].dohvatiBrojBrodova() != 0){//na ovaj nacin one koji su ispali iz igre ne racunam za cekanje
+                    min = igraci[i].dohvatiBrojPoteza();
+                }
             }
         }
         return min;
@@ -331,7 +333,9 @@ public class PotapanjeBrodova implements Serializable {
                 int igracPoteza = igraci[i].dohvatiBrojPoteza();
                 for (int j = 0; j < trenutniBrojIgraca; j++) {
                     if (igraci[j].dohvatiBrojPoteza() < igracPoteza) {
-                        brojIgraca++;
+                        if(igraci[j].dohvatiBrojBrodova() != 0){
+                            brojIgraca++;
+                        }
                     }
                 }
             }
@@ -379,7 +383,7 @@ public class PotapanjeBrodova implements Serializable {
      * Sluzi za prikaz svih brodova na ploci
      */
     public void prikazSvihBrodova() {
-        System.out.println("IGRA | Polje brodova: " + Arrays.deepToString(this.poljeBrodova));
+        System.out.println("IGRA | Polje brodova: ");
         for (int i = 0; i < poljeBrodova.length; i++) {
 
             for (int j = 0; j < poljeBrodova[0].length; j++) {

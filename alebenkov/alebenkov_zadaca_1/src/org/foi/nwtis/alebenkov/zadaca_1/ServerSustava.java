@@ -76,18 +76,18 @@ public class ServerSustava {
             int x = Integer.parseInt(konfig.dajPostavku("brojX"));
             int y = Integer.parseInt(konfig.dajPostavku("brojY"));
             int brojBrodova = Integer.parseInt(konfig.dajPostavku("brojBrodova"));
-            igra = new PotapanjeBrodova(brojIgraca, x, y, brojBrodova);
-            evid = new Evidencija(igra);
+            igra = new PotapanjeBrodova(brojIgraca, x, y, brojBrodova); //kreiram novu igru sa postavkama iz datoteke
+            evid = new Evidencija(igra); //kreiram evidenciju za novu igru
             evid.dodajServerZapis("SERVER | Kreiram novu igru. Broj igraca: " + brojIgraca + ". Broj brodova: " + brojBrodova + ". Velicina ploce: " + x + " x " + y + ".");
-            se = new SerijalizatorEvidencije(konfig, evid);
-            se.start(); //pokrecem serijalizaciju evidencije svakih n sekundi
+            se = new SerijalizatorEvidencije(konfig, evid); //kreiram dretvu zaduzenu za serijalizaciju evidencije
+            se.start(); //pokrecem serijalizaciju evidencije svakih n sekundi(postavka u konfig datoteci)
 
         } //ako postoji stara igra ucitavam nju
         else {
-            se = new SerijalizatorEvidencije(konfig);
-            this.evid = se.ucitajEvidenciju();
+            se = new SerijalizatorEvidencije(konfig);//kreiram dretvu za serijalizaciju
+            this.evid = se.ucitajEvidenciju(); //ucitavam serijaliziranu evidenciju
             //evid.dodajServerZapis("SERVER | Ucitavam spremljenu igru...");
-            igra = evid.dohvatiSpremljenuIgru();
+            igra = evid.dohvatiSpremljenuIgru(); //iz spremljene evidencije ucitavam spremljenu igru
             se.start();
 
         }
@@ -227,8 +227,16 @@ public class ServerSustava {
         se.spremiEvidenciju();
     }
 
+    /**
+     * Dohvat evidencije
+     * @return evidenciju
+     */
     public static Evidencija getEvid() {
         return evid;
+    }
+
+    public static void zaustaviRadServera() {
+        System.exit(0);       
     }
 
 }

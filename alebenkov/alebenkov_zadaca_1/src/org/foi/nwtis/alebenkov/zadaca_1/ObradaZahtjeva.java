@@ -89,8 +89,8 @@ public class ObradaZahtjeva extends Thread {
                 Matcher mA = provjeraRegex(naredba, 1);
                 if (mA == null) {
                     out.write("SERVER | ERROR: Neispravni format naredbe.\n");
-                } else {
-                    //System.out.println("SERVER | Primio sam adminov zahtjev. Provjeravam njegove podatke...");
+                } else //System.out.println("SERVER | Primio sam adminov zahtjev. Provjeravam njegove podatke...");
+                {
                     if (adminPrijava(mA.group(1), mA.group(2))) {//provjeravam adminove podatke i ako je sve ok nastavljam s obradom
                         out.write("SERVER | Pozdrav, " + mA.group(1) + "\n");
 
@@ -123,16 +123,16 @@ public class ObradaZahtjeva extends Thread {
                     out.write("SERVER | ERROR: Neispravni format naredbe.\n");
                     evid.dodajServerZapis("SERVER | ERROR: Neispravni format naredbe.\n");
                 } else if (mU.group(2).contains("PLAY")) {
-                        userObradaPlay(mU.group(1));
-                    } else if (naredba.indexOf("[") != -1) {
-                        String imeIgraca = mU.group(1);
-                        int xIgraca = Integer.parseInt(mU.group(3));
-                        int yIgraca = Integer.parseInt(mU.group(5));
+                    userObradaPlay(mU.group(1));
+                } else if (naredba.indexOf("[") != -1) {
+                    String imeIgraca = mU.group(1);
+                    int xIgraca = Integer.parseInt(mU.group(3));
+                    int yIgraca = Integer.parseInt(mU.group(5));
 
-                        userObradaIgraj(imeIgraca, xIgraca, yIgraca);
-                    } else if (mU.group(2).contains("STAT")) {
-                        userObradaStat(mU.group(1));
-                    }
+                    userObradaIgraj(imeIgraca, xIgraca, yIgraca);
+                } else if (mU.group(2).contains("STAT")) {
+                    userObradaStat(mU.group(0));
+                }
             }
             //KRAJ LOGIKE USERA
             out.flush();
@@ -280,32 +280,40 @@ public class ObradaZahtjeva extends Thread {
     }
 
     private void adminObradaStop() throws IOException {
-        ServerSustava.zaustaviSerijalizaciju();
         out.write("SERVER | OK\n");
-        evid.dodajServerZapis("SERVER | Prekidam serijalizaciju evidencije i spremam trenutno stanje.");
+        evid.dodajServerZapis("SERVER | Prekidam serijalizaciju evidencije, spremam trenutno stanje i zaustavljam server.");
+        ServerSustava.zaustaviSerijalizaciju();
+        out.flush();
+        ServerSustava.zaustaviRadServera();
     }
 
     private void adminObradaStat() throws IOException {
         ArrayList<Evidencija.EvidencijaZapis> evidencija = evid.dohvatiZapise();
-        for (int j = 0; j < evidencija.size(); j++) {
-            Evidencija.EvidencijaZapis ev = evidencija.get(j);
-            out.write("-------------------------------------\n"
-                    + "| Vrijeme: " + ev.getVrijeme() + " | Ime igraca: " + ev.getImeIgraca()
-                    + "\n| Gadjana lokacija: " + ev.getX() + "," + ev.getY() + " | Status: " + ev.getBiljeska() + ""
-                    + "\n -------------------------------------\n");
-            int[][] poljeBrodova = ev.getPoljeBrodova();
-            for (int i = 0; i < poljeBrodova.length; i++) {
-                for (int k = 0; k < poljeBrodova[0].length; k++) {
-                    if (i == ev.getX() - 1 && k == ev.getY() - 1) {
-                        out.write("X\t");
-                    } else {
-                        out.write(poljeBrodova[i][k] + "\t");
-                    }
+        if (evidencija.isEmpty()) {
+            out.write("SERVER | ERROR 10: Trenutno nema zapisa o igri.");
+        } else {
+            for (int j = 0; j < evidencija.size(); j++) {
+                Evidencija.EvidencijaZapis ev = evidencija.get(j);
+                out.write("-------------------------------------\n"
+                        + "| Vrijeme: " + ev.getVrijeme() + " | Ime igraca: " + ev.getImeIgraca()
+                        + "\n| Gadjana lokacija: " + ev.getX() + "," + ev.getY() + " | Status: " + ev.getBiljeska() + ""
+                        + "\n -------------------------------------\n");
+                int[][] poljeBrodova = ev.getPoljeBrodova();
+                for (int i = 0; i < poljeBrodova.length; i++) {
+                    for (int k = 0; k < poljeBrodova[0].length; k++) {
+                        if (i == ev.getX() - 1 && k == ev.getY() - 1) {
+                            out.write("X\t");
+                        } else {
+                            out.write(poljeBrodova[i][k] + "\t");
+                        }
 
+                    }
+                    out.write("\n");
                 }
-                out.write("\n");
             }
+
         }
+
     }
 
     private void userObradaPlay(String ime) throws IOException {
@@ -320,7 +328,7 @@ public class ObradaZahtjeva extends Thread {
                 }
             } else {
                 out.write("SERVER | ERROR10: Nema slobodnih mjesta za igru.\n");
-                 evid.dodajServerZapis("Igrac sa istim imenom vec postoji!");
+                evid.dodajServerZapis("Igrac sa istim imenom vec postoji!");
             }
         } else {
             out.write("ERROR | Igra jos nije kreirana!");
@@ -344,7 +352,7 @@ public class ObradaZahtjeva extends Thread {
                     evid.dodajZapis(ime, x, y, igra.getPoljeBrodova(), "Igrac nema vise svojih brodova.");
                 } else if (igra.neprijateljiUnisteni(idIgraca)) {
                     out.write("SERVER | OK 9");
-                    evid.dodajZapis(ime, x, y, igra.getPoljeBrodova(), "Igrac je unistio sve protivnicke brodove!");
+                    evid.dodajZapis(ime, x, y, igra.getPoljeBrodova(), "Igrac je unistio sve protivnicke brodove! POBJEDNIK!!!");
                 } else if ((igra.brojPotezaIgraca(idIgraca) - igra.minBrojPoteza()) == 0) {
                     igra.povecajBrojPoteza(idIgraca);
                     if (igra.pogodiBrod(idIgraca, x - 1, y - 1)) {
@@ -386,12 +394,12 @@ public class ObradaZahtjeva extends Thread {
             ArrayList<Evidencija.EvidencijaZapis> evidencija = evid.dohvatiZapise();
             for (int j = 0; j < evidencija.size(); j++) {
                 Evidencija.EvidencijaZapis ev = evidencija.get(j);
-                if (ev.getImeIgraca() == ime) {
+                if (ev.getImeIgraca().equals(ime)) {
                     out.write("-------------------------------------\n| TVOJ POTEZ:");
                 } else {
                     out.write("-------------------------------------\n| PROTIVNICKI POTEZ (" + ev.getImeIgraca() + ") :\n");
                 }
-                
+
                 int[][] poljeBrodova = ev.getPoljeBrodova();
                 for (int i = 0; i < poljeBrodova.length; i++) {
                     for (int k = 0; k < poljeBrodova[0].length; k++) {
