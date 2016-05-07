@@ -44,16 +44,15 @@ public class KlijentSustava {
     }
 
     public void PokreniKlijentSustava() {
-        System.out.println("Pokrecem klijenta...");
+        //System.out.println("Pokrecem klijenta...");
         Socket server = null;
         InputStream is = null;
         OutputStream os = null;
         String command;
         StringBuilder odgovor;
         int znak;
-        System.out.println("STAT: " +stat);
         try {
-            System.out.println("Spajam se na server " + this.server + ":" + port);
+            //System.out.println("Spajam se na server " + this.server + ":" + port);
             server = new Socket(this.server, this.port);
             is = server.getInputStream();
             os = server.getOutputStream();

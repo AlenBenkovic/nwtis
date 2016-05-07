@@ -56,17 +56,17 @@ public class ServerSustava {
      * dretvi na obradu
      */
     public void pokreniServer() {
-        System.out.println("Pokrecem server!");
+        //System.out.println("Pokrecem server!");
         Konfiguracija konfig = null;
         File dat = new File(this.datoteka);
         if (!dat.exists()) { //provjeravam da li postoji datoteka konfiguracije
-            evid.dodajServerZapis("Datoteka konfiguracije ne postoji.");
+            System.out.println("Datoteka konfiguracije ne postoji.");
             return;
         } else {
             try {//ako postoji pokusavam preuzeti konfiguraciju i spremiti ju u memoriju
                 konfig = KonfiguracijaApstraktna.preuzmiKonfiguraciju(this.datoteka);
             } catch (NemaKonfiguracije ex) {
-                evid.dodajServerZapis("Greska prilikom preuzimanja konfiguracije " + ex.getMessage());
+                System.out.println("Greska prilikom preuzimanja konfiguracije " + ex.getMessage());
             }
         }
 
@@ -78,18 +78,17 @@ public class ServerSustava {
             int brojBrodova = Integer.parseInt(konfig.dajPostavku("brojBrodova"));
             igra = new PotapanjeBrodova(brojIgraca, x, y, brojBrodova);
             evid = new Evidencija(igra);
+            evid.dodajServerZapis("SERVER | Kreiram novu igru. Broj igraca: " + brojIgraca + ". Broj brodova: " + brojBrodova + ". Velicina ploce: " + x + " x " + y + ".");
             se = new SerijalizatorEvidencije(konfig, evid);
             se.start(); //pokrecem serijalizaciju evidencije svakih n sekundi
 
         } //ako postoji stara igra ucitavam nju
         else {
-            evid.dodajServerZapis("SERVER | Ucitavam staru igru...");
             se = new SerijalizatorEvidencije(konfig);
             this.evid = se.ucitajEvidenciju();
+            //evid.dodajServerZapis("SERVER | Ucitavam spremljenu igru...");
             igra = evid.dohvatiSpremljenuIgru();
-            evid.prikazEvidencije();
             se.start();
-           
 
         }
 
@@ -167,7 +166,7 @@ public class ServerSustava {
         for (int i = 0; i < dretve.length; i++) {
             if (dretve[i].stanjeDretve() == 0) {
                 evid.dodajServerZapis("SERVER | Dretva " + dretve[i].getName() + " je slobodna.");
-                
+
             } else if (dretve[i].stanjeDretve() == 1) {
                 evid.dodajServerZapis("SERVER | Dretva " + dretve[i].getName() + " je zauzeta.");
             }
@@ -218,11 +217,12 @@ public class ServerSustava {
             return null;
         }
     }
-    
+
     /**
-     * Metoda za zaustavljanje serijalizacije evidencije i njeno spremanje nakon zaustavljanja
+     * Metoda za zaustavljanje serijalizacije evidencije i njeno spremanje nakon
+     * zaustavljanja
      */
-    public static void zaustaviSerijalizaciju(){
+    public static void zaustaviSerijalizaciju() {
         se.zaustaviSerijalizacijuEvidencije();
         se.spremiEvidenciju();
     }

@@ -64,8 +64,7 @@ public class ObradaZahtjeva extends Thread {
         this.brojacRada += 1;
         long pocetakRadaDretve = System.currentTimeMillis(); //biljezim pocetak rada dretve
 
-        //System.out.println(this.getName() + " | Pokrecem dretvu koja ce posluziti korisnika.| Brojac rada: " + this.brojacRada + ". | Stanje dretve: " + this.getState());
-        evid.dodajServerZapis(this.getName() + " | Pokrecem dretvu koja ce posluziti korisnika.| Brojac rada: " + this.brojacRada + ". | Stanje dretve: " + this.getState());
+        evid.dodajServerZapis(this.getName() + " | Brojac rada: " + this.brojacRada + ". | Stanje dretve: " + this.getState());
         //GLAVNA LOGIKA
         StringBuilder naredba = null;
         int c;
@@ -91,7 +90,7 @@ public class ObradaZahtjeva extends Thread {
                 if (mA == null) {
                     out.write("SERVER | ERROR: Neispravni format naredbe.\n");
                 } else {
-                    System.out.println("SERVER | Primio sam adminov zahtjev. Provjeravam njegove podatke...");
+                    //System.out.println("SERVER | Primio sam adminov zahtjev. Provjeravam njegove podatke...");
                     if (adminPrijava(mA.group(1), mA.group(2))) {//provjeravam adminove podatke i ako je sve ok nastavljam s obradom
                         out.write("SERVER | Pozdrav, " + mA.group(1) + "\n");
 
@@ -108,6 +107,7 @@ public class ObradaZahtjeva extends Thread {
                         }
                     } else {
                         out.write("SERVER | ERROR 00: Neispravno korisnicko ime ili lozinka.\n");
+                        evid.dodajServerZapis("SERVER | ERROR 00: Neispravno korisnicko ime ili lozinka.");
                     }
                 }
 
@@ -115,13 +115,14 @@ public class ObradaZahtjeva extends Thread {
                 //LOGIKA USERA
             } else if (ServerSustava.provjeraPauziran()) {//ukoliko se ne radi o admin korisniku, provjeravam je li server pauziran
                 out.write("SERVER | ERROR: Server je pauziran i ne prima nove naredbe.\n");
+                evid.dodajServerZapis("SERVER | ERROR: Server je pauziran i ne prima nove naredbe.");
             } else if (naredba.indexOf("USER") != -1) {
 
                 Matcher mU = provjeraRegex(naredba, 2);
                 if (mU == null) {
                     out.write("SERVER | ERROR: Neispravni format naredbe.\n");
-                } else //System.out.println("SERVER | Primio sam korisnicki zahtjev. Provjeravam njegove parametre...");
-                 if (mU.group(2).contains("PLAY")) {
+                    evid.dodajServerZapis("SERVER | ERROR: Neispravni format naredbe.\n");
+                } else if (mU.group(2).contains("PLAY")) {
                         userObradaPlay(mU.group(1));
                     } else if (naredba.indexOf("[") != -1) {
                         String imeIgraca = mU.group(1);
@@ -250,9 +251,10 @@ public class ObradaZahtjeva extends Thread {
     private void adminObradaPause() throws IOException {
         if (!ServerSustava.provjeraPauziran()) {
             ServerSustava.SetPauziraj(true);
-            this.out.write("SERVER | OK\n");
+            out.write("SERVER | OK\n");
         } else {
-            this.out.write("SERVER | ERROR 01: Server je vec pauziran.\n");
+            out.write("SERVER | ERROR 01: Server je vec pauziran.\n");
+            evid.dodajServerZapis("SERVER | ERROR 01: Server je vec pauziran.");
         }
     }
 
@@ -262,16 +264,17 @@ public class ObradaZahtjeva extends Thread {
             out.write("SERVER | OK\n");
         } else {
             out.write("SERVER | ERROR 02: Server je vec pokrenut.\n");
+            evid.dodajServerZapis("SERVER | ERROR 02: Server je vec pokrenut.");
         }
     }
 
     private void adminObradaNew() throws IOException {
         if (!igra.igraKreirana()) {
             igra.kreirajBrodove();
-            evid.prikazEvidencije(); //samo radi provjere
             out.write("SERVER | OK\n");
         } else {
             out.write("ERROR | Igra je vec kreirana.\n");
+            evid.dodajServerZapis("ERROR | Igra je vec kreirana.");
         }
 
     }
@@ -287,7 +290,7 @@ public class ObradaZahtjeva extends Thread {
         for (int j = 0; j < evidencija.size(); j++) {
             Evidencija.EvidencijaZapis ev = evidencija.get(j);
             out.write("-------------------------------------\n"
-                    + "| Vrijeme: " + ev.getVrijeme() + "| Ime igraca: " + ev.getImeIgraca()
+                    + "| Vrijeme: " + ev.getVrijeme() + " | Ime igraca: " + ev.getImeIgraca()
                     + "\n| Gadjana lokacija: " + ev.getX() + "," + ev.getY() + " | Status: " + ev.getBiljeska() + ""
                     + "\n -------------------------------------\n");
             int[][] poljeBrodova = ev.getPoljeBrodova();
@@ -310,16 +313,18 @@ public class ObradaZahtjeva extends Thread {
             if (igra.provjeraSlobodnihMjesta()) {
                 if (igra.igracPrijava(ime)) {
                     int[][] kord = igra.koordinateBrodovaIgraca(igra.dohvatiIdIgraca(ime)); //uzimam koordinate njegovih brodova
-                    out.write("OK. \nVelicina ploce: " + igra.velicinaPloce() + ". Broj igraca: " + igra.getBrojIgraca() + ". Broj brodova: " + igra.getBrojBrodova() + ".\n Koordinate vasih brodova: " + Arrays.deepToString(kord));
-
+                    out.write("OK. \nVelicina ploce: " + igra.velicinaPloce() + ". Broj igraca: " + igra.getBrojIgraca() + ". Broj brodova: " + igra.getBrojBrodova() + ".\nKoordinate vasih brodova: " + Arrays.deepToString(kord));
                 } else {
                     out.write("Igrac sa istim imenom vec postoji!");
+                    evid.dodajServerZapis("Igrac sa istim imenom vec postoji!");
                 }
             } else {
                 out.write("SERVER | ERROR10: Nema slobodnih mjesta za igru.\n");
+                 evid.dodajServerZapis("Igrac sa istim imenom vec postoji!");
             }
         } else {
             out.write("ERROR | Igra jos nije kreirana!");
+            evid.dodajServerZapis("ERROR | Igra jos nije kreirana!");
         }
 
     }
@@ -358,18 +363,19 @@ public class ObradaZahtjeva extends Thread {
                     }
                 } else if ((igra.brojPotezaIgraca(idIgraca) - igra.minBrojPoteza()) != 0) {
                     out.write("SERVER | OK 2 (" + igra.brojIgracaCekanje(idIgraca) + ")");
-                    evid.dodajZapis(ime, x, y, igra.getPoljeBrodova(), "Igrac nije na redu za igranje. Broj igraca na cekanju: " + igra.brojIgracaCekanje(idIgraca));
+                    evid.dodajServerZapis("Igrac nije na redu za igranje. Broj igraca na cekanju: " + igra.brojIgracaCekanje(idIgraca));
                 } else {
                     out.write("SERVER | ERROR 10");
                 }
                 igra.prikazSvihBrodova();//ispis ploce brodova na konzolu servera
-                System.out.println(idIgraca + " " + ime + " X=" + x + ", Y=" + y);
 
             } else {
                 out.write("ERROR | Niste prijavljeni za igranje.");
+                evid.dodajServerZapis("ERROR | Niste prijavljeni za igranje.");
             }
         } else {
             out.write("ERROR | Igra jos nije pocela!");
+            evid.dodajServerZapis("ERROR | Igra jos nije pocela!");
         }
 
     }

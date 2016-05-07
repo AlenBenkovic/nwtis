@@ -39,7 +39,8 @@ public class PotapanjeBrodova implements Serializable {
         this.poljeBrodova = new int[brojX][brojY];
         this.igraci = new Igrac[brojIgraca];
         this.idIgre = 1 + (int) (Math.random() * ((1000 - 1) + 1)); //generiram nasumicni broj. Ovdje bi puno bolje bilo koristiti recimo UUID
-        System.out.println("IGRA | Kreiram novu igru sa ID igre: " + idIgre);
+        //System.out.println("SERVER | Kreiram novu igru sa ID igre: " + idIgre);
+        
     }
 
     public int[][] getPoljeBrodova() {
@@ -274,7 +275,7 @@ public class PotapanjeBrodova implements Serializable {
     }
 
     /**
-     * Metoda koja pove
+     * Metoda koja povecava broj pogodaka za odredjenog igraca
      *
      * @param id
      */

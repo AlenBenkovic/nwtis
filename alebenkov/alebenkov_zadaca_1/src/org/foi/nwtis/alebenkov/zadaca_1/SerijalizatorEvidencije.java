@@ -79,8 +79,7 @@ public class SerijalizatorEvidencije extends Thread {
             out.writeObject(evid);
             out.close();
             fileOut.close();
-            System.out.println("SERVER | Serijalizirana evidencija spremljena u " + dat);
-            evid.prikazEvidencije();
+            //System.out.println("SERVER | Serijalizirana evidencija spremljena u " + dat);
         } catch (IOException ex){
             System.out.println("ERROR | " + ex.getMessage());
         }
@@ -111,7 +110,6 @@ public class SerijalizatorEvidencije extends Thread {
             Logger.getLogger(SerijalizatorEvidencije.class.getName()).log(Level.SEVERE, null, ex);
         }
         return e;
-
     }
     
     public void zaustaviSerijalizacijuEvidencije(){

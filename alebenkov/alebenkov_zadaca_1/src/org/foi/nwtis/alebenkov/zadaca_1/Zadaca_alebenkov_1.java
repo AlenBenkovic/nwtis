@@ -45,7 +45,7 @@ public class Zadaca_alebenkov_1 {
                     ServerSustava server = new ServerSustava(naredba); //kreiram server i saljem mu paremetre naziv konfig datoteke i da li treba ucitati datoteku sa serijalizirnim podacima
                     server.pokreniServer(); //pokrecem server
                 } catch (Exception ex) {
-                    System.out.println("ERROR | Greska na serveru: " + ex.getMessage() + "\n");
+                    System.out.println("ERROR | Greska na serveru: " + ex.getMessage() + "\n"+ ex.toString());
                 }
 
                 break;
