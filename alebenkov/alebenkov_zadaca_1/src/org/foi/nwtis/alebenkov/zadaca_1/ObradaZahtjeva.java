@@ -90,8 +90,7 @@ public class ObradaZahtjeva extends Thread {
                 if (mA == null) {
                     out.write("SERVER | ERROR: Neispravni format naredbe.\n");
                 } else //System.out.println("SERVER | Primio sam adminov zahtjev. Provjeravam njegove podatke...");
-                {
-                    if (adminPrijava(mA.group(1), mA.group(2))) {//provjeravam adminove podatke i ako je sve ok nastavljam s obradom
+                 if (adminPrijava(mA.group(1), mA.group(2))) {//provjeravam adminove podatke i ako je sve ok nastavljam s obradom
                         out.write("SERVER | Pozdrav, " + mA.group(1) + "\n");
 
                         if (mA.group(3).contains("PAUSE")) {
@@ -109,7 +108,6 @@ public class ObradaZahtjeva extends Thread {
                         out.write("SERVER | ERROR 00: Neispravno korisnicko ime ili lozinka.\n");
                         evid.dodajServerZapis("SERVER | ERROR 00: Neispravno korisnicko ime ili lozinka.");
                     }
-                }
 
                 //KRAJ LOGIKE ADMINA
                 //LOGIKA USERA
@@ -211,10 +209,10 @@ public class ObradaZahtjeva extends Thread {
     }
 
     /**
-     *
-     * @param username
-     * @param password
-     * @return
+     * Provjera administratorksih podataka za prijavu
+     * @param username admin korisnicko ime
+     * @param password admin lozinka
+     * @return true ako su podaci ispravni, inace false
      */
     public boolean adminPrijava(String username, String password) {
         if (username.equals(konfig.dajPostavku("adminKorIme")) && password.equals(konfig.dajPostavku("adminKorLozinka"))) {
@@ -224,10 +222,10 @@ public class ObradaZahtjeva extends Thread {
     }
 
     /**
-     *
-     * @param p
-     * @param i
-     * @return
+     * Provjera dobivenih parametara
+     * @param p parametri za provjeru
+     * @param i slucaj za koji se zele provjeriti parametri, 1 - admin, 2 - user
+     * @return matcher ukoliko su parametri u redu, null ako nisu
      */
     public Matcher provjeraRegex(StringBuilder p, int i) {
         String regex = null;
@@ -361,7 +359,6 @@ public class ObradaZahtjeva extends Thread {
                         int idPogedjenogProtivnika = igra.vrijednostPolja(x - 1, y - 1); //u samom polju se nalazi ID igraca ciji je broj pogodjen
                         igra.potopiBrod(x - 1, y - 1);
                         igra.prikazPogodjenogBroda(x - 1, y - 1);
-                        System.out.println("ID POGODJENOG: " + idPogedjenogProtivnika);
                         igra.smanjiBrojBrodova(idPogedjenogProtivnika); //odma smanjujem broj brodova pogodjenog igraca
                         System.out.println("IGRA | POGODAK! | Igrac " + ime + " (id: " + idIgraca + ") pogodio brod igraca " + igra.dohvatiImeIgraca(idPogedjenogProtivnika) + " (id: " + idPogedjenogProtivnika + ")");
                         evid.dodajZapis(ime, x, y, igra.getPoljeBrodova(), "POGODAK! Pogodjen igrac: " + igra.dohvatiImeIgraca(idPogedjenogProtivnika) + " (id: " + idPogedjenogProtivnika + ")");
@@ -394,12 +391,7 @@ public class ObradaZahtjeva extends Thread {
             ArrayList<Evidencija.EvidencijaZapis> evidencija = evid.dohvatiZapise();
             for (int j = 0; j < evidencija.size(); j++) {
                 Evidencija.EvidencijaZapis ev = evidencija.get(j);
-                if (ev.getImeIgraca().equals(ime)) {
-                    out.write("-------------------------------------\n| TVOJ POTEZ:");
-                } else {
-                    out.write("-------------------------------------\n| PROTIVNICKI POTEZ (" + ev.getImeIgraca() + ") :\n");
-                }
-
+                out.write("\n-------------------------------------\n" + ev.getImeIgraca().toUpperCase() + " (" + igra.dohvatiIdIgraca(ev.getImeIgraca()) +"):\n");
                 int[][] poljeBrodova = ev.getPoljeBrodova();
                 for (int i = 0; i < poljeBrodova.length; i++) {
                     for (int k = 0; k < poljeBrodova[0].length; k++) {
@@ -412,7 +404,7 @@ public class ObradaZahtjeva extends Thread {
                     }
                     out.write("\n");
                 }
-                out.write(" | Status: " + ev.getBiljeska() + "\n -------------------------------------\n");
+                out.write("Status: " + ev.getBiljeska());
             }
 
         }

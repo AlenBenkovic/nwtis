@@ -15,8 +15,8 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 /**
- *
- * @author abenkovic
+ * Klasa za administratora
+ * @author Alen Benkovic
  */
 public class AdministratorSustava {
 
@@ -27,6 +27,11 @@ public class AdministratorSustava {
     private String naredba;
     private Matcher mParametri;
 
+    /**
+     * Konstruktor klase administratora
+     * @param parametri administratora
+     * @throws Exception
+     */
     public AdministratorSustava(String parametri) throws Exception {
         this.mParametri = provjeraParametara(parametri);
         if (this.mParametri == null) {
@@ -40,6 +45,9 @@ public class AdministratorSustava {
         }
     }
 
+    /**
+     * 
+     */
     public void pokreniAdminSustava() {
         //System.out.println("Pokrecem administratora s naredbama: " + server + ":" + port + " Korisnik:" + korisnik + " pass: " + lozinka + " " + naredba);
         Socket admin = null;
@@ -62,7 +70,7 @@ public class AdministratorSustava {
             System.out.println(odgovor);
 
         } catch (IOException ex) {
-            System.out.println("ADMIN | Ne mogu se spojiti sa serverom. Prekidam.");
+            System.out.println("ADMIN | Ne mogu se spojiti sa serverom. Prekidam." + ex.getMessage());
         } finally {
             try {
                 if (is != null) {
@@ -81,6 +89,11 @@ public class AdministratorSustava {
         }
     }
 
+    /**
+     * Provjera parametra
+     * @param p parametri
+     * @return matcher ili null ako parametri ne odgovaraju
+     */
     public Matcher provjeraParametara(String p) {
         String regex = "^-admin -s ([^\\s]+) -port ([8-9]\\d{3}) -u ([a-zA-Z0-9_]+) -p ([a-zA-Z0-9_]+) -(|pause|start|stop|stat|new) *$";
         Pattern pattern = Pattern.compile(regex);

@@ -10,8 +10,8 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 /**
- *
- * @author abenkovic
+ * Klasa klijenta
+ * @author Alen Benkovic
  */
 public class KlijentSustava {
 
@@ -24,6 +24,11 @@ public class KlijentSustava {
     private boolean xy = false;
     private final Matcher mParametri;
 
+    /**
+     * Konstruktor klase klijenta
+     * @param parametri
+     * @throws Exception
+     */
     public KlijentSustava(String parametri) throws Exception {
         this.mParametri = provjeraParametara(parametri);
         if (this.mParametri == null) {
@@ -43,6 +48,9 @@ public class KlijentSustava {
 
     }
 
+    /**
+     *
+     */
     public void PokreniKlijentSustava() {
         //System.out.println("Pokrecem klijenta...");
         Socket server = null;
@@ -75,7 +83,7 @@ public class KlijentSustava {
             }
             System.out.println(odgovor);
         } catch (IOException ex) {
-            System.out.println("Ne mogu se spojiti na server.");
+            System.out.println("Ne mogu se spojiti na server."+ ex.getMessage());
         } finally {
             try {
                 if (is != null) {
@@ -93,6 +101,11 @@ public class KlijentSustava {
         }
     }
 
+    /**
+     * Provjera dobivenih parametara
+     * @param p
+     * @return matcher ili null ako parametri ne odgovaraju
+     */
     public Matcher provjeraParametara(String p) {
         String regex = "^-user -s ([^\\s]+) -port ([8-9]\\d{3}) -u ([a-zA-Z0-9_]+)( -x ((10)|[1-9]\\d?) -y ((10)|[1-9]\\d?)| -stat)?";
         Pattern pattern = Pattern.compile(regex);
