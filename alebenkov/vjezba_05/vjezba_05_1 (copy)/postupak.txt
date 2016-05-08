@@ -1,0 +1,23 @@
+
+keytool -keyalg RSA -genkey -dname "CN=Dragutin Kermek, OU=NWTiS O=FOI, L=Varazdin, ST=Croatia, C=HR" -alias dkermek -keypass 123456 -keystore dkermek.jks -storepass nwtis2013
+
+keytool -list -keystore dkermek.jks -storepass nwtis2013
+
+jarsigner -keystore dkermek.jks -storepass nwtis2013 -keypass 123456 -signedjar dist\vjezba_05_1_sign.jar dist\vjezba_05_1.jar dkermek
+
+jarsigner -verify -verbose -certs dist\vjezba_05_1_sign.jar 
+
+keytool -export -keystore dkermek.jks -storepass nwtis2013 -alias dkermek -file dkermek.cer
+
+java -jar dist\vjezba_05_1_sign.jar NWTiS_dkermek.txt
+
+java -Djava.security.manager -jar dist\vjezba_05_1_sign.jar NWTiS_dkermek.txt
+
+policytool -file dkermek.policy
+
+java -Djava.security.manager -Djava.security.policy=dkermek.policy -jar dist\vjezba_05_1_sign.jar NWTiS_dkermek.txt
+
+policytool -file dkermek_signed.policy
+
+java -Djava.security.manager -Djava.security.policy=dkermek_signed.policy -jar dist\vjezba_05_1_sign.jar NWTiS_dkermek.txt
+
