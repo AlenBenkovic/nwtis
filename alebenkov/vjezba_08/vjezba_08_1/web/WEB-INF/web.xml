@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<web-app version="3.1" xmlns="http://xmlns.jcp.org/xml/ns/javaee" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://xmlns.jcp.org/xml/ns/javaee http://xmlns.jcp.org/xml/ns/javaee/web-app_3_1.xsd">
+    <context-param>
+        <param-name>konfiguracija</param-name>
+        <param-value>NWTiS.db.config_1.xml</param-value>
+    </context-param>
+    <listener>
+        <description>ServletContextListener</description>
+        <listener-class>org.foi.nwtis.alebenkov.web.slusaci.SlusacAplikacije</listener-class>
+    </listener>
+    <servlet>
+        <servlet-name>Kontroler</servlet-name>
+        <servlet-class>org.foi.nwtis.alebenkov.web.Kontroler</servlet-class>
+    </servlet>
+    <servlet-mapping>
+        <servlet-name>Kontroler</servlet-name>
+        <url-pattern>/Kontroler</url-pattern>
+        <url-pattern>/PrijavaKorisnika</url-pattern>
+        <url-pattern>/IspisAktivnihKorisnika</url-pattern>
+        <url-pattern>/IspisPodataka</url-pattern>
+        <url-pattern>/OdjavaKorisnika</url-pattern>
+        <url-pattern>/ProvjeraKorisnika</url-pattern>
+        <url-pattern>/IspisKorisnika</url-pattern>
+    </servlet-mapping>
+    <session-config>
+        <session-timeout>
+            30
+        </session-timeout>
+    </session-config>
+    <welcome-file-list>
+        <welcome-file>jsp/index.html</welcome-file>
+    </welcome-file-list>
+    <error-page>
+        <exception-type>org.foi.nwtis.alebenkov.web.NeuspjesnaPrijava</exception-type>
+        <location>/jsp/login.jsp</location>
+    </error-page>
+</web-app>
