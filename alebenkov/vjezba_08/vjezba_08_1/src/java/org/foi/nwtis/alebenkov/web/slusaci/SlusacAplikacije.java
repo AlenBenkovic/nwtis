@@ -26,6 +26,7 @@ public class SlusacAplikacije implements ServletContextListener {
         
         if (bp.getStatus()){
             sc.setAttribute("BP_Konfig", bp);
+            System.out.println("Učitana konfiguracija.");
         }
 
     }

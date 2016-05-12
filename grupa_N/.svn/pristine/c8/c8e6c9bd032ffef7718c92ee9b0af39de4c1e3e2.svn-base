@@ -1,0 +1,14 @@
+# To change this license header, choose License Headers in Project Properties.
+# To change this template file, choose Tools | Templates
+# and open the template in the editor.
+
+index_naslov=Odaberi jezik
+index_potvrdi=Potvrdi jezik
+index_slanjePoruke=Slanje poruke
+slanjePoruke_naslov=Slanje poruke
+slanjePoruke_salje=\u0160alje
+slanjePoruke_prima=Prima
+slanjePoruke_predmet=Predmet
+slanjePoruke_tekst=Test poruke
+slanjePoruke_saljiPoruku=\u0160alji poruku
+slanjePoruke_izborJezika=Izbor jezika

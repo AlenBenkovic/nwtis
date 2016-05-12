@@ -1,0 +1,13 @@
+#NWTiS dkermek - Wed Mar 30 15:44:12 CEST 2016
+#Wed Mar 30 15:44:12 CEST 2016
+server.database=jdbc\:mysql\://192.168.15.1/
+admin.password=nwtis_foi
+driver.database.mysql=com.mysql.jdbc.Drive
+admin.database=mysql
+user.username=nwtis_g1
+driver.database.odbc=sun.jdbc.odbc.JdbcOdbcDriver
+driver.database.postgresql=org.postgresql.Driver
+user.password=g1_nwtis
+driver.database.derby=org.apache.derby.jdbc.ClientDriver
+admin.username=>nwtis_admin
+user.database=nwtis_g1

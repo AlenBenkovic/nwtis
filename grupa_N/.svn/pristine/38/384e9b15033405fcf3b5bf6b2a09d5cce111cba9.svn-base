@@ -1,0 +1,67 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+      xmlns:h="http://xmlns.jcp.org/jsf/html"
+      xmlns:f="http://xmlns.jcp.org/jsf/core">
+
+    <body>
+
+        <ui:composition template="./predlozak.xhtml">
+
+            <ui:define name="naslov">
+                NWTiS - Pregled adresa i prognoza vremena
+            </ui:define>
+
+            <ui:define name="top">
+                NWTiS - Pregled adresa i prognoza vremena
+            </ui:define>
+
+            <ui:define name="left">
+                <h:link outcome="pocetak" value="Početna stranica"/>
+                <br/>
+                <h:link outcome="dnevnik" value="Pregled dnevnika"/>
+                <br/>
+            </ui:define>
+
+            <ui:define name="content">
+                <h:form id="obrazac">
+                    <h:panelGrid columns="3">
+                        <h:outputLabel value="Nova adresa:"/>
+                        <h:inputText id="novaAdresa" value="#{odabirAdresaPrognoza.novaAdresa}" size="50" />
+                        <h:commandButton value="Dodaj adresu" action="#{odabirAdresaPrognoza.dodajAdresu()}" >
+                            <f:ajax execute="novaAdresa" render="ponudeneAdrese"/>
+                        </h:commandButton>
+
+                        <h:selectManyListbox id="ponudeneAdrese" value="#{odabirAdresaPrognoza.oznacenePonudneAdrese}" size="10">
+                            <f:selectItems value="#{odabirAdresaPrognoza.ponudeneAdrese}" />
+                        </h:selectManyListbox>
+
+                        <h:panelGroup>
+                            <h:commandButton value="Preuzmi" action="#{odabirAdresaPrognoza.preuzmiAdrese()}" >
+                                <f:ajax execute="ponudeneAdrese" render="ponudeneAdrese odabraneAdrese"/>
+                            </h:commandButton>
+                            <br/>
+                            <h:commandButton value="Makni" action="#{odabirAdresaPrognoza.makniAdrese()}" />
+                            <br/>
+                            <h:commandButton value="Ažuriraj" action="#{odabirAdresaPrognoza.azurirajAdresu()}" >
+                                 <f:ajax execute="ponudeneAdrese" render="azuriranaAdresa"/>
+                            </h:commandButton>
+                            <br/>
+                        </h:panelGroup>
+
+                        <h:selectManyListbox id="odabraneAdrese" value="#{odabirAdresaPrognoza.oznaceneOdabraneAdrese}" size="10">
+                            <f:selectItems value="#{odabirAdresaPrognoza.odabraneAdrese}" />
+                        </h:selectManyListbox>
+
+                        <h:outputLabel value="Ažuriraj adresu:" rendered="#{odabirAdresaPrognoza.prikaziAzuriranje}" />
+                        <h:inputText id="azuriranaAdresa" value="#{odabirAdresaPrognoza.azuriranaAdresa}" size="50" rendered="#{odabirAdresaPrognoza.prikaziAzuriranje}"/>
+                        <h:commandButton value="Upiši" action="#{odabirAdresaPrognoza.upisiAdresu()}" rendered="#{odabirAdresaPrognoza.prikaziAzuriranje}"/>
+                    </h:panelGrid>
+                </h:form>
+            </ui:define>
+
+        </ui:composition>
+
+    </body>
+</html>

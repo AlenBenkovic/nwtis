@@ -12,6 +12,8 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
+import org.foi.nwtis.alebenkov.web.kontrole.Korisnik;
 
 /**
  *
@@ -43,14 +45,14 @@ public class Kontroler extends HttpServlet {
                 cilj = "/Kontroler";
                 break;
             case "/ProvjeraKorisnika":
-                /*String ki = request.getParameter("ki");
+                String ki = request.getParameter("ki");
                 String pw = request.getParameter("pw");
                 if (ki == null || ki.length() == 0 || pw == null || pw.length() == 0) {
                     throw new NeuspjesnaPrijava("Neispravni podaci za prijavljivanje.");
                 }
                 HttpSession session = request.getSession();
-                Korisnik k = new Korisnik(ki, "Kermek", "Dragutin", request.getRemoteAddr(), session.getId(), 0);
-                session.setAttribute("korisnik", k);*/
+                Korisnik k = new Korisnik(ki, "Benkovic", "Alen", request.getRemoteAddr(), session.getId(), 0);
+                session.setAttribute("korisnik", k);
 
                 cilj = "/IspisPodataka";
                 break;

@@ -8,6 +8,10 @@
         <description>ServletContextListener</description>
         <listener-class>org.foi.nwtis.alebenkov.web.slusaci.SlusacAplikacije</listener-class>
     </listener>
+    <listener>
+        <description>HttpSessionListener, HttpSessionAttributeListener</description>
+        <listener-class>org.foi.nwtis.alebenkov.web.slusaci.SlusacSesije</listener-class>
+    </listener>
     <servlet>
         <servlet-name>Kontroler</servlet-name>
         <servlet-class>org.foi.nwtis.alebenkov.web.Kontroler</servlet-class>
@@ -34,4 +38,20 @@
         <exception-type>org.foi.nwtis.alebenkov.web.NeuspjesnaPrijava</exception-type>
         <location>/jsp/login.jsp</location>
     </error-page>
+    <security-constraint>
+        <display-name>Admin</display-name>
+        <web-resource-collection>
+            <web-resource-name>Admin</web-resource-name>
+            <description/>
+            <url-pattern>/admin/*</url-pattern>
+        </web-resource-collection>
+        <auth-constraint>
+            <description>admin je nwtis</description>
+            <role-name>nwtis</role-name>
+        </auth-constraint>
+    </security-constraint>
+    <security-role>
+        <description/>
+        <role-name>nwtis</role-name>
+    </security-role>
 </web-app>

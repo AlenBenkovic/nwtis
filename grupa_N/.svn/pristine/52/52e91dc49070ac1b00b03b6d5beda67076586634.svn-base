@@ -1,0 +1,12 @@
+#NWTIS konfiguracija
+#Thu Mar 18 12:00:00 CET 2016
+port=8000
+evidDatoteka=DZ_1_evidencija.bin
+intervalSerijalizacije=60
+adminKorIme=admin
+adminKorLozinka=123456
+brojDretvi=5
+brojX=5
+brojY=4
+brojIgraca=3
+brojBrodova=4

@@ -1,0 +1,8 @@
+#NWTiS matnovak - Wed Mar 23 16:20:52 CET 2016
+#Wed Mar 23 16:20:52 CET 2016
+6=Marta
+5=Ivo
+4=Mirta
+3=Marko
+2=Iva
+1=Mato
