@@ -1,16 +1,23 @@
 <?xml version='1.0' encoding='UTF-8' ?>
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml"
-      xmlns:h="http://xmlns.jcp.org/jsf/html">
-    <h:head>
-        <title>Prijava korisnika</title>
-    </h:head>
-    <h:body>
-        <h:form id="login" >
-            Korisničko ime: <h:inputText value="#{login.korisnickoIme}" /><br/> 
-            Korisnička lozinka: <h:inputSecret value="#{login.korisnickaLozinka}" /> <br/>
-            <h:commandButton value="Prijava" action="#{login.provjeraKorisnika()}" />
-        </h:form>
-    </h:body>
+      xmlns:h="http://xmlns.jcp.org/jsf/html"
+      xmlns:f="http://xmlns.jcp.org/jsf/core">
+    <f:view locale="#{i18n.lokal}" >
+        <h:head>
+            <title>#{i18n.login_naslov}</title>
+        </h:head>
+        <h:body>
+            <h:form id="login" >
+                #{i18n.login_kIme} <h:inputText id="kIme" 
+                             value="#{login.korisnickoIme}"
+                             validator="#{login.validirajKorisnickoIme}"/> <h:message for="kIme" /> <br/> 
+                #{i18n.login_kloz}<h:inputSecret id="kLoz" 
+                               value="#{login.korisnickaLozinka}"
+                               validator="#{login.validirajKorisnickuLozinku}"/> <h:message for="kLoz" /> <br/>
+                <h:commandButton value="#{i18n.login_prijavise}" action="#{login.provjeraKorisnika()}" />
+            </h:form>
+        </h:body>
+    </f:view>
 </html>
 

@@ -3,6 +3,17 @@
               xmlns="http://xmlns.jcp.org/xml/ns/javaee"
               xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
               xsi:schemaLocation="http://xmlns.jcp.org/xml/ns/javaee http://xmlns.jcp.org/xml/ns/javaee/web-facesconfig_2_2.xsd">
+    <application>
+        <resource-bundle>
+            <base-name>i18n</base-name>
+            <var>i18n</var>
+        </resource-bundle>
+        <message-bundle>i18n</message-bundle>
+        <locale-config>
+            <default-locale>hr</default-locale>
+            <supported-locale>en</supported-locale>
+        </locale-config>
+    </application>
     <navigation-rule>
         <description>Prijavljivanje korisnika</description>
         <from-view-id>/login.xhtml</from-view-id>
@@ -33,6 +44,15 @@
             <from-action>#{odaberiKorisnika.odabirKorisnika()}</from-action>
             <from-outcome>OK</from-outcome>
             <to-view-id>/ispisKorisnika.xhtml</to-view-id>
+        </navigation-case>
+    </navigation-rule>
+    <navigation-rule>
+        <description>Odabir jezika</description>
+        <from-view-id>/lokalizacija_1.xhtml</from-view-id>
+        <navigation-case>
+            <from-action>#{lokalizacija.odaberiJezik()}</from-action>
+            <from-outcome>OK</from-outcome>
+            <to-view-id>/login.xhtml</to-view-id>
         </navigation-case>
     </navigation-rule>
 </faces-config>

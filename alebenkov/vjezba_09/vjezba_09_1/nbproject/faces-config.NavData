@@ -3,10 +3,11 @@
     <Scope Scope="Faces Configuration Only"/>
     <Scope Scope="Project">
         <Node id="login.xhtml" x="650" y="150" zoom="false"/>
-        <Node id="loginOK.xhtml" x="836" y="249" zoom="true"/>
         <Node id="nepoznatiError.xhtml" x="150" y="300" zoom="true"/>
         <Node id="index.xhtml" x="400" y="150" zoom="true"/>
+        <Node id="ispisKorisnika.xhtml" x="150" y="150" zoom="true"/>
         <Node id="loginError.xhtml" x="823" y="69" zoom="true"/>
+        <Node id="loginOK.xhtml" x="836" y="249" zoom="true"/>
     </Scope>
     <Scope Scope="All Faces Configurations"/>
 </Scene>
