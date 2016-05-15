@@ -13,6 +13,7 @@ import javax.servlet.ServletContextEvent;
 import javax.servlet.ServletContextListener;
 import org.foi.nwtis.alebenkov.konfiguracije.NemaKonfiguracije;
 import org.foi.nwtis.alebenkov.konfiguracije.bp.BP_konfiguracija;
+import org.foi.nwtis.alebenkov.web.ObradaPoruka;
 
 /**
  * Web application lifecycle listener.
@@ -20,6 +21,7 @@ import org.foi.nwtis.alebenkov.konfiguracije.bp.BP_konfiguracija;
  * @author abenkovic
  */
 public class SlusacAplikacije implements ServletContextListener {
+private ObradaPoruka dretvaZaPoruke;
 
     @Override
     public void contextInitialized(ServletContextEvent sce) {
@@ -33,12 +35,16 @@ public class SlusacAplikacije implements ServletContextListener {
         if (konfig.getStatus()) {
             context.setAttribute("BP_Konfig", konfig);
             System.out.println("Ucitana konfiguracija.");
+            dretvaZaPoruke = new ObradaPoruka(context);//kreiram i pokrecem dretvu za obradu poruka i saljem joj kontekst
+            dretvaZaPoruke.start();
         }
 
     }
 
     @Override
     public void contextDestroyed(ServletContextEvent sce) {
-
+        if(dretvaZaPoruke.isAlive()){//ako kod zatvaranja contexta dretva jos radi, istu gasim
+            dretvaZaPoruke.interrupt();
+        }
     }
 }
