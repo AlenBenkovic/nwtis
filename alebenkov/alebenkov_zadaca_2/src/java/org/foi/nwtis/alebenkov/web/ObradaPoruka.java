@@ -5,6 +5,8 @@
  */
 package org.foi.nwtis.alebenkov.web;
 
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 import javax.mail.AuthenticationFailedException;
 import javax.mail.Flags;
 import javax.mail.Folder;
@@ -19,7 +21,6 @@ import javax.mail.ReadOnlyFolderException;
 import javax.mail.Session;
 import javax.mail.Store;
 import javax.mail.StoreClosedException;
-import javax.mail.internet.InternetAddress;
 import javax.servlet.ServletContext;
 
 /**
@@ -27,12 +28,13 @@ import javax.servlet.ServletContext;
  * @author abenkovic
  */
 public class ObradaPoruka extends Thread {
-
+    
+    private boolean dretvaRadi = true;
     private ServletContext kontekst;
     //TODO preuzimi podatke iz konfiguracijske datoteke
     private String adresaServera = "nwtis.nastava.foi.hr";
     private String korisnickoIme = "servis@nwtis.nastava.foi.hr"; //ovo bi mozda trebalo iz konfiguracijske datoteke povuci
-    private String korisnickaLozinka = "12346";//ovo bi mozda trebalo iz konfiguracijske datoteke povuci
+    private String korisnickaLozinka = "123456";//ovo bi mozda trebalo iz konfiguracijske datoteke povuci
     private long intervalSpavanja = 60000; //1 min
     private String nazivIspravnogDirektorija = "Ispravne_poruke"; //TODO uzmi iz konfig datoteke
     private String nazivNeispravnogDirektorija = "Neispravne_poruke"; //TODO uzmi iz konfig datoteke
@@ -44,6 +46,7 @@ public class ObradaPoruka extends Thread {
 
     @Override
     public void interrupt() {
+        this.dretvaRadi = false;// ne znam iz kojeg razlika ali nakon interrupta dretva i dalje radi..
         super.interrupt(); //To change body of generated methods, choose Tools | Templates.
     }
 
@@ -62,75 +65,103 @@ public class ObradaPoruka extends Thread {
         String contentType = null;
         int sveukupnoPoruka = 0;
 
-        while (true) {
+        while (dretvaRadi) {
             int ukupnoPoruka = 0;
             int ispravnoPoruka = 0;
             int neispravnoPoruka = 0;
             int ostaloPoruka = 0;
+            int brojDodanihGrad = 0;
+            int brojDodanihTvrtka = 0;
+            int brojAzuriranihGrad = 0;
+            int brojAzuziranihTvrtka = 0;
 
             try {
-                //printData("--------------processing mails started-----------------");
-                session = Session.getDefaultInstance(System.getProperties(), null);
 
-                //printData("getting the session for accessing email.");
-                store = session.getStore("imap");
+                session = Session.getDefaultInstance(System.getProperties(), null); //procesiranje maila pocinje
 
-                store.connect(this.adresaServera, this.korisnickoIme, this.korisnickaLozinka);
-                //printData("Connection established with IMAP server.");
+                store = session.getStore("imap"); //spremam sesiju za pristup mailu
 
-                // Get a handle on the default folder
-                folder = store.getDefaultFolder();
+                store.connect(this.adresaServera, this.korisnickoIme, this.korisnickaLozinka);//spajam se na IMAP server
 
-                //printData("Getting the Inbox folder.");
-                // Retrieve the "Inbox"
+                folder = store.getDefaultFolder(); //uzimam default folder
+
                 folder = folder.getFolder("inbox");
 
-                //Reading the Email Index in Read / Write Mode
-                folder.open(Folder.READ_WRITE);
+                folder.open(Folder.READ_WRITE); //citam postu u index folderu u RW modu
 
-                // Retrieve the messages
-                messages = folder.getMessages();
+                messages = folder.getMessages();//uzimam poruke iz inboxa
 
-                // Loop over all of the messages
+                //Prolazim kroz sve poruke
                 for (int messageNumber = 0; messageNumber < messages.length; messageNumber++) {
                     sveukupnoPoruka++;
                     ukupnoPoruka++;
 
-                    // Retrieve the next message to be read
-                    message = messages[messageNumber];
+                    message = messages[messageNumber]; //uzimam trenutnu poruku kroz koju prolazim
 
-                    // Retrieve the message content
-                    messagecontentObject = message.getContent();
+                    messagecontentObject = message.getContent();// Retrieve the message content
 
-                    String vrstaPoruke = message.getContentType();
+                    String vrstaPoruke = message.getContentType().toLowerCase();//stavljam u mala slova kako god da pise radi kasnije probjere
+                    String naslovPoruke = message.getSubject();
+                    String sadrzajPoruke = message.getContent().toString();
 
-                    if (vrstaPoruke.equals("text/plain")) {
+                    System.out.println("Dretva "+this.getId() + " | Poruka " + messageNumber + " | Vrsta poruke: " + vrstaPoruke + "\nNaslov: " + naslovPoruke + "\nSadrzaj: " + sadrzajPoruke);
 
-                        if (ispravnaPoruka(message)) {
-                            
+                    if (vrstaPoruke.startsWith("text/plain")) {
+                        Matcher mSadrzaj = provjeraSadrzaja(sadrzajPoruke.trim());
+
+                        if ((naslovPoruke.equalsIgnoreCase("NWTiS poruka")) && (mSadrzaj != null)) {
+                            System.out.println(this.getId() + " | Poruka " + messageNumber + " | ISPRAVNA");
                             ispravnoPoruka++;
-                            premjestiPoruku(nazivIspravnogDirektorija, store, message, folder);
-                                    
+                            if (mSadrzaj.group(3).equals("ADD")) {
+                                //TODO napravi ADD
+                                System.out.println("ADD operacija");
+                                if (mSadrzaj.group(1).equals("GRAD")) {
+                                    brojDodanihGrad++;
+                                    System.out.println("GRAD ADD +");
+                                } else {
+                                    brojDodanihTvrtka++;
+                                    System.out.println("TVRTKA ADD +");
+
+                                }
+
+                            } else {//ako nije ADD onda mora biti UPDATE
+                                //TODO napravi UPDATE
+                                System.out.println("UPDATE operacija");
+                                if (mSadrzaj.group(1).equals("GRAD")) {
+                                    brojAzuriranihGrad++;
+                                    System.out.println("GRAD UPDATE +");
+                                } else {
+                                    brojAzuziranihTvrtka++;
+                                    System.out.println("TVRTKA UPDATE +");
+                                }
+
+                            }
+                            //premjestiPoruku(nazivIspravnogDirektorija, store, message, folder);
+
                         } else {
-                            premjestiPoruku(nazivNeispravnogDirektorija, store, message, folder);
+                            //premjestiPoruku(nazivNeispravnogDirektorija, store, message, folder);
                             neispravnoPoruka++;
+                            System.out.println(this.getId() + " | Poruka " + messageNumber + " | NEISPRAVNA");
                         }
 
                     } else {
-                        premjestiPoruku(nazivOstalogDirektorija, store, message, folder);
+                        //premjestiPoruku(nazivOstalogDirektorija, store, message, folder);
                         ostaloPoruka++;
+                        System.out.println(this.getId() + " | Poruka " + messageNumber + " | OSTALA");
 
                     }
 
-                    // Close the folder
-                    folder.close(true);//sa ovim true govorim serveru da sve poruke koje su oznacene za brisanje i obrise
-
-                    // Close the message store
-                    store.close();
-        
-                    //TODO korigiraj interval spavanja za utroseno vrijeme
-                    sleep(intervalSpavanja);//odlazim na spavanje
                 }
+
+                // Close the folder
+                folder.close(true);//sa ovim true govorim serveru da sve poruke koje su oznacene za brisanje i obrise
+
+                // Close the message store
+                store.close();
+
+                //TODO korigiraj interval spavanja za utroseno vrijeme
+                sleep(intervalSpavanja);//odlazim na spavanje
+
             } catch (AuthenticationFailedException e) {
                 //printData("Not able to process the mail reading.");
                 e.printStackTrace();
@@ -159,7 +190,7 @@ public class ObradaPoruka extends Thread {
     private void premjestiPoruku(String nazivDirektorija, Store store, Message message, Folder folder) throws MessagingException {
 
         Folder noviFolder = store.getFolder(nazivDirektorija);
-        if(!noviFolder.exists()){
+        if (!noviFolder.exists()) {
             noviFolder.create(Folder.HOLDS_MESSAGES); //kreiram novi folder ako ne postoji
         }
         noviFolder.open(Folder.READ_WRITE);
@@ -175,9 +206,16 @@ public class ObradaPoruka extends Thread {
         super.start(); //To change body of generated methods, choose Tools | Templates.
     }
 
-    private boolean ispravnaPoruka(Message message) {
-        //TODO provjeri ostale uvjete da poruka bude ispravna (predmet, komande)
-        return true;
+    public Matcher provjeraSadrzaja(String p) {
+        String regex = "(GRAD|TVRTKA) (\\w+); (ADD|UPDATE);"; //group 1 grad ili tvrtka, group 2 naziv, group 3 operacija
+        Pattern pattern = Pattern.compile(regex);
+        Matcher m = pattern.matcher(p);
+        boolean status = m.matches();
+        if (status) {
+            return m;
+        } else {
+            return null;
+        }
     }
 
 }
