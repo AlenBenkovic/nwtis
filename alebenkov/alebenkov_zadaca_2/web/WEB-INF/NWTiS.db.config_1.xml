@@ -13,4 +13,11 @@
 <entry key="driver.database.mysql">com.mysql.jdbc.Driver</entry>
 <entry key="driver.database.derby">org.apache.derby.jdbc.ClientDriver</entry>
 <entry key="driver.database.postgresql">org.postgresql.Driver</entry>
+<entry key="adresaServera">nwtis.nastava.foi.hr</entry>
+<entry key="korisnickoIme">servis@nwtis.nastava.foi.hr</entry>
+<entry key="korisnickaLozinka">123456</entry>
+<entry key="intervalDretve">60000</entry>
+<entry key="nazivIspravnogDirektorija">Ispravne_poruke</entry>
+<entry key="nazivNeispravnogDirektorija">Neispravne_poruke</entry>
+<entry key="nazivOstalogDirektorija">Ostale_poruke</entry>
 </properties>

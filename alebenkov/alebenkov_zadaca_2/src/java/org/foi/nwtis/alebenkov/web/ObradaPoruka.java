@@ -5,6 +5,7 @@
  */
 package org.foi.nwtis.alebenkov.web;
 
+import java.text.SimpleDateFormat;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import javax.mail.AuthenticationFailedException;
@@ -22,26 +23,35 @@ import javax.mail.Session;
 import javax.mail.Store;
 import javax.mail.StoreClosedException;
 import javax.servlet.ServletContext;
+import org.foi.nwtis.alebenkov.konfiguracije.Konfiguracija;
 
 /**
  *
  * @author abenkovic
  */
 public class ObradaPoruka extends Thread {
-    
+
     private boolean dretvaRadi = true;
     private ServletContext kontekst;
-    //TODO preuzimi podatke iz konfiguracijske datoteke
-    private String adresaServera = "nwtis.nastava.foi.hr";
-    private String korisnickoIme = "servis@nwtis.nastava.foi.hr"; //ovo bi mozda trebalo iz konfiguracijske datoteke povuci
-    private String korisnickaLozinka = "123456";//ovo bi mozda trebalo iz konfiguracijske datoteke povuci
-    private long intervalSpavanja = 60000; //1 min
-    private String nazivIspravnogDirektorija = "Ispravne_poruke"; //TODO uzmi iz konfig datoteke
-    private String nazivNeispravnogDirektorija = "Neispravne_poruke"; //TODO uzmi iz konfig datoteke
-    private String nazivOstalogDirektorija = "Ostale_poruke"; //TODO uzmi iz konfig datoteke
+    private String adresaServera;
+    private String korisnickoIme;
+    private String korisnickaLozinka;
+    private int intervalSpavanja ;
+    private String nazivIspravnogDirektorija;
+    private String nazivNeispravnogDirektorija;
+    private String nazivOstalogDirektorija;
 
     public ObradaPoruka(ServletContext kontekst) {
         this.kontekst = kontekst;
+        Konfiguracija mailConfig = (Konfiguracija) kontekst.getAttribute("mailConfig");
+        this.adresaServera = mailConfig.dajPostavku("adresaServera");
+        this.korisnickoIme = mailConfig.dajPostavku("korisnickoIme");
+        this.korisnickaLozinka = mailConfig.dajPostavku("korisnickaLozinka");
+        this.intervalSpavanja = Integer.parseInt(mailConfig.dajPostavku("intervalDretve"));
+        this.nazivIspravnogDirektorija = mailConfig.dajPostavku("nazivIspravnogDirektorija");
+        this.nazivNeispravnogDirektorija = mailConfig.dajPostavku(" nazivNeispravnogDirektorija");
+        this.nazivOstalogDirektorija = mailConfig.dajPostavku("nazivOstalogDirektorija");
+
     }
 
     @Override
@@ -76,6 +86,9 @@ public class ObradaPoruka extends Thread {
             int brojAzuziranihTvrtka = 0;
 
             try {
+                SimpleDateFormat sdf = new SimpleDateFormat("dd-M-yyyy H:mm:ss");
+                long pocetakRadaDretve = System.currentTimeMillis(); //biljezim pocetak rada dretve
+                System.out.println("Obrada zapocela u: " + sdf.format(pocetakRadaDretve) );
 
                 session = Session.getDefaultInstance(System.getProperties(), null); //procesiranje maila pocinje
 
@@ -104,7 +117,7 @@ public class ObradaPoruka extends Thread {
                     String naslovPoruke = message.getSubject();
                     String sadrzajPoruke = message.getContent().toString();
 
-                    System.out.println("Dretva "+this.getId() + " | Poruka " + messageNumber + " | Vrsta poruke: " + vrstaPoruke + "\nNaslov: " + naslovPoruke + "\nSadrzaj: " + sadrzajPoruke);
+                    System.out.println("Dretva " + this.getId() + " | Poruka " + messageNumber + " | Vrsta poruke: " + vrstaPoruke + "\nNaslov: " + naslovPoruke + "\nSadrzaj: " + sadrzajPoruke);
 
                     if (vrstaPoruke.startsWith("text/plain")) {
                         Matcher mSadrzaj = provjeraSadrzaja(sadrzajPoruke.trim());
@@ -158,9 +171,11 @@ public class ObradaPoruka extends Thread {
 
                 // Close the message store
                 store.close();
-
-                //TODO korigiraj interval spavanja za utroseno vrijeme
-                sleep(intervalSpavanja);//odlazim na spavanje
+                
+                long krajRadaDretve = System.currentTimeMillis(); //biljezim pocetak rada dretve
+                long trajanjeRadaDretve = krajRadaDretve - pocetakRadaDretve;           
+                System.out.println("Obrada zavrsila u: " + sdf.format(krajRadaDretve));
+                sleep(intervalSpavanja-trajanjeRadaDretve);//odlazim na spavanje
 
             } catch (AuthenticationFailedException e) {
                 //printData("Not able to process the mail reading.");

@@ -11,6 +11,8 @@ import java.util.logging.Logger;
 import javax.servlet.ServletContext;
 import javax.servlet.ServletContextEvent;
 import javax.servlet.ServletContextListener;
+import org.foi.nwtis.alebenkov.konfiguracije.Konfiguracija;
+import org.foi.nwtis.alebenkov.konfiguracije.KonfiguracijaApstraktna;
 import org.foi.nwtis.alebenkov.konfiguracije.NemaKonfiguracije;
 import org.foi.nwtis.alebenkov.konfiguracije.bp.BP_konfiguracija;
 import org.foi.nwtis.alebenkov.web.ObradaPoruka;
@@ -21,7 +23,8 @@ import org.foi.nwtis.alebenkov.web.ObradaPoruka;
  * @author abenkovic
  */
 public class SlusacAplikacije implements ServletContextListener {
-private ObradaPoruka dretvaZaPoruke;
+
+    private ObradaPoruka dretvaZaPoruke;
 
     @Override
     public void contextInitialized(ServletContextEvent sce) {
@@ -34,7 +37,18 @@ private ObradaPoruka dretvaZaPoruke;
 
         if (konfig.getStatus()) {
             context.setAttribute("BP_Konfig", konfig);
-            System.out.println("Ucitana konfiguracija.");
+
+            Konfiguracija mailConfig = null;
+
+            try {
+                mailConfig = KonfiguracijaApstraktna.preuzmiKonfiguraciju(putanje + konfiguracija);
+                context.setAttribute("mailConfig", mailConfig);
+                System.out.println("Ucitana konfiguracija.");
+            } catch (NemaKonfiguracije ex) {
+                System.out.println("Greska prilikom preuzimanja konfiguracije. " + ex.getMessage());
+            }
+            
+
             dretvaZaPoruke = new ObradaPoruka(context);//kreiram i pokrecem dretvu za obradu poruka i saljem joj kontekst
             dretvaZaPoruke.start();
         }
@@ -43,7 +57,7 @@ private ObradaPoruka dretvaZaPoruke;
 
     @Override
     public void contextDestroyed(ServletContextEvent sce) {
-        if(dretvaZaPoruke.isAlive()){//ako kod zatvaranja contexta dretva jos radi, istu gasim
+        if (dretvaZaPoruke.isAlive()) {//ako kod zatvaranja contexta dretva jos radi, istu gasim
             dretvaZaPoruke.interrupt();
         }
     }
