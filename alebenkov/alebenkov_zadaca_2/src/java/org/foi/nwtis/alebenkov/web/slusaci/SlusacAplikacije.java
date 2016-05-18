@@ -36,7 +36,7 @@ public class SlusacAplikacije implements ServletContextListener {
         konfig = new BP_konfiguracija(putanje + konfiguracija);
 
         if (konfig.getStatus()) {
-            context.setAttribute("BP_Konfig", konfig);
+            context.setAttribute("bpConfig", konfig);
 
             Konfiguracija mailConfig = null;
 

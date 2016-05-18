@@ -5,6 +5,11 @@
  */
 package org.foi.nwtis.alebenkov.web;
 
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.sql.Statement;
 import java.text.SimpleDateFormat;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -24,6 +29,7 @@ import javax.mail.Store;
 import javax.mail.StoreClosedException;
 import javax.servlet.ServletContext;
 import org.foi.nwtis.alebenkov.konfiguracije.Konfiguracija;
+import org.foi.nwtis.alebenkov.konfiguracije.bp.BP_konfiguracija;
 
 /**
  *
@@ -36,20 +42,23 @@ public class ObradaPoruka extends Thread {
     private String adresaServera;
     private String korisnickoIme;
     private String korisnickaLozinka;
-    private int intervalSpavanja ;
+    private int intervalSpavanja;
     private String nazivIspravnogDirektorija;
     private String nazivNeispravnogDirektorija;
     private String nazivOstalogDirektorija;
+    private Konfiguracija mailConfig;
+    private BP_konfiguracija bpConfig;
 
     public ObradaPoruka(ServletContext kontekst) {
         this.kontekst = kontekst;
-        Konfiguracija mailConfig = (Konfiguracija) kontekst.getAttribute("mailConfig");
+        this.mailConfig = (Konfiguracija) kontekst.getAttribute("mailConfig");
+        this.bpConfig = (BP_konfiguracija) kontekst.getAttribute("bpConfig");
         this.adresaServera = mailConfig.dajPostavku("adresaServera");
         this.korisnickoIme = mailConfig.dajPostavku("korisnickoIme");
         this.korisnickaLozinka = mailConfig.dajPostavku("korisnickaLozinka");
-        this.intervalSpavanja = Integer.parseInt(mailConfig.dajPostavku("intervalDretve"));
+        this.intervalSpavanja = Integer.parseInt(mailConfig.dajPostavku("intervalDretve")) * 1000;//spremam u sekundama
         this.nazivIspravnogDirektorija = mailConfig.dajPostavku("nazivIspravnogDirektorija");
-        this.nazivNeispravnogDirektorija = mailConfig.dajPostavku(" nazivNeispravnogDirektorija");
+        this.nazivNeispravnogDirektorija = mailConfig.dajPostavku("nazivNeispravnogDirektorija");
         this.nazivOstalogDirektorija = mailConfig.dajPostavku("nazivOstalogDirektorija");
 
     }
@@ -88,7 +97,7 @@ public class ObradaPoruka extends Thread {
             try {
                 SimpleDateFormat sdf = new SimpleDateFormat("dd-M-yyyy H:mm:ss");
                 long pocetakRadaDretve = System.currentTimeMillis(); //biljezim pocetak rada dretve
-                System.out.println("Obrada zapocela u: " + sdf.format(pocetakRadaDretve) );
+                System.out.println("Obrada zapocela u: " + sdf.format(pocetakRadaDretve));
 
                 session = Session.getDefaultInstance(System.getProperties(), null); //procesiranje maila pocinje
 
@@ -126,7 +135,7 @@ public class ObradaPoruka extends Thread {
                             System.out.println(this.getId() + " | Poruka " + messageNumber + " | ISPRAVNA");
                             ispravnoPoruka++;
                             if (mSadrzaj.group(3).equals("ADD")) {
-                                //TODO napravi ADD
+                                operacijaNadBazom(mSadrzaj.group(1), mSadrzaj.group(2), "ADD");
                                 System.out.println("ADD operacija");
                                 if (mSadrzaj.group(1).equals("GRAD")) {
                                     brojDodanihGrad++;
@@ -138,7 +147,7 @@ public class ObradaPoruka extends Thread {
                                 }
 
                             } else {//ako nije ADD onda mora biti UPDATE
-                                //TODO napravi UPDATE
+                                operacijaNadBazom(mSadrzaj.group(1), mSadrzaj.group(2), "UPDATE");
                                 System.out.println("UPDATE operacija");
                                 if (mSadrzaj.group(1).equals("GRAD")) {
                                     brojAzuriranihGrad++;
@@ -149,16 +158,16 @@ public class ObradaPoruka extends Thread {
                                 }
 
                             }
-                            //premjestiPoruku(nazivIspravnogDirektorija, store, message, folder);
+                            premjestiPoruku(nazivIspravnogDirektorija, store, message, folder);
 
                         } else {
-                            //premjestiPoruku(nazivNeispravnogDirektorija, store, message, folder);
+                            premjestiPoruku(nazivNeispravnogDirektorija, store, message, folder);
                             neispravnoPoruka++;
                             System.out.println(this.getId() + " | Poruka " + messageNumber + " | NEISPRAVNA");
                         }
 
                     } else {
-                        //premjestiPoruku(nazivOstalogDirektorija, store, message, folder);
+                        premjestiPoruku(nazivOstalogDirektorija, store, message, folder);
                         ostaloPoruka++;
                         System.out.println(this.getId() + " | Poruka " + messageNumber + " | OSTALA");
 
@@ -171,11 +180,15 @@ public class ObradaPoruka extends Thread {
 
                 // Close the message store
                 store.close();
-                
+
+                if (ukupnoPoruka == 0) {
+                    System.out.println("Nema novih poruka.");
+                }
+
                 long krajRadaDretve = System.currentTimeMillis(); //biljezim pocetak rada dretve
-                long trajanjeRadaDretve = krajRadaDretve - pocetakRadaDretve;           
+                long trajanjeRadaDretve = krajRadaDretve - pocetakRadaDretve;
                 System.out.println("Obrada zavrsila u: " + sdf.format(krajRadaDretve));
-                sleep(intervalSpavanja-trajanjeRadaDretve);//odlazim na spavanje
+                sleep(intervalSpavanja - trajanjeRadaDretve);//odlazim na spavanje
 
             } catch (AuthenticationFailedException e) {
                 //printData("Not able to process the mail reading.");
@@ -203,17 +216,92 @@ public class ObradaPoruka extends Thread {
     }
 
     private void premjestiPoruku(String nazivDirektorija, Store store, Message message, Folder folder) throws MessagingException {
+        try {
+            Folder noviFolder = store.getFolder(nazivDirektorija);
+            if (!noviFolder.exists()) {
+                noviFolder.create(Folder.HOLDS_MESSAGES); //kreiram novi folder ako ne postoji
+            }
+            noviFolder.open(Folder.READ_WRITE);
+            Message[] zaKopiranje = new Message[1];//kreiram polje poruka
+            zaKopiranje[0] = message; //u polje poruka spremma trenutnu poruku
+            folder.copyMessages(zaKopiranje, noviFolder); //kopiram trenutnu poruku u novi folder
+            noviFolder.close(false);//zatvaram novi folder
+            message.setFlag(Flags.Flag.DELETED, true); //oznacavam trenutnu poruku da je spremna za brisanje
 
-        Folder noviFolder = store.getFolder(nazivDirektorija);
-        if (!noviFolder.exists()) {
-            noviFolder.create(Folder.HOLDS_MESSAGES); //kreiram novi folder ako ne postoji
+        } catch (Exception e) {
+            System.out.println("Greska prilikom kreiranja foldera " + e.getMessage() + e.toString());
         }
-        noviFolder.open(Folder.READ_WRITE);
-        Message[] zaKopiranje = new Message[1];//kreiram polje poruka
-        zaKopiranje[0] = message; //u polje poruka spremma trenutnu poruku
-        folder.copyMessages(zaKopiranje, noviFolder); //kopiram trenutnu poruku u novi folder
-        noviFolder.close(false);//zatvaram novi folder
-        message.setFlag(Flags.Flag.DELETED, true); //oznacavam trenutnu poruku da je spremna za brisanje
+
+    }
+
+    private void operacijaNadBazom(String vrsta, String naziv, String operacija) {
+        String url = bpConfig.getServerDatabase() + bpConfig.getUserDatabase();
+        String korisnik = bpConfig.getUserDatabase();
+        String lozinka = bpConfig.getUserPassword();
+        Connection connection = null;
+        Statement statemant = null;
+        ResultSet rs = null;
+        String sql = null;
+
+        try {
+            Class.forName(bpConfig.getDriverDatabase()); //dovoljno pozvati jednom na razini projekta da bi se ucitao sam driver
+        } catch (ClassNotFoundException ex) {
+            System.out.println("Greska kod ucitavanja drivera: " + ex.getMessage());
+            return;
+        }
+
+        try {
+            connection = DriverManager.getConnection(url, korisnik, lozinka);
+            statemant = connection.createStatement(ResultSet.TYPE_FORWARD_ONLY, ResultSet.TYPE_SCROLL_INSENSITIVE);
+
+            sql = "SELECT * FROM elementi where vrsta = '" + vrsta + "' AND  naziv ='" + naziv + "'";
+            rs = statemant.executeQuery(sql);
+            rs.last();
+            System.out.println("Stanje row : "+ rs.getRow());
+
+            if (true) {
+                if (operacija.equals("UPDATE")) {
+                    System.out.println("ERROR | Zapis ne postoji u bazi.");
+                } else if (operacija.equals("ADD")) {
+                    sql = "INSERT INTO elementi VALUES ('" + vrsta + "','" + naziv + "')";
+                    if (statemant.execute(sql)) {
+                        System.out.println("Zapis uspjesno spremljen u bazu.");
+                    }
+                }
+            } else if (operacija.equals("ADD")) {
+                System.out.println("ERROR | Zapis vec postoji u bazi.");
+            } else if (operacija.equals("UPDATE")) {
+                System.out.println("TODO | Pozivam metodu za spremanje datoteke");
+            }
+
+            System.out.println(sql);
+
+        } catch (SQLException ex) {
+            System.out.println("Greska u radu s bazom: " + ex.getMessage());
+        } finally {
+            if (rs != null) {
+                try {
+                    rs.close();
+                } catch (SQLException ex) {
+                    System.out.println(ex.getMessage());
+                }
+            }
+            if (statemant != null) {
+                try {
+                    statemant.close();
+                } catch (SQLException ex) {
+                    System.out.println(ex.getMessage());
+                }
+            }
+
+            if (connection != null) {
+                try {
+                    connection.close();
+                } catch (SQLException ex) {
+                    System.out.println(ex.getMessage());
+                }
+            }
+        }
     }
 
     @Override
