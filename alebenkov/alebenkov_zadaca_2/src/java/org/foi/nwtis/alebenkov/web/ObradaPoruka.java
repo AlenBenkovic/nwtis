@@ -5,12 +5,20 @@
  */
 package org.foi.nwtis.alebenkov.web;
 
+import java.io.BufferedInputStream;
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.net.MalformedURLException;
+import java.net.URL;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.text.SimpleDateFormat;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import javax.mail.AuthenticationFailedException;
@@ -46,6 +54,7 @@ public class ObradaPoruka extends Thread {
     private String nazivIspravnogDirektorija;
     private String nazivNeispravnogDirektorija;
     private String nazivOstalogDirektorija;
+    private String dirZaSpremanjeStranica;
     private Konfiguracija mailConfig;
     private BP_konfiguracija bpConfig;
 
@@ -60,6 +69,18 @@ public class ObradaPoruka extends Thread {
         this.nazivIspravnogDirektorija = mailConfig.dajPostavku("nazivIspravnogDirektorija");
         this.nazivNeispravnogDirektorija = mailConfig.dajPostavku("nazivNeispravnogDirektorija");
         this.nazivOstalogDirektorija = mailConfig.dajPostavku("nazivOstalogDirektorija");
+        this.dirZaSpremanjeStranica = mailConfig.dajPostavku("dirZaSpremanjeStranica");
+
+        File direktorijZaSpremanje = new File(this.kontekst.getRealPath("/WEB-INF") + java.io.File.separator + dirZaSpremanjeStranica);
+        if (!direktorijZaSpremanje.exists()) {
+            try {
+                direktorijZaSpremanje.mkdir();
+                System.err.println("USPIO!");
+            } catch (SecurityException se) {
+                System.out.println("Problem sa dozvolama!");
+            }
+
+        }
 
     }
 
@@ -93,6 +114,11 @@ public class ObradaPoruka extends Thread {
             int brojDodanihTvrtka = 0;
             int brojAzuriranihGrad = 0;
             int brojAzuziranihTvrtka = 0;
+            String vrsta; //tvrtka ili grad
+            String naziv; //naziv tvrtke ili rada
+            String operacija; //ADD ili UPDATE
+
+            dohvatiStranicu("bug");
 
             try {
                 SimpleDateFormat sdf = new SimpleDateFormat("dd-M-yyyy H:mm:ss");
@@ -132,32 +158,27 @@ public class ObradaPoruka extends Thread {
                         Matcher mSadrzaj = provjeraSadrzaja(sadrzajPoruke.trim());
 
                         if ((naslovPoruke.equalsIgnoreCase("NWTiS poruka")) && (mSadrzaj != null)) {
+                            vrsta = mSadrzaj.group(1);
+                            naziv = mSadrzaj.group(2);
+                            operacija = mSadrzaj.group(3);
                             System.out.println(this.getId() + " | Poruka " + messageNumber + " | ISPRAVNA");
                             ispravnoPoruka++;
-                            if (mSadrzaj.group(3).equals("ADD")) {
-                                operacijaNadBazom(mSadrzaj.group(1), mSadrzaj.group(2), "ADD");
-                                System.out.println("ADD operacija");
-                                if (mSadrzaj.group(1).equals("GRAD")) {
+
+                            if (operacijaNadBazom(vrsta, naziv, operacija)) {
+                                dohvatiStranicu(naziv.toLowerCase());
+
+                                if (vrsta.equals("GRAD") && operacija.equals("ADD")) {
                                     brojDodanihGrad++;
-                                    System.out.println("GRAD ADD +");
-                                } else {
-                                    brojDodanihTvrtka++;
-                                    System.out.println("TVRTKA ADD +");
-
-                                }
-
-                            } else {//ako nije ADD onda mora biti UPDATE
-                                operacijaNadBazom(mSadrzaj.group(1), mSadrzaj.group(2), "UPDATE");
-                                System.out.println("UPDATE operacija");
-                                if (mSadrzaj.group(1).equals("GRAD")) {
+                                } else if (vrsta.equals("GRAD") && operacija.equals("UPDATE")) {
                                     brojAzuriranihGrad++;
-                                    System.out.println("GRAD UPDATE +");
-                                } else {
+                                } else if (vrsta.equals("TVRTKA") && operacija.equals("ADD")) {
+                                    brojDodanihTvrtka++;
+                                } else if (vrsta.equals("TVRTKA") && operacija.equals("UPDATE")) {
                                     brojAzuziranihTvrtka++;
-                                    System.out.println("TVRTKA UPDATE +");
                                 }
-
                             }
+                            System.out.println("\n| GRAD ADD: " + brojDodanihGrad + "\n| GRAD UPDATE: " + brojAzuriranihGrad + "\n| TVRTKA ADD: " + brojDodanihTvrtka + "\n| TVRTKA UPDATE: " + brojAzuziranihTvrtka);
+
                             premjestiPoruku(nazivIspravnogDirektorija, store, message, folder);
 
                         } else {
@@ -234,7 +255,7 @@ public class ObradaPoruka extends Thread {
 
     }
 
-    private void operacijaNadBazom(String vrsta, String naziv, String operacija) {
+    private boolean operacijaNadBazom(String vrsta, String naziv, String operacija) {
         String url = bpConfig.getServerDatabase() + bpConfig.getUserDatabase();
         String korisnik = bpConfig.getUserDatabase();
         String lozinka = bpConfig.getUserPassword();
@@ -248,7 +269,6 @@ public class ObradaPoruka extends Thread {
             Class.forName(bpConfig.getDriverDatabase()); //dovoljno pozvati jednom na razini projekta da bi se ucitao sam driver
         } catch (ClassNotFoundException ex) {
             System.out.println("Greska kod ucitavanja drivera: " + ex.getMessage());
-            return;
         }
 
         try {
@@ -266,14 +286,13 @@ public class ObradaPoruka extends Thread {
                     System.out.println("ERROR | Zapis ne postoji u bazi.");
                 } else if (operacija.equals("ADD")) {
                     sql = "INSERT INTO elementi VALUES ('" + vrsta + "','" + naziv + "')";
-                    if (statemant.execute(sql)) {
-                        System.out.println("Zapis uspjesno spremljen u bazu.");
-                    }
+                    return true;
                 }
             } else if (operacija.equals("ADD")) {
                 System.out.println("ERROR | Zapis vec postoji u bazi.");
             } else if (operacija.equals("UPDATE")) {
                 System.out.println("TODO | Pozivam metodu za spremanje datoteke");
+                return true;
             }
 
             System.out.println(sql);
@@ -304,6 +323,67 @@ public class ObradaPoruka extends Thread {
                 }
             }
         }
+        return false;
+    }
+
+    private void dohvatiStranicu(String naziv) {
+        SimpleDateFormat sdf = new SimpleDateFormat("yMdHms");
+        long trenutnoVrijeme = System.currentTimeMillis();
+        String folder = naziv + "_" + sdf.format(trenutnoVrijeme);
+        System.out.println(folder);
+        System.out.println("Pokusavam dohvatiti stranicu www." + naziv + ".hr | . info | .com | .eu");
+        BufferedInputStream ulaz = null;
+        FileOutputStream izlaz = null;
+        String url = "http://" + naziv + ".hr";
+        String path = this.kontekst.getRealPath("/WEB-INF") + java.io.File.separator + this.dirZaSpremanjeStranica + java.io.File.separator + folder + java.io.File.separator + "www." + naziv + ".hr";
+        File datoteka = new File(path);
+        try {
+            ulaz = new BufferedInputStream(new URL(url).openStream());
+            izlaz = new FileOutputStream(datoteka);
+            System.out.println(path);
+
+            if (ulaz != null) {
+                File direktorijStranice = new File(folder);
+                if (!direktorijStranice.exists()) {
+                    try {
+                        direktorijStranice.mkdir();
+                        System.out.println("USSSSSSSSSSSSSSSSSSS");
+                    } catch (SecurityException se) {
+                        System.out.println("Problem sa dozvolama:");
+                    }
+                    
+                }
+
+                final byte data[] = new byte[1024];
+                int count;
+                while ((count = ulaz.read(data, 0, 1024)) != -1) {
+                    izlaz.write(data, 0, count);
+                }
+            } else {
+                System.out.println("Stranica " + url + " ne postoji.");
+            }
+
+        } catch (MalformedURLException ex) {
+            Logger.getLogger(ObradaPoruka.class.getName()).log(Level.SEVERE, null, ex);
+        } catch (IOException ex) {
+            Logger.getLogger(ObradaPoruka.class.getName()).log(Level.SEVERE, null, ex);
+        } finally {
+            if (ulaz != null) {
+                try {
+                    ulaz.close();
+                } catch (IOException ex) {
+                    Logger.getLogger(ObradaPoruka.class.getName()).log(Level.SEVERE, null, ex);
+                }
+            }
+            if (izlaz != null) {
+                try {
+                    izlaz.close();
+                } catch (IOException ex) {
+                    Logger.getLogger(ObradaPoruka.class.getName()).log(Level.SEVERE, null, ex);
+                }
+            }
+        }
+
     }
 
     @Override
