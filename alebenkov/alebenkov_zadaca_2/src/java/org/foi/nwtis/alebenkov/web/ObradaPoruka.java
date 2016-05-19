@@ -242,6 +242,7 @@ public class ObradaPoruka extends Thread {
         Statement statemant = null;
         ResultSet rs = null;
         String sql = null;
+        int brojRedaka = 0;
 
         try {
             Class.forName(bpConfig.getDriverDatabase()); //dovoljno pozvati jednom na razini projekta da bi se ucitao sam driver
@@ -252,14 +253,15 @@ public class ObradaPoruka extends Thread {
 
         try {
             connection = DriverManager.getConnection(url, korisnik, lozinka);
-            statemant = connection.createStatement(ResultSet.TYPE_FORWARD_ONLY, ResultSet.TYPE_SCROLL_INSENSITIVE);
+            statemant = connection.createStatement();
 
             sql = "SELECT * FROM elementi where vrsta = '" + vrsta + "' AND  naziv ='" + naziv + "'";
             rs = statemant.executeQuery(sql);
-            rs.last();
-            System.out.println("Stanje row : "+ rs.getRow());
+            while (rs.next()) {
+                brojRedaka++; //ovo se moze rjesiti na elegantniji nacin ali ovo mi je trenutno najbrzi (getRow, beforeFirst,..) ali je potrebno podici odredjene zastavice na resultsetu
+            }
 
-            if (true) {
+            if (brojRedaka == 0) {
                 if (operacija.equals("UPDATE")) {
                     System.out.println("ERROR | Zapis ne postoji u bazi.");
                 } else if (operacija.equals("ADD")) {
