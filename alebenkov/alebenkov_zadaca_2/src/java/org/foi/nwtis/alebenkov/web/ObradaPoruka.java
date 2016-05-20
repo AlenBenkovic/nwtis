@@ -70,12 +70,11 @@ public class ObradaPoruka extends Thread {
         this.nazivNeispravnogDirektorija = mailConfig.dajPostavku("nazivNeispravnogDirektorija");
         this.nazivOstalogDirektorija = mailConfig.dajPostavku("nazivOstalogDirektorija");
         this.dirZaSpremanjeStranica = mailConfig.dajPostavku("dirZaSpremanjeStranica");
-
         File direktorijZaSpremanje = new File(this.kontekst.getRealPath("/WEB-INF") + java.io.File.separator + dirZaSpremanjeStranica);
-        if (!direktorijZaSpremanje.exists()) {
+        if (!direktorijZaSpremanje.exists()) {//ukoliko direktorij koji je naveden u konfiguraciji ne postoji, kreiram ga
             try {
                 direktorijZaSpremanje.mkdir();
-                System.err.println("USPIO!");
+                System.out.println("Kreiram direktorij " + dirZaSpremanjeStranica);
             } catch (SecurityException se) {
                 System.out.println("Problem sa dozvolama!");
             }
@@ -118,12 +117,10 @@ public class ObradaPoruka extends Thread {
             String naziv; //naziv tvrtke ili rada
             String operacija; //ADD ili UPDATE
 
-            dohvatiStranicu("bug");
-
             try {
                 SimpleDateFormat sdf = new SimpleDateFormat("dd-M-yyyy H:mm:ss");
                 long pocetakRadaDretve = System.currentTimeMillis(); //biljezim pocetak rada dretve
-                System.out.println("Obrada zapocela u: " + sdf.format(pocetakRadaDretve));
+                System.out.println("|||| Obrada zapocela u: " + sdf.format(pocetakRadaDretve));
 
                 session = Session.getDefaultInstance(System.getProperties(), null); //procesiranje maila pocinje
 
@@ -152,7 +149,7 @@ public class ObradaPoruka extends Thread {
                     String naslovPoruke = message.getSubject();
                     String sadrzajPoruke = message.getContent().toString();
 
-                    System.out.println("Dretva " + this.getId() + " | Poruka " + messageNumber + " | Vrsta poruke: " + vrstaPoruke + "\nNaslov: " + naslovPoruke + "\nSadrzaj: " + sadrzajPoruke);
+                    System.out.println("|| " + this.getName() + " | Poruka No." + messageNumber + " | Vrsta poruke: " + vrstaPoruke + "\nNaslov: " + naslovPoruke + "\nSadrzaj: " + sadrzajPoruke);
 
                     if (vrstaPoruke.startsWith("text/plain")) {
                         Matcher mSadrzaj = provjeraSadrzaja(sadrzajPoruke.trim());
@@ -161,7 +158,7 @@ public class ObradaPoruka extends Thread {
                             vrsta = mSadrzaj.group(1);
                             naziv = mSadrzaj.group(2);
                             operacija = mSadrzaj.group(3);
-                            System.out.println(this.getId() + " | Poruka " + messageNumber + " | ISPRAVNA");
+                            System.out.println(this.getName() + " | Poruka " + messageNumber + " | ISPRAVNA");
                             ispravnoPoruka++;
 
                             if (operacijaNadBazom(vrsta, naziv, operacija)) {
@@ -177,20 +174,20 @@ public class ObradaPoruka extends Thread {
                                     brojAzuziranihTvrtka++;
                                 }
                             }
-                            System.out.println("\n| GRAD ADD: " + brojDodanihGrad + "\n| GRAD UPDATE: " + brojAzuriranihGrad + "\n| TVRTKA ADD: " + brojDodanihTvrtka + "\n| TVRTKA UPDATE: " + brojAzuziranihTvrtka);
+                            System.out.println("Stanje obrade:\n| GRAD ADD: " + brojDodanihGrad + "\n| GRAD UPDATE: " + brojAzuriranihGrad + "\n| TVRTKA ADD: " + brojDodanihTvrtka + "\n| TVRTKA UPDATE: " + brojAzuziranihTvrtka);
 
                             premjestiPoruku(nazivIspravnogDirektorija, store, message, folder);
 
                         } else {
                             premjestiPoruku(nazivNeispravnogDirektorija, store, message, folder);
                             neispravnoPoruka++;
-                            System.out.println(this.getId() + " | Poruka " + messageNumber + " | NEISPRAVNA");
+                            System.out.println(this.getName() + " | Poruka No." + messageNumber + " | NEISPRAVNA");
                         }
 
                     } else {
                         premjestiPoruku(nazivOstalogDirektorija, store, message, folder);
                         ostaloPoruka++;
-                        System.out.println(this.getId() + " | Poruka " + messageNumber + " | OSTALA");
+                        System.out.println(this.getName() + " | Poruka " + messageNumber + " | OSTALA");
 
                     }
 
@@ -203,12 +200,12 @@ public class ObradaPoruka extends Thread {
                 store.close();
 
                 if (ukupnoPoruka == 0) {
-                    System.out.println("Nema novih poruka.");
+                    System.out.println("| Nema novih poruka.");
                 }
 
                 long krajRadaDretve = System.currentTimeMillis(); //biljezim pocetak rada dretve
                 long trajanjeRadaDretve = krajRadaDretve - pocetakRadaDretve;
-                System.out.println("Obrada zavrsila u: " + sdf.format(krajRadaDretve));
+                System.out.println("|||| Obrada zavrsila u: " + sdf.format(krajRadaDretve));
                 sleep(intervalSpavanja - trajanjeRadaDretve);//odlazim na spavanje
 
             } catch (AuthenticationFailedException e) {
@@ -250,7 +247,7 @@ public class ObradaPoruka extends Thread {
             message.setFlag(Flags.Flag.DELETED, true); //oznacavam trenutnu poruku da je spremna za brisanje
 
         } catch (Exception e) {
-            System.out.println("Greska prilikom kreiranja foldera " + e.getMessage() + e.toString());
+            System.out.println("| Greska prilikom kreiranja foldera " + e.getMessage() + e.toString());
         }
 
     }
@@ -262,13 +259,14 @@ public class ObradaPoruka extends Thread {
         Connection connection = null;
         Statement statemant = null;
         ResultSet rs = null;
+        boolean sqlExe;
         String sql = null;
         int brojRedaka = 0;
 
         try {
             Class.forName(bpConfig.getDriverDatabase()); //dovoljno pozvati jednom na razini projekta da bi se ucitao sam driver
         } catch (ClassNotFoundException ex) {
-            System.out.println("Greska kod ucitavanja drivera: " + ex.getMessage());
+            System.out.println("ERROR | Greska kod ucitavanja drivera: " + ex.getMessage());
         }
 
         try {
@@ -286,19 +284,20 @@ public class ObradaPoruka extends Thread {
                     System.out.println("ERROR | Zapis ne postoji u bazi.");
                 } else if (operacija.equals("ADD")) {
                     sql = "INSERT INTO elementi VALUES ('" + vrsta + "','" + naziv + "')";
+                    sqlExe = statemant.execute(sql);
+                    System.out.println("|| Zapis spremljen u bazu");
                     return true;
                 }
             } else if (operacija.equals("ADD")) {
                 System.out.println("ERROR | Zapis vec postoji u bazi.");
             } else if (operacija.equals("UPDATE")) {
-                System.out.println("TODO | Pozivam metodu za spremanje datoteke");
                 return true;
             }
 
             System.out.println(sql);
 
         } catch (SQLException ex) {
-            System.out.println("Greska u radu s bazom: " + ex.getMessage());
+            System.out.println("ERROR | Greska u radu s bazom: " + ex.getMessage());
         } finally {
             if (rs != null) {
                 try {
@@ -327,59 +326,66 @@ public class ObradaPoruka extends Thread {
     }
 
     private void dohvatiStranicu(String naziv) {
-        SimpleDateFormat sdf = new SimpleDateFormat("yMdHms");
-        long trenutnoVrijeme = System.currentTimeMillis();
-        String folder = naziv + "_" + sdf.format(trenutnoVrijeme);
-        System.out.println(folder);
-        System.out.println("Pokusavam dohvatiti stranicu www." + naziv + ".hr | . info | .com | .eu");
+
+        //Provjeravam postoji li web stranica
         BufferedInputStream ulaz = null;
         FileOutputStream izlaz = null;
-        String url = "http://" + naziv + ".hr";
-        String path = this.kontekst.getRealPath("/WEB-INF") + java.io.File.separator + this.dirZaSpremanjeStranica + java.io.File.separator + folder + java.io.File.separator + "www." + naziv + ".hr";
-        File datoteka = new File(path);
-        try {
-            ulaz = new BufferedInputStream(new URL(url).openStream());
-            izlaz = new FileOutputStream(datoteka);
-            System.out.println(path);
 
-            if (ulaz != null) {
-                File direktorijStranice = new File(folder);
-                if (!direktorijStranice.exists()) {
-                    try {
-                        direktorijStranice.mkdir();
-                        System.out.println("USSSSSSSSSSSSSSSSSSS");
-                    } catch (SecurityException se) {
-                        System.out.println("Problem sa dozvolama:");
+        String domena[] = {".hr", ".info", ".com", ".eu"};
+
+        SimpleDateFormat sdf = new SimpleDateFormat("yMdHms");
+        long trenutnoVrijeme = System.currentTimeMillis();
+        String dirStranice = naziv + "_" + sdf.format(trenutnoVrijeme);
+
+        for (int i = 0; i < domena.length; i++) {
+            try {//provjeravam web mjesto za sve domene
+                System.out.println("|| Pokusavam dohvatiti stranicu www." + naziv + domena[i]);
+                String url = "http://" + naziv + domena[i];
+                ulaz = new BufferedInputStream(new URL(url).openStream());
+                if (ulaz != null) {
+                    //KREIRANJE DIREKTORIJA WEB STRANICE
+                    System.out.println("| Direktorij stranice: " + dirStranice);
+                    File direktorijStranice = new File(this.kontekst.getRealPath("/WEB-INF") + java.io.File.separator + dirZaSpremanjeStranica + java.io.File.separator + dirStranice);
+                    if (!direktorijStranice.exists()) {
+                        try {
+                            direktorijStranice.mkdir();
+                            System.out.println("| Kreiram direktorij " + dirStranice + " za " + url);
+                        } catch (SecurityException se) {
+                            System.out.println("| Problem sa dozvolama:");
+                        }
+
                     }
-                    
+                    //END
+                    //path je samo pomocna varijabla za kreiranje datoteke web mjesta
+                    String path = this.kontekst.getRealPath("/WEB-INF") + java.io.File.separator + this.dirZaSpremanjeStranica + java.io.File.separator + dirStranice + java.io.File.separator + "www." + naziv + domena[i];
+                    File datoteka = new File(path);
+                    izlaz = new FileOutputStream(datoteka);
+                    final byte data[] = new byte[1024];
+                    int count;
+                    while ((count = ulaz.read(data, 0, 1024)) != -1) {
+                        izlaz.write(data, 0, count);
+                    }
+                } else {
+                    System.out.println("ERROR | Stranica " + url + " ne postoji.");
                 }
-
-                final byte data[] = new byte[1024];
-                int count;
-                while ((count = ulaz.read(data, 0, 1024)) != -1) {
-                    izlaz.write(data, 0, count);
+            } catch (MalformedURLException ex) {
+                System.out.println("ERROR | Greska prilikom pristupa web stranici ." + ex.getMessage());
+            } catch (IOException ex) {
+                System.out.println("ERROR | Greska prilikom I/O operacija." + ex.getMessage());
+            } finally {
+                if (ulaz != null) {
+                    try {
+                        ulaz.close();
+                    } catch (IOException ex) {
+                        Logger.getLogger(ObradaPoruka.class.getName()).log(Level.SEVERE, null, ex);
+                    }
                 }
-            } else {
-                System.out.println("Stranica " + url + " ne postoji.");
-            }
-
-        } catch (MalformedURLException ex) {
-            Logger.getLogger(ObradaPoruka.class.getName()).log(Level.SEVERE, null, ex);
-        } catch (IOException ex) {
-            Logger.getLogger(ObradaPoruka.class.getName()).log(Level.SEVERE, null, ex);
-        } finally {
-            if (ulaz != null) {
-                try {
-                    ulaz.close();
-                } catch (IOException ex) {
-                    Logger.getLogger(ObradaPoruka.class.getName()).log(Level.SEVERE, null, ex);
-                }
-            }
-            if (izlaz != null) {
-                try {
-                    izlaz.close();
-                } catch (IOException ex) {
-                    Logger.getLogger(ObradaPoruka.class.getName()).log(Level.SEVERE, null, ex);
+                if (izlaz != null) {
+                    try {
+                        izlaz.close();
+                    } catch (IOException ex) {
+                        Logger.getLogger(ObradaPoruka.class.getName()).log(Level.SEVERE, null, ex);
+                    }
                 }
             }
         }
