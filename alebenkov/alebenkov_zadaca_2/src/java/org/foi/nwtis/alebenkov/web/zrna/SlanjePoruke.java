@@ -27,7 +27,7 @@ public class SlanjePoruke {
     private String predmetPoruke;
     private String tekstPoruke;
     private String tipPoruke;
-    String posluzitelj = "localhost"; //todo preuzmi iz konfiguracije
+    String posluzitelj = "nwtis.nastava.foi.hr"; //todo preuzmi iz konfiguracije
     private String poruka = "";
 
     /**

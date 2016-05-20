@@ -16,6 +16,7 @@ import java.sql.DriverManager;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.text.DecimalFormat;
 import java.text.SimpleDateFormat;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -38,6 +39,7 @@ import javax.mail.StoreClosedException;
 import javax.servlet.ServletContext;
 import org.foi.nwtis.alebenkov.konfiguracije.Konfiguracija;
 import org.foi.nwtis.alebenkov.konfiguracije.bp.BP_konfiguracija;
+import org.foi.nwtis.alebenkov.web.zrna.SlanjePoruke;
 
 /**
  *
@@ -55,6 +57,9 @@ public class ObradaPoruka extends Thread {
     private String nazivNeispravnogDirektorija;
     private String nazivOstalogDirektorija;
     private String dirZaSpremanjeStranica;
+    private String naslovPoruke;
+    private String naslovPorukeStatistike;
+    private String adresaPorukeStatistike;
     private Konfiguracija mailConfig;
     private BP_konfiguracija bpConfig;
 
@@ -70,6 +75,9 @@ public class ObradaPoruka extends Thread {
         this.nazivNeispravnogDirektorija = mailConfig.dajPostavku("nazivNeispravnogDirektorija");
         this.nazivOstalogDirektorija = mailConfig.dajPostavku("nazivOstalogDirektorija");
         this.dirZaSpremanjeStranica = mailConfig.dajPostavku("dirZaSpremanjeStranica");
+        this.naslovPoruke = mailConfig.dajPostavku("naslovPoruke");
+        this.naslovPorukeStatistike = mailConfig.dajPostavku("naslovPorukeStatistike");
+        this.adresaPorukeStatistike = mailConfig.dajPostavku("adresaPorukeStatistike");
         File direktorijZaSpremanje = new File(this.kontekst.getRealPath("/WEB-INF") + java.io.File.separator + dirZaSpremanjeStranica);
         if (!direktorijZaSpremanje.exists()) {//ukoliko direktorij koji je naveden u konfiguraciji ne postoji, kreiram ga
             try {
@@ -103,6 +111,7 @@ public class ObradaPoruka extends Thread {
         Part part = null;
         String contentType = null;
         int sveukupnoPoruka = 0;
+        int redniBrojPoruke = 1;
 
         while (dretvaRadi) {
             int ukupnoPoruka = 0;
@@ -154,7 +163,7 @@ public class ObradaPoruka extends Thread {
                     if (vrstaPoruke.startsWith("text/plain")) {
                         Matcher mSadrzaj = provjeraSadrzaja(sadrzajPoruke.trim());
 
-                        if ((naslovPoruke.equalsIgnoreCase("NWTiS poruka")) && (mSadrzaj != null)) {
+                        if ((naslovPoruke.equalsIgnoreCase(this.naslovPoruke)) && (mSadrzaj != null)) {
                             vrsta = mSadrzaj.group(1);
                             naziv = mSadrzaj.group(2);
                             operacija = mSadrzaj.group(3);
@@ -174,7 +183,6 @@ public class ObradaPoruka extends Thread {
                                     brojAzuziranihTvrtka++;
                                 }
                             }
-                            System.out.println("Stanje obrade:\n| GRAD ADD: " + brojDodanihGrad + "\n| GRAD UPDATE: " + brojAzuriranihGrad + "\n| TVRTKA ADD: " + brojDodanihTvrtka + "\n| TVRTKA UPDATE: " + brojAzuziranihTvrtka);
 
                             premjestiPoruku(nazivIspravnogDirektorija, store, message, folder);
 
@@ -203,32 +211,57 @@ public class ObradaPoruka extends Thread {
                     System.out.println("| Nema novih poruka.");
                 }
 
+                System.out.println("Stanje obrade:\n| GRAD ADD: " + brojDodanihGrad + "\n| GRAD UPDATE: " + brojAzuriranihGrad + "\n| TVRTKA ADD: " + brojDodanihTvrtka + "\n| TVRTKA UPDATE: " + brojAzuziranihTvrtka);
+
+                
+                
+
                 long krajRadaDretve = System.currentTimeMillis(); //biljezim pocetak rada dretve
                 long trajanjeRadaDretve = krajRadaDretve - pocetakRadaDretve;
                 System.out.println("|||| Obrada zavrsila u: " + sdf.format(krajRadaDretve));
+                
+                SimpleDateFormat ms = new SimpleDateFormat("S");
+                
+                SlanjePoruke poruka = new SlanjePoruke();
+                String tekstPoruke = "Obrada započela u: " + sdf.format(pocetakRadaDretve) 
+                        + "\nObrada završila u: " + sdf.format(krajRadaDretve )
+                        + "\n\nTrajanje obrade u ms: " + ms.format(trajanjeRadaDretve)
+                        + "\nBroj poruka: " + ukupnoPoruka
+                        + "\nBroj dodanih podataka GRAD: " + brojDodanihGrad
+                        + "\nBroj dodanih podataka TVRTKA: " + brojDodanihTvrtka
+                        + "\nBroj ažuriranih podataka GRAD: " + brojAzuriranihGrad
+                        + "\nBroj ažuriranih podataka TVRTKA: " + brojAzuziranihTvrtka;
+                DecimalFormat df = new DecimalFormat("##.00");
+                poruka.setPredmetPoruke(this.naslovPorukeStatistike + " " + df.format(redniBrojPoruke));
+                poruka.setTekstPoruke(tekstPoruke);
+                poruka.setTipPoruke("text/plain");
+                poruka.setTkoPrima(this.adresaPorukeStatistike);
+                poruka.setTkoSalje("servis@nwtis.nastava.foi.hr");
+                poruka.saljiPoruku();
+                redniBrojPoruke++;
                 sleep(intervalSpavanja - trajanjeRadaDretve);//odlazim na spavanje
 
             } catch (AuthenticationFailedException e) {
-                //printData("Not able to process the mail reading.");
-                e.printStackTrace();
+                System.out.println(e.getMessage());
+                dretvaRadi = false;
             } catch (FolderClosedException e) {
-                //printData("Not able to process the mail reading.");
-                e.printStackTrace();
+                System.out.println(e.getMessage());
+                dretvaRadi = false;
             } catch (FolderNotFoundException e) {
-                //printData("Not able to process the mail reading.");
-                e.printStackTrace();
+                System.out.println(e.getMessage());
+                dretvaRadi = false;
             } catch (NoSuchProviderException e) {
-                //printData("Not able to process the mail reading.");
-                e.printStackTrace();
+                System.out.println(e.getMessage());
+                dretvaRadi = false;
             } catch (ReadOnlyFolderException e) {
-                //printData("Not able to process the mail reading.");
-                e.printStackTrace();
+                System.out.println(e.getMessage());
+                dretvaRadi = false;
             } catch (StoreClosedException e) {
-                //printData("Not able to process the mail reading.");
-                e.printStackTrace();
-            } catch (Exception e) {
-                //printData("Not able to process the mail reading.");
-                e.printStackTrace();
+                System.out.println(e.getMessage());
+                dretvaRadi = false;
+            } catch (MessagingException | IOException | InterruptedException e) {
+                System.out.println(e.getMessage());
+                dretvaRadi = false;
             }
         }
     }
@@ -293,8 +326,6 @@ public class ObradaPoruka extends Thread {
             } else if (operacija.equals("UPDATE")) {
                 return true;
             }
-
-            System.out.println(sql);
 
         } catch (SQLException ex) {
             System.out.println("ERROR | Greska u radu s bazom: " + ex.getMessage());

@@ -21,4 +21,7 @@
 <entry key="nazivNeispravnogDirektorija">Neispravne_poruke</entry>
 <entry key="nazivOstalogDirektorija">Ostale_poruke</entry>
 <entry key="dirZaSpremanjeStranica">podaci</entry>
+<entry key="naslovPoruke">NWTiS poruka</entry>
+<entry key="naslovPorukeStatistike">Statistika poruka</entry>
+<entry key="adresaPorukeStatistike">admin@nwtis.nastava.foi.hr</entry>
 </properties>
