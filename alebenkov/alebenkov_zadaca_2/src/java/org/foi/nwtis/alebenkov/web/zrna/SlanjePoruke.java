@@ -16,7 +16,7 @@ import javax.mail.internet.MimeMessage;
 
 /**
  *
- * @author grupa_1
+ * @author Alen Benkovic
  */
 @Named(value = "slanjePoruke")
 @RequestScoped
@@ -27,13 +27,21 @@ public class SlanjePoruke {
     private String predmetPoruke;
     private String tekstPoruke;
     private String tipPoruke;
-    String posluzitelj = "nwtis.nastava.foi.hr"; //todo preuzmi iz konfiguracije
+    private String posluzitelj;
     private String poruka = "";
 
     /**
      * Creates a new instance of SlanjePoruke
      */
     public SlanjePoruke() {
+    }
+
+    public String getPosluzitelj() {
+        return posluzitelj;
+    }
+
+    public void setPosluzitelj(String posluzitelj) {
+        this.posluzitelj = posluzitelj;
     }
 
     public String getTkoSalje() {

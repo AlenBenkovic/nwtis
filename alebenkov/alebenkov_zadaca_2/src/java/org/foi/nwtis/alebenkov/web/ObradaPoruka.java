@@ -7,8 +7,12 @@ package org.foi.nwtis.alebenkov.web;
 
 import java.io.BufferedInputStream;
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.sql.Connection;
@@ -18,6 +22,8 @@ import java.sql.SQLException;
 import java.sql.Statement;
 import java.text.DecimalFormat;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.regex.Matcher;
@@ -39,6 +45,7 @@ import javax.mail.StoreClosedException;
 import javax.servlet.ServletContext;
 import org.foi.nwtis.alebenkov.konfiguracije.Konfiguracija;
 import org.foi.nwtis.alebenkov.konfiguracije.bp.BP_konfiguracija;
+import org.foi.nwtis.alebenkov.web.zrna.Datoteka;
 import org.foi.nwtis.alebenkov.web.zrna.SlanjePoruke;
 
 /**
@@ -60,8 +67,11 @@ public class ObradaPoruka extends Thread {
     private String naslovPoruke;
     private String naslovPorukeStatistike;
     private String adresaPorukeStatistike;
+    private String mailPosluzitelj;
     private Konfiguracija mailConfig;
     private BP_konfiguracija bpConfig;
+    private List<Datoteka> datotekeWeb = null;
+    private String webSerijalizacija;
 
     public ObradaPoruka(ServletContext kontekst) {
         this.kontekst = kontekst;
@@ -78,6 +88,8 @@ public class ObradaPoruka extends Thread {
         this.naslovPoruke = mailConfig.dajPostavku("naslovPoruke");
         this.naslovPorukeStatistike = mailConfig.dajPostavku("naslovPorukeStatistike");
         this.adresaPorukeStatistike = mailConfig.dajPostavku("adresaPorukeStatistike");
+        this.mailPosluzitelj = mailConfig.dajPostavku("mailPosluzitelj");
+        this.webSerijalizacija = mailConfig.dajPostavku("webSerijalizacija");
         File direktorijZaSpremanje = new File(this.kontekst.getRealPath("/WEB-INF") + java.io.File.separator + dirZaSpremanjeStranica);
         if (!direktorijZaSpremanje.exists()) {//ukoliko direktorij koji je naveden u konfiguraciji ne postoji, kreiram ga
             try {
@@ -88,6 +100,12 @@ public class ObradaPoruka extends Thread {
             }
 
         }
+        File dirWebSerijalizacija = new File(this.kontekst.getRealPath("/WEB-INF") + java.io.File.separator + dirZaSpremanjeStranica + java.io.File.separator + webSerijalizacija);
+        datotekeWeb = new ArrayList();
+        if (!dirWebSerijalizacija.exists()) {
+            spremiZapisWebMjesta();
+        }
+        datotekeWeb = ucitajZapisWebMjesta();
 
     }
 
@@ -213,18 +231,17 @@ public class ObradaPoruka extends Thread {
 
                 System.out.println("Stanje obrade:\n| GRAD ADD: " + brojDodanihGrad + "\n| GRAD UPDATE: " + brojAzuriranihGrad + "\n| TVRTKA ADD: " + brojDodanihTvrtka + "\n| TVRTKA UPDATE: " + brojAzuziranihTvrtka);
 
-                
-                
-
+                spremiZapisWebMjesta();
+                izlistajZapise();
                 long krajRadaDretve = System.currentTimeMillis(); //biljezim pocetak rada dretve
                 long trajanjeRadaDretve = krajRadaDretve - pocetakRadaDretve;
                 System.out.println("|||| Obrada zavrsila u: " + sdf.format(krajRadaDretve));
-                
+
                 SimpleDateFormat ms = new SimpleDateFormat("S");
-                
+
                 SlanjePoruke poruka = new SlanjePoruke();
-                String tekstPoruke = "Obrada započela u: " + sdf.format(pocetakRadaDretve) 
-                        + "\nObrada završila u: " + sdf.format(krajRadaDretve )
+                String tekstPoruke = "Obrada započela u: " + sdf.format(pocetakRadaDretve)
+                        + "\nObrada završila u: " + sdf.format(krajRadaDretve)
                         + "\n\nTrajanje obrade u ms: " + ms.format(trajanjeRadaDretve)
                         + "\nBroj poruka: " + ukupnoPoruka
                         + "\nBroj dodanih podataka GRAD: " + brojDodanihGrad
@@ -235,6 +252,7 @@ public class ObradaPoruka extends Thread {
                 poruka.setPredmetPoruke(this.naslovPorukeStatistike + " " + df.format(redniBrojPoruke));
                 poruka.setTekstPoruke(tekstPoruke);
                 poruka.setTipPoruke("text/plain");
+                poruka.setPosluzitelj(mailPosluzitelj);
                 poruka.setTkoPrima(this.adresaPorukeStatistike);
                 poruka.setTkoSalje("servis@nwtis.nastava.foi.hr");
                 poruka.saljiPoruku();
@@ -391,11 +409,14 @@ public class ObradaPoruka extends Thread {
                     String path = this.kontekst.getRealPath("/WEB-INF") + java.io.File.separator + this.dirZaSpremanjeStranica + java.io.File.separator + dirStranice + java.io.File.separator + "www." + naziv + domena[i];
                     File datoteka = new File(path);
                     izlaz = new FileOutputStream(datoteka);
+                    String puniNaziv = naziv + domena[i];
+
                     final byte data[] = new byte[1024];
                     int count;
                     while ((count = ulaz.read(data, 0, 1024)) != -1) {
                         izlaz.write(data, 0, count);
                     }
+                    this.datotekeWeb.add(new Datoteka(path, puniNaziv, datoteka.length(), sdf.format(trenutnoVrijeme)));
                 } else {
                     System.out.println("ERROR | Stranica " + url + " ne postoji.");
                 }
@@ -437,6 +458,59 @@ public class ObradaPoruka extends Thread {
             return m;
         } else {
             return null;
+        }
+    }
+
+    /**
+     * Spremanje objekata spremljenih stranica u datoteku
+     */
+    public void spremiZapisWebMjesta() {
+
+        try {
+            String dat = this.kontekst.getRealPath("/WEB-INF") + java.io.File.separator + dirZaSpremanjeStranica + java.io.File.separator + webSerijalizacija;
+            FileOutputStream fileOut = new FileOutputStream(dat);
+            ObjectOutputStream out = new ObjectOutputStream(fileOut);
+
+            out.writeObject(datotekeWeb);
+            out.close();
+            fileOut.close();
+            System.out.println("SERVER | Serijalizirana evidencija spremljena u " + dat);
+        } catch (IOException ex) {
+            System.out.println("ERROR | " + ex.getMessage());
+        }
+    }
+
+    /**
+     * Ucitavanje objekata iz datoteke
+     *
+     * @return objekte iz datoteke (Spremljena web mjesta)
+     */
+    public synchronized List<Datoteka> ucitajZapisWebMjesta() {
+        List<Datoteka> e = null;
+        try {
+            String dat = this.kontekst.getRealPath("/WEB-INF") + java.io.File.separator + dirZaSpremanjeStranica + java.io.File.separator + webSerijalizacija;
+            FileInputStream fileIn = new FileInputStream(dat);
+            ObjectInputStream in = new ObjectInputStream(fileIn);
+            e = (List<Datoteka>) in.readObject();
+            in.close();
+            fileIn.close();
+
+        } catch (ClassNotFoundException c) {
+            System.out.println("ERROR | " + c.getMessage());
+        } catch (FileNotFoundException ex) {
+            System.out.println("ERROR | " + ex.getMessage());
+        } catch (IOException ex) {
+            System.out.println("ERROR | " + ex.getMessage());
+        }
+        return e;
+    }
+
+    public void izlistajZapise() {
+        for (int i = 0; i < datotekeWeb.size(); i++) {
+            System.out.println(datotekeWeb.get(i).getApsolutnaPutanja());
+            System.out.println(datotekeWeb.get(i).getNazivDatoteke());
+            System.out.println(datotekeWeb.get(i).getVelicina());
+            System.out.println(datotekeWeb.get(i).getVrijemeKreiranja());
         }
     }
 
