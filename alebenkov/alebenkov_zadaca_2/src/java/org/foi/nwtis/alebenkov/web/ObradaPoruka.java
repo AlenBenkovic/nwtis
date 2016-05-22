@@ -35,9 +35,7 @@ import javax.mail.FolderClosedException;
 import javax.mail.FolderNotFoundException;
 import javax.mail.Message;
 import javax.mail.MessagingException;
-import javax.mail.Multipart;
 import javax.mail.NoSuchProviderException;
-import javax.mail.Part;
 import javax.mail.ReadOnlyFolderException;
 import javax.mail.Session;
 import javax.mail.Store;
@@ -122,13 +120,6 @@ public class ObradaPoruka extends Thread {
         Folder folder = null;
         Message message = null;
         Message[] messages = null;
-        Object messagecontentObject = null;
-        String sender = null;
-        String subject = null;
-        Multipart multipart = null;
-        Part part = null;
-        String contentType = null;
-        int sveukupnoPoruka = 0;
         int redniBrojPoruke = 1;
 
         while (dretvaRadi) {
@@ -165,12 +156,9 @@ public class ObradaPoruka extends Thread {
 
                 //Prolazim kroz sve poruke
                 for (int messageNumber = 0; messageNumber < messages.length; messageNumber++) {
-                    sveukupnoPoruka++;
                     ukupnoPoruka++;
 
                     message = messages[messageNumber]; //uzimam trenutnu poruku kroz koju prolazim
-
-                    messagecontentObject = message.getContent();// Retrieve the message content
 
                     String vrstaPoruke = message.getContentType().toLowerCase();//stavljam u mala slova kako god da pise radi kasnije probjere
                     String naslovPoruke = message.getSubject();
@@ -257,7 +245,13 @@ public class ObradaPoruka extends Thread {
                 poruka.setTkoSalje("servis@nwtis.nastava.foi.hr");
                 poruka.saljiPoruku();
                 redniBrojPoruke++;
-                sleep(intervalSpavanja - trajanjeRadaDretve);//odlazim na spavanje
+                if((intervalSpavanja - trajanjeRadaDretve)<0){//nekad se zna dogoditi da zbog mail servera koji sporo odgovara vrijeme spavanja bude u minusu
+                    sleep(60000);
+                }else{
+                    sleep(intervalSpavanja - trajanjeRadaDretve);//odlazim na spavanje
+                }
+                
+                
 
             } catch (AuthenticationFailedException e) {
                 System.out.println(e.getMessage());
