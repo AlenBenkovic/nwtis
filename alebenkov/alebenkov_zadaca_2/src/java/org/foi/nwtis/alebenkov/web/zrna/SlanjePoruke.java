@@ -27,7 +27,7 @@ public class SlanjePoruke {
     private String predmetPoruke;
     private String tekstPoruke;
     private String tipPoruke;
-    private String posluzitelj;
+    private String posluzitelj="nwtis.nastava.foi.hr";
     private String poruka = "";
 
     /**
