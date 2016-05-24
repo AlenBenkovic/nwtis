@@ -6,6 +6,7 @@
 package org.foi.nwtis.alebenkov.web.kontrole;
 
 import java.io.Serializable;
+import java.util.Date;
 
 /**
  *
@@ -16,9 +17,9 @@ public class Datoteka implements Serializable{
     private String apsolutnaPutanja;
     private String nazivDatoteke;
     private long velicina;
-    private String vrijemeKreiranja;
+    private Date vrijemeKreiranja;
 
-    public Datoteka(String apsolutnaPutanja, String nazivDatoteke, long velicina, String vrijemeKreiranja) {
+    public Datoteka(String apsolutnaPutanja, String nazivDatoteke, long velicina, Date vrijemeKreiranja) {
         this.apsolutnaPutanja = apsolutnaPutanja;
         this.nazivDatoteke = nazivDatoteke;
         this.velicina = velicina;
@@ -49,11 +50,11 @@ public class Datoteka implements Serializable{
         this.velicina = velicina;
     }
 
-    public String getVrijemeKreiranja() {
+    public Date getVrijemeKreiranja() {
         return vrijemeKreiranja;
     }
 
-    public void setVrijemeKreiranja(String vrijemeKreiranja) {
+    public void setVrijemeKreiranja(Date vrijemeKreiranja) {
         this.vrijemeKreiranja = vrijemeKreiranja;
     }
 

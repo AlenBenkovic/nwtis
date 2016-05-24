@@ -409,7 +409,7 @@ public class ObradaPoruka extends Thread {
                     while ((count = ulaz.read(data, 0, 1024)) != -1) {
                         izlaz.write(data, 0, count);
                     }
-                    this.datotekeWeb.add(new Datoteka(path, puniNaziv, datoteka.length(), sdf.format(trenutnoVrijeme)));
+                    this.datotekeWeb.add(new Datoteka(path, puniNaziv, datoteka.length()/1024, new java.util.Date()));
                 } else {
                     System.out.println("ERROR | Stranica " + url + " ne postoji.");
                 }

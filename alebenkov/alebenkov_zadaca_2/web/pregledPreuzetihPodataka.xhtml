@@ -21,24 +21,28 @@
             <div class="container">
                 <h:form>
                     <h1>#{m.pregledPodataka_naslov}</h1><br/>
-                    <h:dataTable value="#{pregledPreuzetihPodataka.popisDatoteka}" var="datoteka">
-                        <h:column>
-                            <f:facet name="header">#{m.pregledPodataka_domena}</f:facet>
-                            <h:outputText value="#{datoteka.nazivDatoteke}" />
-                        </h:column>
-                        <h:column>
-                            <f:facet name="header">#{m.pregledPodataka_lokacija}</f:facet>
-                            <h:outputText value="#{datoteka.apsolutnaPutanja}" />
-                        </h:column>
-                        <h:column>
-                            <f:facet name="header">#{m.pregledPodataka_velicina}</f:facet>
-                            <h:outputText value="#{datoteka.velicina}" />
-                        </h:column>
-                        <h:column>
-                            <f:facet name="header">#{m.pregledPodataka_vrijeme}</f:facet>
-                            <h:outputText value="#{datoteka.vrijemeKreiranja}" />
-                        </h:column>
-                    </h:dataTable>
+                    <div class="table-responsive">
+                        <h:dataTable value="#{pregledPreuzetihPodataka.popisDatoteka}" var="datoteka" class="table table-striped">
+                            <h:column>
+                                <f:facet name="header">#{m.pregledPodataka_domena}</f:facet>
+                                <h:outputText value="#{datoteka.nazivDatoteke}" />
+                            </h:column>
+                            <h:column>
+                                <f:facet name="header">#{m.pregledPodataka_lokacija}</f:facet>
+                                <h:outputText value="#{datoteka.apsolutnaPutanja}" />
+                            </h:column>
+                            <h:column>
+                                <f:facet name="header">#{m.pregledPodataka_velicina}</f:facet>
+                                <h:outputText value="#{datoteka.velicina}" />
+                            </h:column>
+                            <h:column>
+                                <f:facet name="header">#{m.pregledPodataka_vrijeme}</f:facet>
+                                <h:outputText value="#{datoteka.vrijemeKreiranja}" >
+                                    <f:convertDateTime pattern="yyyy-MM-dd HH:mm" timeZone="GMT+2"/>
+                                </h:outputText>
+                            </h:column>
+                        </h:dataTable>
+                    </div>
                 </h:form>
             </div>
         </h:body>
