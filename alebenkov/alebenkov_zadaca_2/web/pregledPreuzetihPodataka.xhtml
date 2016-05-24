@@ -38,8 +38,14 @@
                             <h:column>
                                 <f:facet name="header">#{m.pregledPodataka_vrijeme}</f:facet>
                                 <h:outputText value="#{datoteka.vrijemeKreiranja}" >
-                                    <f:convertDateTime pattern="yyyy-MM-dd HH:mm" timeZone="GMT+2"/>
+                                    <f:convertDateTime pattern="dd-MM-yyyy HH:mm" timeZone="GMT+2"/>
                                 </h:outputText>
+                            </h:column>
+                            <h:column>
+                                <f:facet name="header">#{m.pregledPodataka_akcija}</f:facet>
+                                <h:commandButton action="#{pregledPreuzetihPodataka.pregledDatoteke()}">
+                                    <f:param name="lokacija" value="#{datoteka.apsolutnaPutanja}" />
+                                </h:commandButton>
                             </h:column>
                         </h:dataTable>
                     </div>

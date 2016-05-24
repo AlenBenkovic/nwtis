@@ -2,12 +2,12 @@
 <Scene Scope="Project" version="2">
     <Scope Scope="Faces Configuration Only"/>
     <Scope Scope="Project">
-        <Node id="lokalizacija_1.xhtml" x="400" y="300" zoom="true"/>
         <Node id="login.xhtml" x="650" y="150" zoom="false"/>
+        <Node id="lokalizacija_1.xhtml" x="400" y="300" zoom="true"/>
         <Node id="nepoznatiError.xhtml" x="150" y="300" zoom="true"/>
         <Node id="index.xhtml" x="400" y="150" zoom="true"/>
-        <Node id="ispisKorisnika.xhtml" x="150" y="150" zoom="true"/>
         <Node id="lokalizacija_2.xhtml" x="150" y="450" zoom="true"/>
+        <Node id="ispisKorisnika.xhtml" x="150" y="150" zoom="true"/>
         <Node id="loginError.xhtml" x="823" y="69" zoom="true"/>
         <Node id="loginOK.xhtml" x="836" y="249" zoom="true"/>
     </Scope>

@@ -49,6 +49,39 @@
             <from-outcome>ERROR</from-outcome>
             <to-view-id>/index.xhtml</to-view-id>
         </navigation-case>
+         
+    </navigation-rule>
+    <navigation-rule>
+        <from-view-id>/pregledPreuzetihPodataka.xhtml</from-view-id>
+        <navigation-case>
+            <description>Ako je sve ok prikazi sadrzaj datoteke</description>
+            <from-action>#{pregledPreuzetihPodataka.pregledDatoteke()}</from-action>
+            <from-outcome>OK</from-outcome>
+            <to-view-id>/pregledDatoteke.xhtml</to-view-id>
+        </navigation-case>
+        <navigation-case>
+            <description>Ako nije sve ok ne radi nista</description>
+            <from-action>#{pregledPreuzetihPodataka.pregledDatoteke()}</from-action>
+            <from-outcome>ERROR</from-outcome>
+            <to-view-id>/pregledPreuzetihPodataka.xhtml</to-view-id>
+        </navigation-case>
+    </navigation-rule>
+     
+
+    <navigation-rule>
+        <from-view-id>/pregledDatoteke.xhtml</from-view-id>
+        <navigation-case>
+            <description>Ako je sve ok prikazi sve datoteke</description>
+            <from-action>#{pregledDatoteke.povratakPregledPreuzetihPodataka()}</from-action>
+            <from-outcome>OK</from-outcome>
+            <to-view-id>/pregledPreuzetihPodataka.xhtml</to-view-id>
+        </navigation-case>
+        <navigation-case>
+            <description>Ako nije sve ok ne radi nista</description>
+            <from-action>#{pregledDatoteke.povratakPregledPreuzetihPodataka()}</from-action>
+            <from-outcome>ERROR</from-outcome>
+            <to-view-id>/pregledDatoteke.xhtml</to-view-id>
+        </navigation-case>
     </navigation-rule>
     
 </faces-config>
