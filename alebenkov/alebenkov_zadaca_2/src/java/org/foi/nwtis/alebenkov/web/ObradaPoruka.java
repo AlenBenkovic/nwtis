@@ -43,7 +43,7 @@ import javax.mail.StoreClosedException;
 import javax.servlet.ServletContext;
 import org.foi.nwtis.alebenkov.konfiguracije.Konfiguracija;
 import org.foi.nwtis.alebenkov.konfiguracije.bp.BP_konfiguracija;
-import org.foi.nwtis.alebenkov.web.zrna.Datoteka;
+import org.foi.nwtis.alebenkov.web.kontrole.Datoteka;
 import org.foi.nwtis.alebenkov.web.zrna.SlanjePoruke;
 
 /**
@@ -245,13 +245,12 @@ public class ObradaPoruka extends Thread {
                 poruka.setTkoSalje("servis@nwtis.nastava.foi.hr");
                 poruka.saljiPoruku();
                 redniBrojPoruke++;
-                if((intervalSpavanja - trajanjeRadaDretve)<0){//nekad se zna dogoditi da zbog mail servera koji sporo odgovara vrijeme spavanja bude u minusu
+                kontekst.setAttribute("datotekeWeb", datotekeWeb);
+                if ((intervalSpavanja - trajanjeRadaDretve) < 0) {//nekad se zna dogoditi da zbog mail servera koji sporo odgovara vrijeme spavanja bude u minusu
                     sleep(60000);
-                }else{
+                } else {
                     sleep(intervalSpavanja - trajanjeRadaDretve);//odlazim na spavanje
                 }
-                
-                
 
             } catch (AuthenticationFailedException e) {
                 System.out.println(e.getMessage());
@@ -458,7 +457,7 @@ public class ObradaPoruka extends Thread {
     /**
      * Spremanje objekata spremljenih stranica u datoteku
      */
-    public void spremiZapisWebMjesta() {
+    public synchronized void spremiZapisWebMjesta() {
 
         try {
             String dat = this.kontekst.getRealPath("/WEB-INF") + java.io.File.separator + dirZaSpremanjeStranica + java.io.File.separator + webSerijalizacija;

@@ -5,6 +5,7 @@
  */
 package org.foi.nwtis.alebenkov.web.zrna;
 
+import java.util.Date;
 import javax.inject.Named;
 import javax.enterprise.context.RequestScoped;
 import javax.mail.Address;
@@ -106,6 +107,8 @@ public class SlanjePoruke {
             // Set the subject and text
             message.setSubject(predmetPoruke);
             message.setText(tekstPoruke);
+            
+            message.setSentDate(new Date());
 
             Transport.send(message);
             poruka = "Poruka je uspješno poslana.";

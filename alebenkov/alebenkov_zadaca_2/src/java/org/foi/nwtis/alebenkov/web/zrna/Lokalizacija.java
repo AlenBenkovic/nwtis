@@ -15,7 +15,7 @@ import javax.faces.context.FacesContext;
 
 /**
  *
- * @author grupa_1
+ * @author abenkovic
  */
 @Named(value = "lokalizacija")
 @SessionScoped

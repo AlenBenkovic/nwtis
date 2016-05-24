@@ -16,7 +16,7 @@
 <entry key="adresaServera">nwtis.nastava.foi.hr</entry>
 <entry key="korisnickoIme">servis@nwtis.nastava.foi.hr</entry>
 <entry key="korisnickaLozinka">123456</entry>
-<entry key="intervalDretve">10</entry>
+<entry key="intervalDretve">30</entry>
 <entry key="nazivIspravnogDirektorija">Ispravne_poruke</entry>
 <entry key="nazivNeispravnogDirektorija">Neispravne_poruke</entry>
 <entry key="nazivOstalogDirektorija">Ostale_poruke</entry>
