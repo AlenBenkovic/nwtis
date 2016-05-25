@@ -11,7 +11,7 @@ import javax.enterprise.context.RequestScoped;
 
 
 /**
- *
+ * Klasa za pregled sadrzaja spremljene web stranice
  * @author abenkovic
  */
 @Named(value = "pregledDatoteke")

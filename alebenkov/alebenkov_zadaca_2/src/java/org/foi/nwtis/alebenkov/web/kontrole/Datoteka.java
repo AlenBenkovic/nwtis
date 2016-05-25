@@ -9,7 +9,7 @@ import java.io.Serializable;
 import java.util.Date;
 
 /**
- *
+ * Klasa za opisivanje spremljenih web stranica
  * @author abenkovic
  */
 public class Datoteka implements Serializable{
@@ -19,6 +19,13 @@ public class Datoteka implements Serializable{
     private long velicina;
     private Date vrijemeKreiranja;
 
+    /**
+     * Konstruktor klase
+     * @param apsolutnaPutanja
+     * @param nazivDatoteke
+     * @param velicina
+     * @param vrijemeKreiranja
+     */
     public Datoteka(String apsolutnaPutanja, String nazivDatoteke, long velicina, Date vrijemeKreiranja) {
         this.apsolutnaPutanja = apsolutnaPutanja;
         this.nazivDatoteke = nazivDatoteke;

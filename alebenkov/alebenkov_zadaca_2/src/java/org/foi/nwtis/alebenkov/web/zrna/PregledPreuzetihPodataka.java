@@ -19,11 +19,9 @@ import javax.inject.Named;
 import javax.enterprise.context.RequestScoped;
 import javax.faces.context.FacesContext;
 import org.unbescape.html.HtmlEscape;
-import org.unbescape.html.HtmlEscapeLevel;
-import org.unbescape.html.HtmlEscapeType;
 
 /**
- *
+ * Klasa za pregled svih preuzetih web stranica
  * @author abenkovic
  */
 @Named(value = "pregledPreuzetihPodataka")

@@ -47,7 +47,7 @@ import org.foi.nwtis.alebenkov.web.kontrole.Datoteka;
 import org.foi.nwtis.alebenkov.web.zrna.SlanjePoruke;
 
 /**
- *
+ * Klasa za obradu poruka koje stignu pomocu pozadinske dretve
  * @author abenkovic
  */
 public class ObradaPoruka extends Thread {
@@ -68,9 +68,13 @@ public class ObradaPoruka extends Thread {
     private String mailPosluzitelj;
     private Konfiguracija mailConfig;
     private BP_konfiguracija bpConfig;
-    private List<Datoteka> datotekeWeb = null;
-    private String webSerijalizacija;
+    private List<Datoteka> datotekeWeb = null;//spremam objetke zapisanih datoteka u listu
+    private String webSerijalizacija; //spremam naziv datoteke u koju spremam serijalizirane objekte spremljenih datoteka
 
+    /**
+     * Konstruktor klase
+     * @param kontekst
+     */
     public ObradaPoruka(ServletContext kontekst) {
         this.kontekst = kontekst;
         this.mailConfig = (Konfiguracija) kontekst.getAttribute("mailConfig");
@@ -101,7 +105,7 @@ public class ObradaPoruka extends Thread {
         File dirWebSerijalizacija = new File(this.kontekst.getRealPath("/WEB-INF") + java.io.File.separator + dirZaSpremanjeStranica + java.io.File.separator + webSerijalizacija);
         datotekeWeb = new ArrayList();
         if (!dirWebSerijalizacija.exists()) {
-            spremiZapisWebMjesta();
+            spremiZapisWebMjesta();//ukoliko serijalizirani objekti ne postoje, odma kreiram datoteku u kojoj ce se spremati objekti
         }
         datotekeWeb = ucitajZapisWebMjesta();
 
@@ -169,14 +173,14 @@ public class ObradaPoruka extends Thread {
                     if (vrstaPoruke.startsWith("text/plain")) {
                         Matcher mSadrzaj = provjeraSadrzaja(sadrzajPoruke.trim());
 
-                        if ((naslovPoruke.equalsIgnoreCase(this.naslovPoruke)) && (mSadrzaj != null)) {
+                        if ((naslovPoruke.equalsIgnoreCase(this.naslovPoruke)) && (mSadrzaj != null)) {//ukoliko je poruka ispravna radi sljedece
                             vrsta = mSadrzaj.group(1);
                             naziv = mSadrzaj.group(2);
                             operacija = mSadrzaj.group(3);
                             System.out.println(this.getName() + " | Poruka " + messageNumber + " | ISPRAVNA");
                             ispravnoPoruka++;
 
-                            if (operacijaNadBazom(vrsta, naziv, operacija)) {
+                            if (operacijaNadBazom(vrsta, naziv, operacija)) {//ukoliko su podaci uspjesno spremljeni u bp, spremi sadrzaj web stranice na disk
                                 dohvatiStranicu(naziv.toLowerCase());
 
                                 if (vrsta.equals("GRAD") && operacija.equals("ADD")) {
@@ -219,14 +223,15 @@ public class ObradaPoruka extends Thread {
 
                 System.out.println("Stanje obrade:\n| GRAD ADD: " + brojDodanihGrad + "\n| GRAD UPDATE: " + brojAzuriranihGrad + "\n| TVRTKA ADD: " + brojDodanihTvrtka + "\n| TVRTKA UPDATE: " + brojAzuziranihTvrtka);
 
-                spremiZapisWebMjesta();
-                izlistajZapise();
-                long krajRadaDretve = System.currentTimeMillis(); //biljezim pocetak rada dretve
+                spremiZapisWebMjesta();//spremam dohvacene web stranice kao objekte u datoteku
+                //izlistajZapise();
+                long krajRadaDretve = System.currentTimeMillis(); //biljezim kraj rada dretve
                 long trajanjeRadaDretve = krajRadaDretve - pocetakRadaDretve;
                 System.out.println("|||| Obrada zavrsila u: " + sdf.format(krajRadaDretve));
 
-                SimpleDateFormat ms = new SimpleDateFormat("S");
-
+                SimpleDateFormat ms = new SimpleDateFormat("S");//potrebno za trajanje obrade u ms
+                
+                //po zavrsetku svega saljem izvjesce na mail adresu odredjenu konfiguracijom
                 SlanjePoruke poruka = new SlanjePoruke();
                 String tekstPoruke = "Obrada započela u: " + sdf.format(pocetakRadaDretve)
                         + "\nObrada završila u: " + sdf.format(krajRadaDretve)
@@ -236,7 +241,7 @@ public class ObradaPoruka extends Thread {
                         + "\nBroj dodanih podataka TVRTKA: " + brojDodanihTvrtka
                         + "\nBroj ažuriranih podataka GRAD: " + brojAzuriranihGrad
                         + "\nBroj ažuriranih podataka TVRTKA: " + brojAzuziranihTvrtka;
-                DecimalFormat df = new DecimalFormat("##.00");
+                DecimalFormat df = new DecimalFormat("##.00"); //ovo mi je potrebno za naslov poruke, iako format koji je zadan u zadatku izbacuje error
                 poruka.setPredmetPoruke(this.naslovPorukeStatistike + " " + df.format(redniBrojPoruke));
                 poruka.setTekstPoruke(tekstPoruke);
                 poruka.setTipPoruke("text/plain");
@@ -247,7 +252,7 @@ public class ObradaPoruka extends Thread {
                 redniBrojPoruke++;
                 kontekst.setAttribute("datotekeWeb", datotekeWeb);
                 if ((intervalSpavanja - trajanjeRadaDretve) < 0) {//nekad se zna dogoditi da zbog mail servera koji sporo odgovara vrijeme spavanja bude u minusu
-                    sleep(60000);
+                    sleep(30000);
                 } else {
                     sleep(intervalSpavanja - trajanjeRadaDretve);//odlazim na spavanje
                 }
@@ -442,6 +447,11 @@ public class ObradaPoruka extends Thread {
         super.start(); //To change body of generated methods, choose Tools | Templates.
     }
 
+    /**
+     * Metoda za provjeru ispravnosti sadrzaja poruke
+     * @param p
+     * @return Matcher ukoliko je poruka ispravna, inace null
+     */
     public Matcher provjeraSadrzaja(String p) {
         String regex = "(GRAD|TVRTKA) (\\w+); (ADD|UPDATE);"; //group 1 grad ili tvrtka, group 2 naziv, group 3 operacija
         Pattern pattern = Pattern.compile(regex);
@@ -498,13 +508,5 @@ public class ObradaPoruka extends Thread {
         return e;
     }
 
-    public void izlistajZapise() {
-        for (int i = 0; i < datotekeWeb.size(); i++) {
-            System.out.println(datotekeWeb.get(i).getApsolutnaPutanja());
-            System.out.println(datotekeWeb.get(i).getNazivDatoteke());
-            System.out.println(datotekeWeb.get(i).getVelicina());
-            System.out.println(datotekeWeb.get(i).getVrijemeKreiranja());
-        }
-    }
 
 }

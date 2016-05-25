@@ -16,7 +16,7 @@ import javax.mail.internet.InternetAddress;
 import javax.mail.internet.MimeMessage;
 
 /**
- *
+ * Klasa za slanje mail poruka
  * @author Alen Benkovic
  */
 @Named(value = "slanjePoruke")
@@ -28,7 +28,7 @@ public class SlanjePoruke {
     private String predmetPoruke;
     private String tekstPoruke;
     private String tipPoruke;
-    private String posluzitelj="nwtis.nastava.foi.hr";
+    private String posluzitelj="nwtis.nastava.foi.hr"; //set metodom moze se postaviti bilo koji drugi, u obradi poruka uzima iz konfiga i postavlja ju vamo
     private String poruka = "";
 
     /**
