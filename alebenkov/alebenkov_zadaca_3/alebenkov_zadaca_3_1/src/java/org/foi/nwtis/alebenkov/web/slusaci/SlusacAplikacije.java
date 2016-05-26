@@ -5,14 +5,11 @@
  */
 package org.foi.nwtis.alebenkov.web.slusaci;
 
-import java.io.File;
 import javax.servlet.ServletContext;
 import javax.servlet.ServletContextEvent;
 import javax.servlet.ServletContextListener;
-import org.foi.nwtis.alebenkov.konfiguracije.Konfiguracija;
-import org.foi.nwtis.alebenkov.konfiguracije.KonfiguracijaApstraktna;
-import org.foi.nwtis.alebenkov.konfiguracije.NemaKonfiguracije;
 import org.foi.nwtis.alebenkov.konfiguracije.bp.BP_konfiguracija;
+import org.foi.nwtis.alebenkov.web.PreuzmiMeteoPodatke;
 
 /**
  * Web application lifecycle listener.
@@ -21,14 +18,21 @@ import org.foi.nwtis.alebenkov.konfiguracije.bp.BP_konfiguracija;
  */
 public class SlusacAplikacije implements ServletContextListener {
 
+    static private ServletContext context = null;
+    private PreuzmiMeteoPodatke pmp;
+
+    public static ServletContext getContext() {
+        return context;
+    }
+
     @Override
     public void contextInitialized(ServletContextEvent sce) {
         ServletContext sc = sce.getServletContext();
         String path = sc.getRealPath("/WEB-INF") + java.io.File.separator; //uzimam koja je to putanja do WEB-INF direktorija jer tamo se nalazi datoteka s postavkama
         String datoteka = path + sc.getInitParameter("konfiguracija");
         BP_konfiguracija bp = new BP_konfiguracija(datoteka);
-        
-        if (bp.getStatus()){
+
+        if (bp.getStatus()) {
             sc.setAttribute("BP_Konfig", bp);
             System.out.println("Učitana konfiguracija.");
         }
@@ -37,6 +41,8 @@ public class SlusacAplikacije implements ServletContextListener {
 
     @Override
     public void contextDestroyed(ServletContextEvent sce) {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+        if (pmp != null && pmp.isAlive()) {
+            pmp.interrupt();
+        }
     }
 }
