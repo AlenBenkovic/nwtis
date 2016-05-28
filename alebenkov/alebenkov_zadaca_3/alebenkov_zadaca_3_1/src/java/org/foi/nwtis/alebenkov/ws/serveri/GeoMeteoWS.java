@@ -10,9 +10,14 @@ import java.util.List;
 import javax.jws.WebService;
 import javax.jws.WebMethod;
 import javax.jws.WebParam;
+import javax.servlet.ServletContext;
+import org.foi.nwtis.alebenkov.konfiguracije.Konfiguracija;
+import org.foi.nwtis.alebenkov.rest.klijenti.GMKlijent;
+import org.foi.nwtis.alebenkov.rest.klijenti.OWMKlijent;
 import org.foi.nwtis.alebenkov.web.podaci.Adresa;
+import org.foi.nwtis.alebenkov.web.podaci.Lokacija;
 import org.foi.nwtis.alebenkov.web.podaci.MeteoPodaci;
-
+import org.foi.nwtis.alebenkov.web.slusaci.SlusacAplikacije;
 
 /**
  *
@@ -22,6 +27,9 @@ import org.foi.nwtis.alebenkov.web.podaci.MeteoPodaci;
 public class GeoMeteoWS {
 
     private static int brojac = 0;
+    private ServletContext sc;
+    private Konfiguracija konfig;
+    private String APPID;
 
     /**
      * Web service operation
@@ -30,7 +38,7 @@ public class GeoMeteoWS {
     public java.util.List<Adresa> dajSveAdrese() {
         List<Adresa> listaAdresa = new ArrayList<>();
         //TODO preuzmi adrese iz baze podataka
-       /*L String adrese[] = {"Hrvatska, Varaždin, Pavlinska 2", 
+        /*L String adrese[] = {"Hrvatska, Varaždin, Pavlinska 2", 
             "Hrvatska, Varaždin, Kralja Petra Krešimira 4",
             "Hrvatska, Zagreb, Trg Bana Jelačića 1", 
             "Hrvatska, Čakovec, Ul. kralja Tomislava 5",
@@ -49,25 +57,28 @@ public class GeoMeteoWS {
 
     Adresa dajAdresu(String adresa) {
 
-        /*GMKlijent gmk = new GMKlijent();
+        GMKlijent gmk = new GMKlijent();
         Lokacija lokacija = gmk.getGeoLocation(adresa);
         Adresa a = new Adresa(brojac++, adresa, lokacija);
 
-        return a;*/
-        return null;
+        return a;
     }
 
     /**
      * Web service operation
+     * @param adresa
+     * @return 
      */
     @WebMethod(operationName = "dajVazeceMeteoPodatkeZaAdresu")
     public MeteoPodaci dajVazeceMeteoPodatkeZaAdresu(@WebParam(name = "adresa") String adresa) {
-       /* Adresa a = dajAdresu(adresa);
-        String APPID = "1234567890"; // TODO preuzmi iz konfiguracijskih podataka
+        this.konfig = SlusacAplikacije.getKonfigOstalog();
+        this.APPID = konfig.dajPostavku("APPID");
+        System.out.println("APPID: " + this.APPID);
+        Adresa a = dajAdresu(adresa);
         OWMKlijent owmk = new OWMKlijent(APPID);
         MeteoPodaci mp = owmk.getRealTimeWeather(a.getGeoloc().getLatitude(), a.getGeoloc().getLongitude());
-        return mp;*/
-       return null;
+        System.out.println("TEMP: " + mp.getTemperatureValue());
+        return mp;
     }
 
     /**

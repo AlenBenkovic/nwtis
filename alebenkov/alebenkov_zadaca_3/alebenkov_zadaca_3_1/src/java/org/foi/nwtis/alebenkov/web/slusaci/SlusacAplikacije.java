@@ -5,9 +5,15 @@
  */
 package org.foi.nwtis.alebenkov.web.slusaci;
 
+import java.io.File;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javax.servlet.ServletContext;
 import javax.servlet.ServletContextEvent;
 import javax.servlet.ServletContextListener;
+import org.foi.nwtis.alebenkov.konfiguracije.Konfiguracija;
+import org.foi.nwtis.alebenkov.konfiguracije.KonfiguracijaApstraktna;
+import org.foi.nwtis.alebenkov.konfiguracije.NemaKonfiguracije;
 import org.foi.nwtis.alebenkov.konfiguracije.bp.BP_konfiguracija;
 import org.foi.nwtis.alebenkov.web.PreuzmiMeteoPodatke;
 
@@ -19,25 +25,42 @@ import org.foi.nwtis.alebenkov.web.PreuzmiMeteoPodatke;
 public class SlusacAplikacije implements ServletContextListener {
 
     static private ServletContext context = null;
+    static private Konfiguracija konfigOstalog = null;
+    static private BP_konfiguracija konfigBP = null;
     private PreuzmiMeteoPodatke pmp;
-
-    public static ServletContext getContext() {
-        return context;
-    }
 
     @Override
     public void contextInitialized(ServletContextEvent sce) {
-        ServletContext sc = sce.getServletContext();
-        String path = sc.getRealPath("/WEB-INF") + java.io.File.separator; //uzimam koja je to putanja do WEB-INF direktorija jer tamo se nalazi datoteka s postavkama
-        String datoteka = path + sc.getInitParameter("konfiguracija");
-        BP_konfiguracija bp = new BP_konfiguracija(datoteka);
+        try {
+            ServletContext context = sce.getServletContext();
+            String konfiguracija = context.getInitParameter("konfiguracija");
+            String putanje = context.getRealPath("/WEB-INF") + File.separator;
 
-        if (bp.getStatus()) {
-            sc.setAttribute("BP_Konfig", bp);
-            System.out.println("Učitana konfiguracija.");
+            SlusacAplikacije.konfigBP = new BP_konfiguracija(putanje + konfiguracija);
+            SlusacAplikacije.konfigOstalog = KonfiguracijaApstraktna.preuzmiKonfiguraciju(putanje + konfiguracija);
+
+            if (konfigBP.getStatus()) {
+
+                System.out.println("Ucitana konfiguracija.");
+                pmp = new PreuzmiMeteoPodatke();
+                pmp.start();
+
+            }
+        } catch (NemaKonfiguracije ex) {
+            System.out.println("Greska prilikom preuzimanja konfiguracije");
         }
 
     }
+
+    public static Konfiguracija getKonfigOstalog() {
+        return konfigOstalog;
+    }
+
+    public static BP_konfiguracija getKonfigBP() {
+        return konfigBP;
+    }
+
+  
 
     @Override
     public void contextDestroyed(ServletContextEvent sce) {
