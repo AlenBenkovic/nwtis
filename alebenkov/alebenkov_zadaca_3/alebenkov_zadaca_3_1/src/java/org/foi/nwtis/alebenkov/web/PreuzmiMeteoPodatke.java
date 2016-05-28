@@ -38,7 +38,8 @@ public class PreuzmiMeteoPodatke extends Thread {
     public void run() {
         while (dretvaRadi) {
             long pocetakRadaDretve = System.currentTimeMillis(); //biljezim pocetak rada dretve
-            
+            GeoMeteoWS gmw = new GeoMeteoWS();
+            System.out.println("TEMP: " + gmw.dajVazeceMeteoPodatkeZaAdresu("Orahovica").getTemperatureValue());
             System.out.println("Dretva radi...");
             
             

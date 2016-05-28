@@ -13,10 +13,10 @@
     </head>
     <form action="dodajAdresu" method="POST">
         <label for="adresa">Adresa</label>
-        <input name="adresa" id="adresa" size="100" maxlength="254"><br>
-        <input type="submit" name="dohvatGP" value=" Dohvati geo podatke "><br>
-        <input type="submit" name="spremiGP" value=" Spremi geo podatke "><br>
-        <input type="submit" name="dohvatMP" value=" Dohvati meteo podatke "><br>
+        <input name="adresa" id="adresa" size="100" maxlength="254"><br> <br />
+        <input type="submit" name = "akcija" value="dohvatGP" ><br>
+        <input type="submit" name = "akcija" value="spremiGP" ><br>
+        <input type="submit" name = "akcija" value="dohvatMP" ><br>
     </form>
-    </body>
+</body>
 </html>

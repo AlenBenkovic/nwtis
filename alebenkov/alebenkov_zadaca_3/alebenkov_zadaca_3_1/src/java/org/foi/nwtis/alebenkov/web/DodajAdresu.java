@@ -12,6 +12,10 @@ import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import org.foi.nwtis.alebenkov.rest.klijenti.GMKlijent;
+import org.foi.nwtis.alebenkov.web.podaci.Lokacija;
+import org.foi.nwtis.alebenkov.web.podaci.MeteoPodaci;
+import org.foi.nwtis.alebenkov.ws.serveri.GeoMeteoWS;
 
 /**
  *
@@ -19,6 +23,12 @@ import javax.servlet.http.HttpServletResponse;
  */
 @WebServlet(name = "DodajAdresu", urlPatterns = {"/dodajAdresu"})
 public class DodajAdresu extends HttpServlet {
+
+    private String adresa;
+    private String akcija;
+    private Lokacija lokacija;
+    private GeoMeteoWS gmws;
+    private MeteoPodaci mp;
 
     /**
      * Processes requests for both HTTP <code>GET</code> and <code>POST</code>
@@ -31,16 +41,43 @@ public class DodajAdresu extends HttpServlet {
      */
     protected void processRequest(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
+        this.adresa = request.getParameter("adresa");
+        this.akcija = request.getParameter("akcija");
+        if (akcija.equals("dohvatGP")) {
+            //TODO dohvat GEO podataka
+
+            GMKlijent gmk = new GMKlijent();
+            this.lokacija = gmk.getGeoLocation(adresa);
+
+        } else if (akcija.equals("spremiGP")) {
+            //TODO spremanje podataka o adresi u tablicu bp adrese
+            GMKlijent gmk = new GMKlijent();
+            this.lokacija = gmk.getGeoLocation(adresa);
+            //treba napraviti spajanje na bazu i spremiti lokaciju u bazu za trazenu adresu
+        } else if (akcija.equals("dohvatMP")) {
+            //TODO dohvat vazecih metopodataka upisane adrese
+            gmws = new GeoMeteoWS();
+            mp = gmws.dajVazeceMeteoPodatkeZaAdresu(adresa);
+        }
         response.setContentType("text/html;charset=UTF-8");
         try (PrintWriter out = response.getWriter()) {
             /* TODO output your page here. You may use following sample code. */
             out.println("<!DOCTYPE html>");
             out.println("<html>");
             out.println("<head>");
-            out.println("<title>Servlet DodajAdresu</title>");            
+            out.println("<title>Servlet DodajAdresu</title>");
             out.println("</head>");
             out.println("<body>");
-            out.println("<h1>Servlet DodajAdresu at " + request.getContextPath() + "</h1>");
+            out.println("<h1>Servlet DodajAdresu at " + request.getContextPath() + "</h1><br/>");
+            if (lokacija != null) {
+                out.println("LAT: " + this.lokacija.getLatitude() + " LON: " + this.lokacija.getLongitude());
+            }
+            if (mp != null) {
+                out.println("Temperatura: " + mp.getTemperatureValue() + "<br/>");
+                out.println("Vlažnost zraka: " + mp.getHumidityValue() + "<br/>");
+                out.println("Vrijeme: " + mp.getWeatherValue() + "<br/>");
+
+            }
             out.println("</body>");
             out.println("</html>");
         }

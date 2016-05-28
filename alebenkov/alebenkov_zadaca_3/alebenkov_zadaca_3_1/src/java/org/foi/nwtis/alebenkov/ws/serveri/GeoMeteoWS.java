@@ -73,11 +73,9 @@ public class GeoMeteoWS {
     public MeteoPodaci dajVazeceMeteoPodatkeZaAdresu(@WebParam(name = "adresa") String adresa) {
         this.konfig = SlusacAplikacije.getKonfigOstalog();
         this.APPID = konfig.dajPostavku("APPID");
-        System.out.println("APPID: " + this.APPID);
         Adresa a = dajAdresu(adresa);
         OWMKlijent owmk = new OWMKlijent(APPID);
         MeteoPodaci mp = owmk.getRealTimeWeather(a.getGeoloc().getLatitude(), a.getGeoloc().getLongitude());
-        System.out.println("TEMP: " + mp.getTemperatureValue());
         return mp;
     }
 
