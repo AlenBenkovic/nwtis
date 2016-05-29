@@ -11,9 +11,10 @@
         <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
         <title>Zadaća 3</title>
     </head>
+    <h1>alebenkov_zadaca_3_1</h1><br/>
     <form action="dodajAdresu" method="POST">
-        <label for="adresa">Adresa</label>
-        <input name="adresa" id="adresa" size="100" maxlength="254"><br> <br />
+        <label for="adresa">Adresa:</label>
+        <input name="adresa" id="adresa" size="100" maxlength="254" required="required" ><br> <br />
         <input type="submit" name = "akcija" value="dohvatGP" ><br>
         <input type="submit" name = "akcija" value="spremiGP" ><br>
         <input type="submit" name = "akcija" value="dohvatMP" ><br>
