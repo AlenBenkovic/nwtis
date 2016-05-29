@@ -5,8 +5,8 @@
  */
 package org.foi.nwtis.alebenkov.rest.serveri;
 
+import java.util.List;
 import javax.json.Json;
-import javax.json.JsonArrayBuilder;
 import javax.json.JsonObjectBuilder;
 import javax.ws.rs.Produces;
 import javax.ws.rs.Consumes;
@@ -14,6 +14,8 @@ import javax.ws.rs.GET;
 import javax.ws.rs.PUT;
 import javax.ws.rs.DELETE;
 import javax.ws.rs.core.MediaType;
+import org.foi.nwtis.alebenkov.web.OperacijeBP;
+import org.foi.nwtis.alebenkov.web.podaci.Adresa;
 
 /**
  * REST Web Service
@@ -49,19 +51,15 @@ public class MeteoRESTResource {
     @GET
     @Produces(MediaType.APPLICATION_JSON)
     public String getJson() {
-        //TODO preuzmi adrese iz baze podataka
-        String adrese[] = {"Hrvatska, Varaždin, Pavlinska 2",
-            "Hrvatska, Varaždin, Kralja Petra Krešimira 4",
-            "Hrvatska, Zagreb, Trg Bana Jelačića 1",
-            "Hrvatska, Čakovec, Ul. kralja Tomislava 5",
-            "Hrvatska, Split, Trg Braće Radić 15",
-            "Hrvatska, Osijek, Ul. Ivana Gundulića 66",
-            "Hrvatska, Rijeka, Trg Ivana Koblera 1"};
+        OperacijeBP obp = new OperacijeBP();
+        List<Adresa> adreseLista = obp.ucitajAdrese();
+        Adresa adrese[] = new Adresa[adreseLista.size()];
+        adrese = adreseLista.toArray(adrese); //prebacujem listu u polje
 
         int br = Integer.parseInt(id);
         if (br < adrese.length) {
             JsonObjectBuilder jbf = Json.createObjectBuilder();
-            jbf.add("adresa", adrese[br]);
+            jbf.add("adresa", adrese[br].getAdresa());
             return jbf.build().toString();
         } else {
             return "";
