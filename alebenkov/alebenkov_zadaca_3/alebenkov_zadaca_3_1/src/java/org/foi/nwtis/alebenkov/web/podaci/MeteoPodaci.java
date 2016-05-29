@@ -42,15 +42,19 @@ public class MeteoPodaci {
     private String precipitationMode;
     private String precipitationUnit;
 
+    private String weatherMain;
     private int weatherNumber;
     private String weatherValue;
     private String weatherIcon;
     private Date lastUpdate;
+    
+    private String country;
+    private String name;
 
     public MeteoPodaci() {
     }
 
-    public MeteoPodaci(Date sunRise, Date sunSet, Float temperatureValue, Float temperatureMin, Float temperatureMax, String temperatureUnit, Float humidityValue, String humidityUnit, Float pressureValue, String pressureUnit, Float windSpeedValue, String windSpeedName, Float windDirectionValue, String windDirectionCode, String windDirectionName, int cloudsValue, String cloudsName, String visibility, Float precipitationValue, String precipitationMode, String precipitationUnit, int weatherNumber, String weatherValue, String weatherIcon, Date lastUpdate) {
+    public MeteoPodaci(Date sunRise, Date sunSet, Float temperatureValue, Float temperatureMin, Float temperatureMax, String temperatureUnit, Float humidityValue, String humidityUnit, Float pressureValue, String pressureUnit, Float windSpeedValue, String windSpeedName, Float windDirectionValue, String windDirectionCode, String windDirectionName, int cloudsValue, String cloudsName, String visibility, Float precipitationValue, String precipitationMode, String precipitationUnit, String weatherMain, int weatherNumber, String weatherValue, String weatherIcon, Date lastUpdate, String country, String name) {
         this.sunRise = sunRise;
         this.sunSet = sunSet;
         this.temperatureValue = temperatureValue;
@@ -72,10 +76,13 @@ public class MeteoPodaci {
         this.precipitationValue = precipitationValue;
         this.precipitationMode = precipitationMode;
         this.precipitationUnit = precipitationUnit;
+        this.weatherMain = weatherMain;
         this.weatherNumber = weatherNumber;
         this.weatherValue = weatherValue;
         this.weatherIcon = weatherIcon;
         this.lastUpdate = lastUpdate;
+        this.country = country;
+        this.name = name;
     }
 
     public Date getSunRise() {
@@ -276,6 +283,30 @@ public class MeteoPodaci {
 
     public void setLastUpdate(Date lastUpdate) {
         this.lastUpdate = lastUpdate;
+    }
+
+    public String getCountry() {
+        return country;
+    }
+
+    public void setCountry(String country) {
+        this.country = country;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    public String getWeatherMain() {
+        return weatherMain;
+    }
+
+    public void setWeatherMain(String weatherMain) {
+        this.weatherMain = weatherMain;
     }
 
 }

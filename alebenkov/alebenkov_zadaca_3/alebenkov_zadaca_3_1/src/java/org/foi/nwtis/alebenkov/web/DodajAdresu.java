@@ -63,7 +63,8 @@ public class DodajAdresu extends HttpServlet {
             //TODO spremanje podataka o adresi u tablicu bp adrese
             GMKlijent gmk = new GMKlijent();
             this.lokacija = gmk.getGeoLocation(adresa);
-            upisBP = upisAdreseBP(adresa, lokacija.getLatitude(), lokacija.getLongitude());
+            OperacijeBP obp = new OperacijeBP();
+            upisBP = obp.upisAdreseBP(adresa, lokacija.getLatitude(), lokacija.getLongitude());
         } else if (akcija.equals("dohvatMP")) {
             //TODO dohvat vazecih metopodataka upisane adrese
             gmws = new GeoMeteoWS();
@@ -98,73 +99,6 @@ public class DodajAdresu extends HttpServlet {
             out.println("</body>");
             out.println("</html>");
         }
-    }
-
-    private boolean upisAdreseBP(String adresa, String lat, String lon) {
-        BP_konfiguracija bpConfig = null;
-        bpConfig = SlusacAplikacije.getKonfigBP();
-        String url = bpConfig.getServerDatabase() + bpConfig.getUserDatabase();
-        String korisnik = bpConfig.getUserDatabase();
-        String lozinka = bpConfig.getUserPassword();
-        Connection connection = null;
-        Statement statemant = null;
-        ResultSet rs = null;
-        boolean sqlExe;
-        String sql = null;
-        int brojRedaka = 0;
-
-        try {
-            Class.forName(bpConfig.getDriverDatabase()); //dovoljno pozvati jednom na razini projekta da bi se ucitao sam driver
-        } catch (ClassNotFoundException ex) {
-            System.out.println("ERROR | Greska kod ucitavanja drivera: " + ex.getMessage());
-        }
-
-        try {
-            connection = DriverManager.getConnection(url, korisnik, lozinka);
-            statemant = connection.createStatement();
-
-            sql = "SELECT * FROM adrese where adresa = '" + adresa + "'";
-            rs = statemant.executeQuery(sql);
-            while (rs.next()) {
-                brojRedaka++; //ovo se moze rjesiti na elegantniji nacin ali ovo mi je trenutno najbrzi (getRow, beforeFirst,..) ali je potrebno podici odredjene zastavice na resultsetu
-            }
-
-            if (brojRedaka == 0) {
-
-                sql = "INSERT INTO adrese(adresa, latitude, longitude) VALUES ('" + adresa + "','" + lat + "','" + lon + "')";
-                sqlExe = statemant.execute(sql);
-                System.out.println("|| Zapis spremljen u bazu");
-                return true;
-
-            }
-
-        } catch (SQLException ex) {
-            System.out.println("ERROR | Greska u radu s bazom: " + ex.getMessage());
-        } finally {
-            if (rs != null) {
-                try {
-                    rs.close();
-                } catch (SQLException ex) {
-                    System.out.println(ex.getMessage());
-                }
-            }
-            if (statemant != null) {
-                try {
-                    statemant.close();
-                } catch (SQLException ex) {
-                    System.out.println(ex.getMessage());
-                }
-            }
-
-            if (connection != null) {
-                try {
-                    connection.close();
-                } catch (SQLException ex) {
-                    System.out.println(ex.getMessage());
-                }
-            }
-        }
-        return false;
     }
 
     // <editor-fold defaultstate="collapsed" desc="HttpServlet methods. Click on the + sign on the left to edit the code.">

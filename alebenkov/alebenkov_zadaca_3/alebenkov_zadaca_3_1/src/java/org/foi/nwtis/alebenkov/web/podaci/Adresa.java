@@ -11,14 +11,14 @@ package org.foi.nwtis.alebenkov.web.podaci;
  * @author dkermek
  */
 public class Adresa {
-    private long idadresa;
+    private int idadresa;
     private String adresa;
     private Lokacija geoloc;
 
     public Adresa() {
     }
 
-    public Adresa(long idadresa, String adresa, Lokacija geoloc) {
+    public Adresa(int idadresa, String adresa, Lokacija geoloc) {
         this.idadresa = idadresa;
         this.adresa = adresa;
         this.geoloc = geoloc;
@@ -32,11 +32,11 @@ public class Adresa {
         this.geoloc = geoloc;
     }
 
-    public long getIdadresa() {
+    public int getIdadresa() {
         return idadresa;
     }
 
-    public void setIdadresa(long idadresa) {
+    public void setIdadresa(int idadresa) {
         this.idadresa = idadresa;
     }
 

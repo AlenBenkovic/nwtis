@@ -14,5 +14,5 @@
 <entry key="driver.database.derby">org.apache.derby.jdbc.ClientDriver</entry>
 <entry key="driver.database.postgresql">org.postgresql.Driver</entry>
 <entry key="APPID">251fce21bdb88341273354e83b1f0b87</entry>
-<entry key="intervalDretve">10</entry>
+<entry key="intervalDretve">30</entry>
 </properties>
