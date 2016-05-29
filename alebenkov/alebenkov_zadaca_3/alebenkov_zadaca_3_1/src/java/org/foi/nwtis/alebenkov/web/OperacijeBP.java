@@ -48,7 +48,7 @@ public class OperacijeBP {
     }
 
     public boolean upisAdreseBP(String adresa, String lat, String lon) {
-        
+
         int brojRedaka = 0;
 
         try {
@@ -196,6 +196,107 @@ public class OperacijeBP {
             }
         }
         return false;
+    }
+
+    public MeteoPodaci zadnjiMeteoPodaci(String adresa) {
+        MeteoPodaci mp = new MeteoPodaci();
+        sql = "select * from meteo as m, adrese as a where m.IDADRESA = a.IDADRESA and a.ADRESA = '" + adresa + "' ORDER BY idmeteo DESC FETCH FIRST ROW ONLY";
+
+        try {
+            connection = DriverManager.getConnection(url, korisnik, lozinka);
+            statemant = connection.createStatement();
+
+            rs = statemant.executeQuery(sql);
+            while (rs.next()) {
+                mp.setWeatherMain(rs.getString("vrijeme"));
+                mp.setWeatherValue(rs.getString("vrijemeopis"));
+                mp.setTemperatureValue(rs.getFloat("temp"));
+                mp.setTemperatureMin(rs.getFloat("tempmin"));
+                mp.setTemperatureMax(rs.getFloat("tempmax"));
+                mp.setHumidityValue(rs.getFloat("vlaga"));
+                mp.setWindSpeedValue(rs.getFloat("vjetar"));
+                mp.setWindDirectionValue(rs.getFloat("vjetarsmjer"));
+            }
+
+        } catch (SQLException ex) {
+            System.out.println("ERROR | Greska u radu s bazom: " + ex.getMessage());
+        } finally {
+            if (rs != null) {
+                try {
+                    rs.close();
+                } catch (SQLException ex) {
+                    System.out.println(ex.getMessage());
+                }
+            }
+            if (statemant != null) {
+                try {
+                    statemant.close();
+                } catch (SQLException ex) {
+                    System.out.println(ex.getMessage());
+                }
+            }
+
+            if (connection != null) {
+                try {
+                    connection.close();
+                } catch (SQLException ex) {
+                    System.out.println(ex.getMessage());
+                }
+            }
+        }
+        return mp;
+    }
+
+    public List<MeteoPodaci> sviMeteoPodaci(String adresa) {
+        List<MeteoPodaci> mpl = new ArrayList<>();
+
+        sql = "select * from meteo as m, adrese as a where m.IDADRESA = a.IDADRESA and a.ADRESA = '" + adresa + "'";
+
+        try {
+            connection = DriverManager.getConnection(url, korisnik, lozinka);
+            statemant = connection.createStatement();
+
+            rs = statemant.executeQuery(sql);
+            while (rs.next()) {
+                MeteoPodaci mp = new MeteoPodaci();
+                mp.setWeatherMain(rs.getString("vrijeme"));
+                mp.setWeatherValue(rs.getString("vrijemeopis"));
+                mp.setTemperatureValue(rs.getFloat("temp"));
+                mp.setTemperatureMin(rs.getFloat("tempmin"));
+                mp.setTemperatureMax(rs.getFloat("tempmax"));
+                mp.setHumidityValue(rs.getFloat("vlaga"));
+                mp.setWindSpeedValue(rs.getFloat("vjetar"));
+                mp.setWindDirectionValue(rs.getFloat("vjetarsmjer"));
+                mpl.add(mp);
+            }
+
+        } catch (SQLException ex) {
+            System.out.println("ERROR | Greska u radu s bazom: " + ex.getMessage());
+        } finally {
+            if (rs != null) {
+                try {
+                    rs.close();
+                } catch (SQLException ex) {
+                    System.out.println(ex.getMessage());
+                }
+            }
+            if (statemant != null) {
+                try {
+                    statemant.close();
+                } catch (SQLException ex) {
+                    System.out.println(ex.getMessage());
+                }
+            }
+
+            if (connection != null) {
+                try {
+                    connection.close();
+                } catch (SQLException ex) {
+                    System.out.println(ex.getMessage());
+                }
+            }
+        }
+        return mpl;
     }
 
 }
