@@ -97,6 +97,54 @@
 
             <h:panelGroup rendered="#{odabirAdresa.m3}">
                 <h1>M3 podaci za #{odabirAdresa.odabranaAdresa}</h1>
+                <h:dataTable value="#{odabirAdresa.meteoLast}" var="meteo" class="table table-striped" >
+                    <h:column>
+                        <f:facet name="header">Adresa</f:facet>
+                        <h:outputText value="#{meteo.name}" />
+                    </h:column>
+                    <h:column>
+                        <f:facet name="header">Datum</f:facet>
+                        <h:outputText value="#{meteo.lastUpdate.day}.#{meteo.lastUpdate.month}.#{meteo.lastUpdate.year} #{meteo.lastUpdate.hour}:#{meteo.lastUpdate.minute}" >
+                           
+                        </h:outputText>
+                    </h:column>
+                    <h:column>
+                        <f:facet name="header">Temperatura</f:facet>
+                        <h:outputText value="#{meteo.temperatureValue}" />
+                    </h:column>
+                    <h:column>
+                        <f:facet name="header">Vrijeme</f:facet>
+                        <h:outputText value="#{meteo.weatherMain}" />
+                    </h:column>
+                    <h:column>
+                        <f:facet name="header">Vrijeme opis</f:facet>
+                        <h:outputText value="#{meteo.weatherValue}" />
+                    </h:column>
+                    <h:column>
+                        <f:facet name="header">T. Min.</f:facet>
+                        <h:outputText value="#{meteo.temperatureMin}" />
+                    </h:column>
+                    <h:column>
+                        <f:facet name="header">T. Max.</f:facet>
+                        <h:outputText value="#{meteo.temperatureMax}" />
+                    </h:column>
+                    <h:column>
+                        <f:facet name="header">Vlaga</f:facet>
+                        <h:outputText value="#{meteo.humidityValue}" />
+                    </h:column>
+                    <h:column>
+                        <f:facet name="header">Tlak</f:facet>
+                        <h:outputText value="#{meteo.pressureValue}" />
+                    </h:column>
+                    <h:column>
+                        <f:facet name="header">Vjetar</f:facet>
+                        <h:outputText value="#{meteo.windSpeedValue}" />
+                    </h:column>
+                    <h:column>
+                        <f:facet name="header">Smjer vjetra</f:facet>
+                        <h:outputText value="#{meteo.windDirectionValue}" />
+                    </h:column>
+                </h:dataTable>
             </h:panelGroup>
         </div>
     </h:body>

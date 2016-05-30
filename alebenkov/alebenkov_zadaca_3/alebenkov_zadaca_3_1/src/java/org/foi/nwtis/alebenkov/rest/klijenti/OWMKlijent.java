@@ -72,6 +72,11 @@ public class OWMKlijent {
                 mp.setWindDirectionCode("");
                 mp.setWindDirectionName("");
                 
+            } else {
+                float  a = 0;//ako ne stavim ništa onda javlja problem kod upisa u bazu zbog null vrijednosti
+                mp.setWindDirectionValue(a);
+                mp.setWindDirectionCode("");
+                mp.setWindDirectionName("");
             }
             
             mp.setCloudsValue(jo.getJsonObject("clouds").getInt("all"));

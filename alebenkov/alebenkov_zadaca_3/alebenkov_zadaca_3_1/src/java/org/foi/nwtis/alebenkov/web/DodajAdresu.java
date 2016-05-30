@@ -86,8 +86,13 @@ public class DodajAdresu extends HttpServlet {
             if (mp != null && akcija.equals("dohvatMP")) {
                 out.println("Podaci za adresu: " + adresa + "<br/>");
                 out.println("Temperatura: " + mp.getTemperatureValue() + "<br/>");
+                out.println("Temperatura min.: " + mp.getTemperatureMin()+ "<br/>");
+                out.println("Temperatura max.: " + mp.getTemperatureMax()+ "<br/>");
                 out.println("Vlažnost zraka: " + mp.getHumidityValue() + "<br/>");
-                out.println("Vrijeme: " + mp.getWeatherValue() + "<br/>");
+                out.println("Tlak zraka: " + mp.getPressureValue()+ "<br/>");
+                out.println("Vjetar: " + mp.getWindSpeedValue()+ "<br/>");
+                out.println("Smjer vjetra: " + mp.getWindDirectionValue()+ "<br/>");
+                out.println("Vrijeme: " + mp.getWeatherValue() + " / "+ mp.getWeatherMain() +"<br/>");
 
             } 
             if(upisBP && akcija.equals("spremiGP")){

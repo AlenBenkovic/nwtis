@@ -42,7 +42,7 @@ public class MeteoRESTResourceContainer {
 
     /**
      * Retrieves representation of an instance of
-     * org.foi.nwtis.dkermek.rest.serveri.MeteoRESTResourceContainer
+     * org.foi.nwtis.alebenkov.rest.serveri.MeteoRESTResourceContainer
      *
      * @return an instance of java.lang.String
      */
@@ -53,6 +53,8 @@ public class MeteoRESTResourceContainer {
         List<Adresa> adreseLista = obp.ucitajAdrese();
         Adresa adrese[] = new Adresa[adreseLista.size()];
         adrese = adreseLista.toArray(adrese); //prebacujem listu u polje
+        
+        
 
         JsonArrayBuilder jab = Json.createArrayBuilder();
         for (Adresa a : adrese) {

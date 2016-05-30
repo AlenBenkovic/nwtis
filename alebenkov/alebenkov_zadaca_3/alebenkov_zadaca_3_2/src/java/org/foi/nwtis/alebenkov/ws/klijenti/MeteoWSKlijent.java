@@ -16,6 +16,14 @@ public class MeteoWSKlijent {
         org.foi.nwtis.alebenkov.ws.serveri.GeoMeteoWS port = service.getGeoMeteoWSPort();
         return port.dajSveAdrese();
     }
+
+    public static java.util.List<org.foi.nwtis.alebenkov.ws.serveri.MeteoPodaci> dajSveMeteoPodatkeZaAdresu(java.lang.String adresa) {
+        org.foi.nwtis.alebenkov.ws.serveri.GeoMeteoWS_Service service = new org.foi.nwtis.alebenkov.ws.serveri.GeoMeteoWS_Service();
+        org.foi.nwtis.alebenkov.ws.serveri.GeoMeteoWS port = service.getGeoMeteoWSPort();
+        return port.dajSveMeteoPodatkeZaAdresu(adresa);
+    }
+    
+    
     
     
 }

@@ -5,6 +5,7 @@
  */
 package org.foi.nwtis.alebenkov.rest.serveri;
 
+import java.sql.Timestamp;
 import java.util.List;
 import javax.json.Json;
 import javax.json.JsonObjectBuilder;
@@ -16,6 +17,8 @@ import javax.ws.rs.DELETE;
 import javax.ws.rs.core.MediaType;
 import org.foi.nwtis.alebenkov.web.OperacijeBP;
 import org.foi.nwtis.alebenkov.web.podaci.Adresa;
+import org.foi.nwtis.alebenkov.web.podaci.MeteoPodaci;
+import org.foi.nwtis.alebenkov.ws.serveri.GeoMeteoWS;
 
 /**
  * REST Web Service
@@ -55,15 +58,33 @@ public class MeteoRESTResource {
         List<Adresa> adreseLista = obp.ucitajAdrese();
         Adresa adrese[] = new Adresa[adreseLista.size()];
         adrese = adreseLista.toArray(adrese); //prebacujem listu u polje
-
         int br = Integer.parseInt(id);
         if (br < adrese.length) {
-            JsonObjectBuilder jbf = Json.createObjectBuilder();
-            jbf.add("adresa", adrese[br].getAdresa());
-            return jbf.build().toString();
+            for (int i = 0; i < adrese.length; i++) {
+                System.out.println("AAA" + i + adrese[i].getAdresa() + adrese[i].getIdadresa() );
+                if (adrese[i].getIdadresa() == br) {
+                    System.out.println("Trazim podatke za adresu: " + adrese[i].getAdresa());
+                    GeoMeteoWS gmws = new GeoMeteoWS();
+                    MeteoPodaci mp = gmws.dajZadnjeMeteoPodatkeZaAdresu(adrese[i].getAdresa());
+                    JsonObjectBuilder jbf = Json.createObjectBuilder();
+                    jbf.add("adresa", adrese[i].getAdresa());
+                    jbf.add("temperatura", mp.getTemperatureValue());
+                    jbf.add("tempMin", mp.getTemperatureMin());
+                    jbf.add("tempMax", mp.getTemperatureMax());
+                    jbf.add("vrijeme", mp.getWeatherMain());
+                    jbf.add("vrijemeOpis", mp.getWeatherValue());
+                    jbf.add("vlaga", mp.getHumidityValue());
+                    jbf.add("tlak", mp.getPressureValue());
+                    jbf.add("vjetar", mp.getWindSpeedValue());
+                    jbf.add("smjerVjetra", mp.getWindDirectionValue());
+                    jbf.add("datum", mp.getLastUpdate().getTime());
+                    return jbf.build().toString();
+                }
+            }
         } else {
             return "";
         }
+        return "";
     }
 
     /**

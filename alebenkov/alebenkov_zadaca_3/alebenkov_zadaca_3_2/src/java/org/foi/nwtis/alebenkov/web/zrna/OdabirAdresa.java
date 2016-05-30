@@ -6,17 +6,15 @@
 package org.foi.nwtis.alebenkov.web.zrna;
 
 import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
-import static javafx.scene.input.KeyCode.G;
 import javax.inject.Named;
 import javax.enterprise.context.RequestScoped;
-import javax.xml.ws.WebServiceRef;
+import org.foi.nwtis.alebenkov.ws.klijenti.MeteoRESTKlijent;
 import org.foi.nwtis.alebenkov.ws.klijenti.MeteoWSKlijent;
 import org.foi.nwtis.alebenkov.ws.serveri.Adresa;
-import org.foi.nwtis.alebenkov.ws.serveri.GeoMeteoWS;
-import org.foi.nwtis.alebenkov.ws.serveri.GeoMeteoWS_Service;
 import org.foi.nwtis.alebenkov.ws.serveri.MeteoPodaci;
 
 /**
@@ -26,19 +24,18 @@ import org.foi.nwtis.alebenkov.ws.serveri.MeteoPodaci;
 @Named(value = "odabirAdresa")
 @RequestScoped
 public class OdabirAdresa implements Serializable {
-
-    @WebServiceRef(wsdlLocation = "WEB-INF/wsdl/localhost_8084/alebenkov_zadaca_3_1/GeoMeteoWS.wsdl")
-    private GeoMeteoWS_Service service;
     private List<Adresa> adrese;
     private List<String> odabranaAdresa;
     private Map<String, Object> listaAdresa = new LinkedHashMap<>();
-    private boolean start = true;
+    private boolean start = true; //boolean mi sluzi za hide/show pojedinih elemenata kod renderiranja stranice
     private boolean multiple = false;
     private boolean single = false;
     private boolean p1 = false;
     private boolean p2 = false;
     private boolean m3 = false;
     List<MeteoPodaci> meteo;
+    List<MeteoPodaci> meteoLast;
+    List<Integer> idAdresa;
 
     /**
      * Creates a new instance of OdabirAdresa
@@ -71,6 +68,15 @@ public class OdabirAdresa implements Serializable {
         }
         return listaAdresa;
     }
+    
+    private int nadjiIDadrese(int j){
+        for (Adresa a : adrese) {
+            if(a.getAdresa().equals(odabranaAdresa.get(j))){
+                return a.getIdadresa();
+            }
+        }
+        return 0;
+    }
 
     public void setListaAdresa(Map<String, Object> listaAdresa) {
         this.listaAdresa = listaAdresa;
@@ -88,7 +94,7 @@ public class OdabirAdresa implements Serializable {
     }
 
     public void allMeteoData() {
-        this.meteo = dajSveMeteoPodatkeZaAdresu(odabranaAdresa.get(0));
+        this.meteo = MeteoWSKlijent.dajSveMeteoPodatkeZaAdresu(odabranaAdresa.get(0));
         p1 = true;
 
     }
@@ -98,6 +104,14 @@ public class OdabirAdresa implements Serializable {
     }
 
     public void lastMeteoData() {
+        MeteoRESTKlijent mrk = new MeteoRESTKlijent();
+        meteoLast = new ArrayList<>();
+        for(int i = 0; i<odabranaAdresa.size(); i++){
+            int id = nadjiIDadrese(i);
+            System.out.println("ID: " + id);
+            MeteoPodaci mp = mrk.dajMeteoPodatak(id);
+            meteoLast.add(mp);
+        }
         m3 = true;
     }
 
@@ -109,12 +123,7 @@ public class OdabirAdresa implements Serializable {
         return single;
     }
 
-    private java.util.List<org.foi.nwtis.alebenkov.ws.serveri.MeteoPodaci> dajSveMeteoPodatkeZaAdresu(java.lang.String adresa) {
-        // Note that the injected javax.xml.ws.Service reference as well as port objects are not thread safe.
-        // If the calling of port operations may lead to race condition some synchronization is required.
-        org.foi.nwtis.alebenkov.ws.serveri.GeoMeteoWS port = service.getGeoMeteoWSPort();
-        return port.dajSveMeteoPodatkeZaAdresu(adresa);
-    }
+    
 
     public boolean isP1() {
         return p1;
@@ -134,6 +143,10 @@ public class OdabirAdresa implements Serializable {
 
     public boolean isStart() {
         return start;
+    }
+
+    public List<MeteoPodaci> getMeteoLast() {
+        return meteoLast;
     }
 
 }
