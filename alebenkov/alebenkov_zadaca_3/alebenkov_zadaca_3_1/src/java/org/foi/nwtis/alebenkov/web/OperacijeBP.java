@@ -214,8 +214,10 @@ public class OperacijeBP {
                 mp.setTemperatureMin(rs.getFloat("tempmin"));
                 mp.setTemperatureMax(rs.getFloat("tempmax"));
                 mp.setHumidityValue(rs.getFloat("vlaga"));
+                mp.setPressureValue(rs.getFloat("tlak"));
                 mp.setWindSpeedValue(rs.getFloat("vjetar"));
                 mp.setWindDirectionValue(rs.getFloat("vjetarsmjer"));
+                mp.setLastUpdate(rs.getTimestamp("preuzeto"));
             }
 
         } catch (SQLException ex) {
@@ -265,8 +267,10 @@ public class OperacijeBP {
                 mp.setTemperatureMin(rs.getFloat("tempmin"));
                 mp.setTemperatureMax(rs.getFloat("tempmax"));
                 mp.setHumidityValue(rs.getFloat("vlaga"));
+                mp.setPressureValue(rs.getFloat("tlak"));
                 mp.setWindSpeedValue(rs.getFloat("vjetar"));
                 mp.setWindDirectionValue(rs.getFloat("vjetarsmjer"));
+                mp.setLastUpdate(rs.getTimestamp("preuzeto"));
                 mpl.add(mp);
             }
 

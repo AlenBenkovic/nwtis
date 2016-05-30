@@ -1,0 +1,104 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:h="http://xmlns.jcp.org/jsf/html"
+      xmlns:f="http://xmlns.jcp.org/jsf/core">
+    <h:head>
+        <title>Odabir adresa</title>
+        <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+        <meta content="text/html; charset=UTF-8" http-equiv="Content-Type" />
+        <meta name="viewport" content="width=device-width, initial-scale=1" />		
+        <h:outputStylesheet name="css/bootstrap.css" />
+        <h:outputScript name="js/jquery.min.js" />
+        <h:outputScript name="js/bootstrap.js" />
+    </h:head>
+    <h:body>
+        <div class="container">
+            <h1>alebenkov_zadaca_3_2</h1>
+
+            <h:form rendered="#{odabirAdresa.start}">
+                <h:selectManyListbox value="#{odabirAdresa.odabranaAdresa}">
+                    <f:selectItems value="#{odabirAdresa.listaAdresa}"/>
+                </h:selectManyListbox>
+                <br/>
+                <h:commandButton value="Odaberi" action="#{odabirAdresa.submit()}"  /><br/>
+            </h:form>
+
+
+            <h:form rendered="#{odabirAdresa.single}">
+                <h:selectManyListbox value="#{odabirAdresa.odabranaAdresa}" id="single1" >
+                    <f:selectItems value="#{odabirAdresa.listaAdresa}"/>
+                </h:selectManyListbox>
+                <br/>
+                <h:commandButton value="Preuzmi sve pohranjene meteo podatke za odabranu adresu" action="#{odabirAdresa.allMeteoData()}"  /><br/>
+                <h:commandButton value="Preuzmi prognozu za sljedećih 5 dana za odabranu adresu" action="#{odabirAdresa.next5MeteoData()}" />
+            </h:form>
+
+            <h:form rendered="#{odabirAdresa.multiple}">
+                <h:selectManyListbox value="#{odabirAdresa.odabranaAdresa}" id="multiple1" >
+                    <f:selectItems value="#{odabirAdresa.listaAdresa}"/>
+                </h:selectManyListbox>
+                <br/>
+                <h:commandButton value="Preuzmi zadnje upisane podatke za odabrane adrese" action="#{odabirAdresa.lastMeteoData()}"  /><br/>
+
+            </h:form>
+
+            <h:panelGroup rendered="#{odabirAdresa.p1}">
+                <h1>Podaci za #{odabirAdresa.odabranaAdresa.get(0)}</h1>
+                <h:dataTable value="#{odabirAdresa.meteo}" var="meteo" class="table table-striped" >
+                    <h:column>
+                        <f:facet name="header">Datum</f:facet>
+                        <h:outputText value="#{meteo.lastUpdate.day}.#{meteo.lastUpdate.month}.#{meteo.lastUpdate.year} #{meteo.lastUpdate.hour}:#{meteo.lastUpdate.minute}" >
+                           
+                        </h:outputText>
+                    </h:column>
+                    <h:column>
+                        <f:facet name="header">Temperatura</f:facet>
+                        <h:outputText value="#{meteo.temperatureValue}" />
+                    </h:column>
+                    <h:column>
+                        <f:facet name="header">Vrijeme</f:facet>
+                        <h:outputText value="#{meteo.weatherMain}" />
+                    </h:column>
+                    <h:column>
+                        <f:facet name="header">Vrijeme opis</f:facet>
+                        <h:outputText value="#{meteo.weatherValue}" />
+                    </h:column>
+                    <h:column>
+                        <f:facet name="header">T. Min.</f:facet>
+                        <h:outputText value="#{meteo.temperatureMin}" />
+                    </h:column>
+                    <h:column>
+                        <f:facet name="header">T. Max.</f:facet>
+                        <h:outputText value="#{meteo.temperatureMax}" />
+                    </h:column>
+                    <h:column>
+                        <f:facet name="header">Vlaga</f:facet>
+                        <h:outputText value="#{meteo.humidityValue}" />
+                    </h:column>
+                    <h:column>
+                        <f:facet name="header">Tlak</f:facet>
+                        <h:outputText value="#{meteo.pressureValue}" />
+                    </h:column>
+                    <h:column>
+                        <f:facet name="header">Vjetar</f:facet>
+                        <h:outputText value="#{meteo.windSpeedValue}" />
+                    </h:column>
+                    <h:column>
+                        <f:facet name="header">Smjer vjetra</f:facet>
+                        <h:outputText value="#{meteo.windDirectionValue}" />
+                    </h:column>
+                </h:dataTable>
+            </h:panelGroup>
+
+            <h:panelGroup rendered="#{odabirAdresa.p2}">
+                <h1>P2 podaci za #{odabirAdresa.odabranaAdresa.get(0)}</h1>
+            </h:panelGroup>
+
+            <h:panelGroup rendered="#{odabirAdresa.m3}">
+                <h1>M3 podaci za #{odabirAdresa.odabranaAdresa}</h1>
+            </h:panelGroup>
+        </div>
+    </h:body>
+</html>
+
