@@ -59,11 +59,9 @@ public class MeteoRESTResource {
         Adresa adrese[] = new Adresa[adreseLista.size()];
         adrese = adreseLista.toArray(adrese); //prebacujem listu u polje
         int br = Integer.parseInt(id);
-        if (br < adrese.length) {
+        if (br <= adrese.length) {
             for (int i = 0; i < adrese.length; i++) {
-                System.out.println("AAA" + i + adrese[i].getAdresa() + adrese[i].getIdadresa() );
                 if (adrese[i].getIdadresa() == br) {
-                    System.out.println("Trazim podatke za adresu: " + adrese[i].getAdresa());
                     GeoMeteoWS gmws = new GeoMeteoWS();
                     MeteoPodaci mp = gmws.dajZadnjeMeteoPodatkeZaAdresu(adrese[i].getAdresa());
                     JsonObjectBuilder jbf = Json.createObjectBuilder();
