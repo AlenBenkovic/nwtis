@@ -59,29 +59,27 @@ public class MeteoRESTResource {
         Adresa adrese[] = new Adresa[adreseLista.size()];
         adrese = adreseLista.toArray(adrese); //prebacujem listu u polje
         int br = Integer.parseInt(id);
-        if (br <= adrese.length) {
-            for (int i = 0; i < adrese.length; i++) {
-                if (adrese[i].getIdadresa() == br) {
-                    GeoMeteoWS gmws = new GeoMeteoWS();
-                    MeteoPodaci mp = gmws.dajZadnjeMeteoPodatkeZaAdresu(adrese[i].getAdresa());
-                    JsonObjectBuilder jbf = Json.createObjectBuilder();
-                    jbf.add("adresa", adrese[i].getAdresa());
-                    jbf.add("temperatura", mp.getTemperatureValue());
-                    jbf.add("tempMin", mp.getTemperatureMin());
-                    jbf.add("tempMax", mp.getTemperatureMax());
-                    jbf.add("vrijeme", mp.getWeatherMain());
-                    jbf.add("vrijemeOpis", mp.getWeatherValue());
-                    jbf.add("vlaga", mp.getHumidityValue());
-                    jbf.add("tlak", mp.getPressureValue());
-                    jbf.add("vjetar", mp.getWindSpeedValue());
-                    jbf.add("smjerVjetra", mp.getWindDirectionValue());
-                    jbf.add("datum", mp.getLastUpdate().getTime());
-                    return jbf.build().toString();
-                }
+
+        for (int i = 0; i < adrese.length; i++) {
+            if (adrese[i].getIdadresa() == br) {
+                GeoMeteoWS gmws = new GeoMeteoWS();
+                MeteoPodaci mp = gmws.dajZadnjeMeteoPodatkeZaAdresu(adrese[i].getAdresa());
+                JsonObjectBuilder jbf = Json.createObjectBuilder();
+                jbf.add("adresa", adrese[i].getAdresa());
+                jbf.add("temperatura", mp.getTemperatureValue());
+                jbf.add("tempMin", mp.getTemperatureMin());
+                jbf.add("tempMax", mp.getTemperatureMax());
+                jbf.add("vrijeme", mp.getWeatherMain());
+                jbf.add("vrijemeOpis", mp.getWeatherValue());
+                jbf.add("vlaga", mp.getHumidityValue());
+                jbf.add("tlak", mp.getPressureValue());
+                jbf.add("vjetar", mp.getWindSpeedValue());
+                jbf.add("smjerVjetra", mp.getWindDirectionValue());
+                jbf.add("datum", mp.getLastUpdate().getTime());
+                return jbf.build().toString();
             }
-        } else {
-            return "";
         }
+
         return "";
     }
 

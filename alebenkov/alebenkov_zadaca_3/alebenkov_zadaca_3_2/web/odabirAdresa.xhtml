@@ -92,7 +92,7 @@
             </h:panelGroup>
 
             <h:panelGroup rendered="#{odabirAdresa.p2}">
-                <h1>P2 podaci za #{odabirAdresa.odabranaAdresa.get(0)}</h1>
+                <h1>Vremenska prognoza narednih 5 dana za #{odabirAdresa.odabranaAdresa.get(0)}</h1>
                 <h:dataTable value="#{odabirAdresa.meteoNext}" var="meteo" class="table table-striped" >
                     <h:column>
                         <f:facet name="header">Prognoza</f:facet>
@@ -136,7 +136,7 @@
             </h:panelGroup>
 
             <h:panelGroup rendered="#{odabirAdresa.m3}">
-                <h1>M3 podaci za #{odabirAdresa.odabranaAdresa}</h1>
+                <h1>Zadnje upisani meteo podaci za #{odabirAdresa.odabranaAdresa}</h1>
                 <h:dataTable value="#{odabirAdresa.meteoLast}" var="meteo" class="table table-striped" >
                     <h:column>
                         <f:facet name="header">Adresa</f:facet>

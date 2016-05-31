@@ -52,8 +52,6 @@ public class OWMKlijent {
 
             List<MeteoPodaci> mpLista = new ArrayList<>();
 
-            System.out.println(jo.getJsonArray("list").size());
-
             for (int i = 0; i < jo.getJsonArray("list").size(); i++) {
                 MeteoPodaci mp = new MeteoPodaci();
                 mp.setTemperatureValue(new Double(jo.getJsonArray("list").getJsonObject(i).getJsonObject("main").getJsonNumber("temp").doubleValue()).floatValue());
