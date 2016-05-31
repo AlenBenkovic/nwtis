@@ -1,3 +1,0 @@
-ODGOVOR ZA http://api.openweathermap.org/data/2.5/weather?lat=45.571228&lon=17.9267349&units=metric&lang=hr&APIKEY=251fce21bdb88341273354e83b1f0b87:
-----------------------------------------------------------------------------------------------------------------------------------------------------
-{"coord":{"lon":17.95,"lat":45.59},"weather":[{"id":803,"main":"Clouds","description":"isprekidani oblaci","icon":"04d"}],"base":"cmc stations","main":{"temp":25,"pressure":1016,"humidity":44,"temp_min":25,"temp_max":25},"wind":{"speed":5.7,"deg":330},"clouds":{"all":75},"dt":1464268500,"sys":{"type":1,"id":5728,"message":0.0035,"country":"HR","sunrise":1464231960,"sunset":1464287116},"id":3186671,"name":"Zdenci","cod":200}
