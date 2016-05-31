@@ -14,6 +14,7 @@ import javax.inject.Named;
 import javax.enterprise.context.RequestScoped;
 import org.foi.nwtis.alebenkov.ws.klijenti.MeteoRESTKlijent;
 import org.foi.nwtis.alebenkov.ws.klijenti.MeteoWSKlijent;
+import org.foi.nwtis.alebenkov.ws.klijenti.OWMKlijent;
 import org.foi.nwtis.alebenkov.ws.serveri.Adresa;
 import org.foi.nwtis.alebenkov.ws.serveri.MeteoPodaci;
 
@@ -35,6 +36,7 @@ public class OdabirAdresa implements Serializable {
     private boolean m3 = false;
     List<MeteoPodaci> meteo;
     List<MeteoPodaci> meteoLast;
+    List<MeteoPodaci> meteoNext;
     List<Integer> idAdresa;
 
     /**
@@ -100,6 +102,18 @@ public class OdabirAdresa implements Serializable {
     }
 
     public void next5MeteoData() {
+        
+        String APPID = "";
+        String lat="";
+        String lon="";
+        for (int k = 0; k<adrese.size(); k++){
+            if(adrese.get(k).getAdresa().equals(odabranaAdresa.get(0))){
+                lat = adrese.get(k).getGeoloc().getLatitude();
+                lon = adrese.get(k).getGeoloc().getLongitude();
+            }
+        }
+        OWMKlijent owm = new OWMKlijent("251fce21bdb88341273354e83b1f0b87");
+        meteoNext = owm.getRealTimeWeather(lat, lon);
         p2 = true;
     }
 
@@ -148,5 +162,11 @@ public class OdabirAdresa implements Serializable {
     public List<MeteoPodaci> getMeteoLast() {
         return meteoLast;
     }
+
+    public List<MeteoPodaci> getMeteoNext() {
+        return meteoNext;
+    }
+    
+    
 
 }
