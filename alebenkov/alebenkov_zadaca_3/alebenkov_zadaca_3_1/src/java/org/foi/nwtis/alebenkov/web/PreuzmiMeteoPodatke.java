@@ -5,22 +5,14 @@
  */
 package org.foi.nwtis.alebenkov.web;
 
-import java.sql.Connection;
-import java.sql.DriverManager;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import org.foi.nwtis.alebenkov.konfiguracije.Konfiguracija;
 import org.foi.nwtis.alebenkov.konfiguracije.bp.BP_konfiguracija;
 import org.foi.nwtis.alebenkov.rest.klijenti.OWMKlijent;
 import org.foi.nwtis.alebenkov.web.podaci.Adresa;
 import org.foi.nwtis.alebenkov.web.podaci.MeteoPodaci;
 import org.foi.nwtis.alebenkov.web.slusaci.SlusacAplikacije;
-import org.foi.nwtis.alebenkov.ws.serveri.GeoMeteoWS;
 
 /**
  *

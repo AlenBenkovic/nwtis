@@ -67,7 +67,7 @@ public class GeoMeteoWS {
     /**
      * Web service operation
      * @param adresa
-     * @return 
+     * @return meteo podatke
      */
     @WebMethod(operationName = "dajZadnjeMeteoPodatkeZaAdresu")
     public MeteoPodaci dajZadnjeMeteoPodatkeZaAdresu(@WebParam(name = "adresa") String adresa) {
@@ -79,7 +79,7 @@ public class GeoMeteoWS {
     /**
      * Web service operation
      * @param adresa
-     * @return 
+     * @return listu sa meteo podacima
      */
     @WebMethod(operationName = "dajSveMeteoPodatkeZaAdresu")
     public java.util.List<MeteoPodaci> dajSveMeteoPodatkeZaAdresu(@WebParam(name = "adresa") String adresa) {

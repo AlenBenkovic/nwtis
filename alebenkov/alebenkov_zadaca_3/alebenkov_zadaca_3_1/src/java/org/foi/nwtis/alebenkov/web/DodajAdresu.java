@@ -13,16 +13,9 @@ import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import java.sql.Connection;
-import java.sql.DriverManager;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.sql.Statement;
-import org.foi.nwtis.alebenkov.konfiguracije.bp.BP_konfiguracija;
 import org.foi.nwtis.alebenkov.rest.klijenti.GMKlijent;
 import org.foi.nwtis.alebenkov.web.podaci.Lokacija;
 import org.foi.nwtis.alebenkov.web.podaci.MeteoPodaci;
-import org.foi.nwtis.alebenkov.web.slusaci.SlusacAplikacije;
 import org.foi.nwtis.alebenkov.ws.serveri.GeoMeteoWS;
 
 /**
