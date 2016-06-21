@@ -24,54 +24,58 @@
 
             <ui:define name="content">
                 <h:form id="obrazac">
-                    <h:panelGrid columns="3">
+
+                    <h:panelGrid>
                         <h:panelGroup layout="block">
                             <h:outputLabel value="Nova adresa:"/> 
-                        </h:panelGroup>
-                        <h:panelGroup layout="block">
                             <h:inputText id="novaAdresa" value="#{odabirAdresaPrognoza.novaAdresa}" size="50"/>
-                        </h:panelGroup>
-                        <h:panelGroup layout="block">
                             <h:commandButton value=" Dodaj adresu " action="#{odabirAdresaPrognoza.dodajNovuAdresu()}">
                                 <f:ajax render="aktivneAdrese" execute="novaAdresa"/>
                             </h:commandButton>
                         </h:panelGroup>
+
+                        <h:panelGroup layout="block" id="azuriranje" rendered="#{odabirAdresaPrognoza.prikazAzuriranjaAdrese}">
+                            <h:outputLabel value="Adresa za ažuriranje:" /> 
+                            <h:inputText id="azuriranaAdresa" value="#{odabirAdresaPrognoza.azuriranaAdresa}" size="50" />
+                            <h:commandButton value=" Ažuriraj adresu " action="#{odabirAdresaPrognoza.upisiAdresu()}">
+                                <f:ajax render="obrazac aktivneAdrese" execute="azuriranaAdresa"/>
+                            </h:commandButton>
+                        </h:panelGroup>
+                    </h:panelGrid>
+
+                    
+                    <h:panelGrid columns="3">
+                        
                         <h:panelGroup layout="block">
                             <h:selectManyListbox id="aktivneAdrese" value="#{odabirAdresaPrognoza.adreseZaDodavanje}" size="10">
                                 <f:selectItems value="#{odabirAdresaPrognoza.aktivneAdrese}"/>
                             </h:selectManyListbox>
                         </h:panelGroup>
+                        
                         <h:panelGroup layout="block">
-                            <h:commandButton value=" Preuzmi " action="#{odabirAdresaPrognoza.preuzmiAdrese()}">
+                            <h:commandButton value=" Preuzmi " action="#{odabirAdresaPrognoza.preuzmiAdrese()}" >
                                 <f:ajax render="kandidiraneAdrese aktivneAdrese" execute="aktivneAdrese"/>
                             </h:commandButton><br/>
-                            <h:commandButton value=" Makni " action="#{odabirAdresaPrognoza.dodajNovuAdresu()}">
-                                <f:ajax render="aktivneAdrese" execute="novaAdresa"/>
+                             <h:commandButton value=" Makni " action="#{odabirAdresaPrognoza.ukloniAdrese()}" >
+                                <f:ajax render="kandidiraneAdrese aktivneAdrese" execute="kandidiraneAdrese"/>
                             </h:commandButton><br/>
                             <h:commandButton value=" Ažuriraj " action="#{odabirAdresaPrognoza.azurirajAdresu()}">
-                                <f:ajax render="azuriranaAdresa" execute="aktivneAdrese"/>
+                                <f:ajax render="obrazac azuriranaAdresa" execute="aktivneAdrese"/>
                             </h:commandButton><br/>
                         </h:panelGroup>
+                        
                         <h:panelGroup layout="block">
                             <h:selectManyListbox id="kandidiraneAdrese" value="#{odabirAdresaPrognoza.adreseZaBrisanje}" size="10">
                                 <f:selectItems value="#{odabirAdresaPrognoza.kandidiraneAdrese}"/>
                             </h:selectManyListbox>
-                        </h:panelGroup>
-                        <h:panelGroup layout="block">
-                            <h:outputLabel value="Adresa za ažuriranje:" rendered="#{odabirAdresaPrognoza.prikazAzuriranjaAdrese}"/> 
-                        </h:panelGroup>
-                        <h:panelGroup layout="block">
-                            <h:inputText id="azuriranaAdresa" value="#{odabirAdresaPrognoza.azuriranaAdresa}" size="50" rendered="#{odabirAdresaPrognoza.prikazAzuriranjaAdrese}"/>
-                        </h:panelGroup>
-                        <h:panelGroup layout="block">
-                            <h:commandButton value=" Dodaj adresu " action="#{odabirAdresaPrognoza.upisiAdresu()}" rendered="#{odabirAdresaPrognoza.prikazAzuriranjaAdrese}">
-                                <f:ajax render="aktivneAdrese" execute="azuriranaAdresa"/>
-                            </h:commandButton>
+                            <h:commandButton value=" Prognoza " action="#{odabirAdresaPrognoza.dohvatiPrognozu()}">
+                                <f:ajax render="obrazac" execute="aktivneAdrese"/>
+                            </h:commandButton><br/>
                         </h:panelGroup>
                         
                     </h:panelGrid>
                 </h:form>
-                    
+
             </ui:define>
 
         </ui:composition>

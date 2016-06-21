@@ -46,7 +46,7 @@ public class MeteoAdresniKlijent {
     public MeteoPrognoza[] dajMeteoPrognoze(String adresa) {
         OWMKlijent owmk = new OWMKlijent(apiKey);
         Lokacija l = dajLokaciju(adresa);
-        owmk.getWeatherForecast(l.getLatitude(), l.getLongitude());
+
         return null;
     }
 }

@@ -37,6 +37,7 @@ public class OdabirAdresaPrognoza implements Serializable {
     private Map<String, Object> aktivneAdrese;
     private List<String> adreseZaDodavanje;
     private Map<String, Object> kandidiraneAdrese;
+    private Map<String, Object> kandidiraneAdresePomocna; //problem sa brisanjem kod iteracije
     private List<String> adreseZaBrisanje;
     private String azuriranaAdresa;
     private String idAzuriraneAdrese;
@@ -50,7 +51,7 @@ public class OdabirAdresaPrognoza implements Serializable {
     public OdabirAdresaPrognoza() {
         kandidiraneAdrese = new HashMap<>();
     }
-
+    
     public String getNovaAdresa() {
         return novaAdresa;
     }
@@ -167,6 +168,20 @@ public class OdabirAdresaPrognoza implements Serializable {
         }
         return "";
     }
+
+    public String ukloniAdrese() {
+        kandidiraneAdresePomocna = new HashMap<String, Object>(kandidiraneAdrese);//radim kopiju jer ne mogu brisati kod iteracije
+        for (String a : adreseZaBrisanje) {
+            for (Map.Entry<String, Object> e : kandidiraneAdresePomocna.entrySet()) {
+                if (e.getValue().toString().compareTo(a) == 0) {
+                    kandidiraneAdrese.remove(e.getKey());
+                }
+            }
+        }
+
+        return "";
+    }
+
     public String upisiAdresu() {
         Lokacija l = meteoAdresniKlijent.dajLokaciju(azuriranaAdresa);
         Adrese ispravljenaAdresa = new Adrese(Integer.parseInt(idAzuriraneAdrese), azuriranaAdresa, l.getLatitude(), l.getLongitude());
@@ -175,9 +190,10 @@ public class OdabirAdresaPrognoza implements Serializable {
 
         return "";
     }
-    
+
     public String azurirajAdresu() {
-        if(adreseZaDodavanje.size() != 1) {
+        prikazAzuriranjaAdrese = true;
+        if (adreseZaDodavanje.size() != 1) {
             // TODO ipisati pogrešku
         } else {
             idAzuriraneAdrese = adreseZaDodavanje.get(0);
@@ -193,5 +209,10 @@ public class OdabirAdresaPrognoza implements Serializable {
         }
         return "";
     }
+    
+      public void dohvatiPrognozu(){
+        System.out.println("TODO dohvati prognozu...");
+    }
+
 
 }
