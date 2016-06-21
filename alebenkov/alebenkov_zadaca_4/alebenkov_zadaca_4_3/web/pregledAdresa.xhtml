@@ -43,37 +43,136 @@
                         </h:panelGroup>
                     </h:panelGrid>
 
-                    
+
                     <h:panelGrid columns="3">
-                        
+
                         <h:panelGroup layout="block">
                             <h:selectManyListbox id="aktivneAdrese" value="#{odabirAdresaPrognoza.adreseZaDodavanje}" size="10">
                                 <f:selectItems value="#{odabirAdresaPrognoza.aktivneAdrese}"/>
                             </h:selectManyListbox>
                         </h:panelGroup>
-                        
+
                         <h:panelGroup layout="block">
                             <h:commandButton value=" Preuzmi " action="#{odabirAdresaPrognoza.preuzmiAdrese()}" >
                                 <f:ajax render="kandidiraneAdrese aktivneAdrese" execute="aktivneAdrese"/>
                             </h:commandButton><br/>
-                             <h:commandButton value=" Makni " action="#{odabirAdresaPrognoza.ukloniAdrese()}" >
-                                <f:ajax render="kandidiraneAdrese aktivneAdrese" execute="kandidiraneAdrese"/>
+                            <h:commandButton value=" Makni " action="#{odabirAdresaPrognoza.ukloniAdrese()}" >
+                                <f:ajax render="obrazac kandidiraneAdrese aktivneAdrese" execute="kandidiraneAdrese"/>
                             </h:commandButton><br/>
                             <h:commandButton value=" Ažuriraj " action="#{odabirAdresaPrognoza.azurirajAdresu()}">
                                 <f:ajax render="obrazac azuriranaAdresa" execute="aktivneAdrese"/>
                             </h:commandButton><br/>
                         </h:panelGroup>
-                        
+
                         <h:panelGroup layout="block">
                             <h:selectManyListbox id="kandidiraneAdrese" value="#{odabirAdresaPrognoza.adreseZaBrisanje}" size="10">
                                 <f:selectItems value="#{odabirAdresaPrognoza.kandidiraneAdrese}"/>
                             </h:selectManyListbox>
                             <h:commandButton value=" Prognoza " action="#{odabirAdresaPrognoza.dohvatiPrognozu()}">
-                                <f:ajax render="obrazac" execute="aktivneAdrese"/>
+                                <f:ajax render="obrazac" execute="kandidiraneAdrese"/>
                             </h:commandButton><br/>
                         </h:panelGroup>
-                        
+
+
                     </h:panelGrid>
+                    <h:panelGroup layout="block" id="prikazPrognoze" rendered="#{odabirAdresaPrognoza.prikazPrognoze}">
+
+                        <h:dataTable value="#{odabirAdresaPrognoza.prognozeVremena}" var="meteo"  >
+                            <h:column>
+                                <f:facet name="header">Grad</f:facet>
+                                <h:outputText value="#{meteo.adresa}" >
+                                </h:outputText>
+                            </h:column>
+                            <h:column>
+                                <f:facet name="header"> | </f:facet>
+                                <h:outputText value=" | " >
+                                </h:outputText>
+                            </h:column>
+                            <h:column>
+                                <f:facet name="header">Prognoza</f:facet>
+                                <h:outputText value="#{meteo.prognoza.name}" >
+                                </h:outputText>
+                            </h:column>
+                            <h:column>
+                                <f:facet name="header"> | </f:facet>
+                                <h:outputText value=" | " >
+                                </h:outputText>
+                            </h:column>
+                            <h:column>
+                                <f:facet name="header">Vrijeme opis</f:facet>
+                                <h:outputText value="#{meteo.prognoza.weatherValue}" />
+                            </h:column>
+                            <h:column>
+                                <f:facet name="header"> | </f:facet>
+                                <h:outputText value=" | " >
+                                </h:outputText>
+                            </h:column>
+                            <h:column>
+                                <f:facet name="header">Vlaga</f:facet>
+                                <h:outputText value="#{meteo.prognoza.humidityValue}" />
+                            </h:column>
+                            <h:column>
+                                <f:facet name="header"> | </f:facet>
+                                <h:outputText value=" | " >
+                                </h:outputText>
+                            </h:column>
+                            <h:column>
+                                <f:facet name="header">Tlak</f:facet>
+                                <h:outputText value="#{meteo.prognoza.pressureValue}" />
+                            </h:column>
+                            <h:column>
+                                <f:facet name="header"> | </f:facet>
+                                <h:outputText value=" | " >
+                                </h:outputText>
+                            </h:column>
+                            <h:column>
+                                <f:facet name="header">Vjetar</f:facet>
+                                <h:outputText value="#{meteo.prognoza.windSpeedValue}" />
+                            </h:column>
+                            <h:column>
+                                <f:facet name="header"> | </f:facet>
+                                <h:outputText value=" | " >
+                                </h:outputText>
+                            </h:column>
+                            <h:column>
+                                <f:facet name="header">Smjer vjetra</f:facet>
+                                <h:outputText value="#{meteo.prognoza.windDirectionValue}" />
+                            </h:column>
+                            <h:column>
+                                <f:facet name="header"> | </f:facet>
+                                <h:outputText value=" | " >
+                                </h:outputText>
+                            </h:column>
+                            <h:column>
+                                <f:facet name="header">T. Min.</f:facet>
+                                <h:outputText value="#{meteo.prognoza.temperatureMin}" />
+                            </h:column>
+                            <h:column>
+                                <f:facet name="header"> | </f:facet>
+                                <h:outputText value=" | " >
+                                </h:outputText>
+                            </h:column>
+                            <h:column>
+                                <f:facet name="header">T. Max.</f:facet>
+                                <h:outputText value="#{meteo.prognoza.temperatureMax}" />
+                            </h:column>
+                            <h:column>
+                                <f:facet name="header"> | </f:facet>
+                                <h:outputText value=" | " >
+                                </h:outputText>
+                            </h:column>
+                            <h:column>
+                                <f:facet name="header">Temperatura</f:facet>
+                                <h:outputText value="#{meteo.prognoza.temperatureValue}" />
+                            </h:column>
+                        </h:dataTable>
+                    </h:panelGroup>
+                    <br/>
+                    <h:panelGroup layout="block" id="greska" rendered="#{odabirAdresaPrognoza.prikazGreske}">
+
+                        <h:outputLabel value="GREŠKA: " /> 
+                        <h:outputLabel id="tekstGreske" value="#{odabirAdresaPrognoza.tekstGreske}"  /> 
+                    </h:panelGroup>
                 </h:form>
 
             </ui:define>

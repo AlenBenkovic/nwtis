@@ -8,6 +8,7 @@ package org.foi.nwtis.alebenkov.web.zrna;
 import javax.inject.Named;
 import javax.enterprise.context.SessionScoped;
 import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
@@ -38,12 +39,15 @@ public class OdabirAdresaPrognoza implements Serializable {
     private List<String> adreseZaDodavanje;
     private Map<String, Object> kandidiraneAdrese;
     private Map<String, Object> kandidiraneAdresePomocna; //problem sa brisanjem kod iteracije
-    private List<String> adreseZaBrisanje;
+    private List<String> OdabraneAdrese;
     private String azuriranaAdresa;
     private String idAzuriraneAdrese;
     private boolean prikazAzuriranjaAdrese = false;
-    private boolean prikazPrognozaAdrese = false;
+    private boolean prikazPrognoze = false;
+    private boolean prikazGreske = false;
     private List<MeteoPrognoza> prognozeVremena;
+    private String tekstGreske = "";
+    private MeteoPrognoza[] mp;
 
     /**
      * Creates a new instance of OdabirAdresaPrognoza
@@ -51,7 +55,7 @@ public class OdabirAdresaPrognoza implements Serializable {
     public OdabirAdresaPrognoza() {
         kandidiraneAdrese = new HashMap<>();
     }
-    
+
     public String getNovaAdresa() {
         return novaAdresa;
     }
@@ -100,12 +104,20 @@ public class OdabirAdresaPrognoza implements Serializable {
         this.kandidiraneAdrese = kandidiraneAdrese;
     }
 
+    public List<String> getOdabraneAdrese() {
+        return OdabraneAdrese;
+    }
+
+    public void setOdabraneAdrese(List<String> OdabraneAdrese) {
+        this.OdabraneAdrese = OdabraneAdrese;
+    }
+
     public List<String> getAdreseZaBrisanje() {
-        return adreseZaBrisanje;
+        return OdabraneAdrese;
     }
 
     public void setAdreseZaBrisanje(List<String> adreseZaBrisanje) {
-        this.adreseZaBrisanje = adreseZaBrisanje;
+        this.OdabraneAdrese = adreseZaBrisanje;
     }
 
     public String getAzuriranaAdresa() {
@@ -132,13 +144,15 @@ public class OdabirAdresaPrognoza implements Serializable {
         this.prikazAzuriranjaAdrese = prikazAzuriranjaAdrese;
     }
 
-    public boolean isPrikazPrognozaAdrese() {
-        return prikazPrognozaAdrese;
+    public boolean isPrikazPrognoze() {
+        return prikazPrognoze;
     }
 
-    public void setPrikazPrognozaAdrese(boolean prikazPrognozaAdrese) {
-        this.prikazPrognozaAdrese = prikazPrognozaAdrese;
+    public void setPrikazPrognoze(boolean prikazPrognoze) {
+        this.prikazPrognoze = prikazPrognoze;
     }
+
+   
 
     public List<MeteoPrognoza> getPrognozeVremena() {
         return prognozeVremena;
@@ -171,10 +185,11 @@ public class OdabirAdresaPrognoza implements Serializable {
 
     public String ukloniAdrese() {
         kandidiraneAdresePomocna = new HashMap<String, Object>(kandidiraneAdrese);//radim kopiju jer ne mogu brisati kod iteracije
-        for (String a : adreseZaBrisanje) {
+        for (String a : OdabraneAdrese) {
             for (Map.Entry<String, Object> e : kandidiraneAdresePomocna.entrySet()) {
                 if (e.getValue().toString().compareTo(a) == 0) {
                     kandidiraneAdrese.remove(e.getKey());
+                    prikazPrognoze = false;
                 }
             }
         }
@@ -194,7 +209,8 @@ public class OdabirAdresaPrognoza implements Serializable {
     public String azurirajAdresu() {
         prikazAzuriranjaAdrese = true;
         if (adreseZaDodavanje.size() != 1) {
-            // TODO ipisati pogrešku
+            tekstGreske = "Smijete dodati samo jednu adresu.";
+            prikazGreske = true;
         } else {
             idAzuriraneAdrese = adreseZaDodavanje.get(0);
             Iterator<Map.Entry<String, Object>> iterator = aktivneAdrese.entrySet().iterator();
@@ -209,10 +225,54 @@ public class OdabirAdresaPrognoza implements Serializable {
         }
         return "";
     }
-    
-      public void dohvatiPrognozu(){
-        System.out.println("TODO dohvati prognozu...");
+
+    public boolean isPrikazGreske() {
+        return prikazGreske;
     }
 
+    public void setPrikazGreske(boolean prikazGreske) {
+        this.prikazGreske = prikazGreske;
+    }
+
+    public String getTekstGreske() {
+        return tekstGreske;
+    }
+
+    public void setTekstGreske(String tekstGreske) {
+        this.tekstGreske = tekstGreske;
+    }
+
+    public MeteoPrognoza[] getMp() {
+        return mp;
+    }
+
+    public void setMp(MeteoPrognoza[] mp) {
+        this.mp = mp;
+    }
+
+    public void dohvatiPrognozu() {
+        prognozeVremena = new ArrayList<>();
+        if (OdabraneAdrese.size() != 1) {
+            tekstGreske = "SMIJETE ODABRATI SAMO JEDNU ADRESU ZA PROGNOZU!";
+            prikazGreske = true;
+        } else {
+            prikazGreske = false;
+            for (Map.Entry<String, Object> e : kandidiraneAdrese.entrySet()) {
+
+                if (OdabraneAdrese.get(0).compareTo(e.getValue().toString()) == 0) {
+                    System.out.println("Trazim meteo prognozu za " + e.getKey());
+                    mp = meteoAdresniKlijent.dajMeteoPrognoze(e.getKey());
+
+                    System.out.println("Dohvatio sam meteo podatke, prolazim kroz petlju.." + mp.length);
+                    prikazPrognoze = true;
+                    for (int i = 0; i < mp.length; i++) {
+                        prognozeVremena.add(mp[i]);
+                    }
+                }
+
+            }
+        }
+
+    }
 
 }

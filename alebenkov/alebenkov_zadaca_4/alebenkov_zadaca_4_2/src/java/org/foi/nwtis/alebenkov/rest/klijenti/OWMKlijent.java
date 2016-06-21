@@ -114,7 +114,7 @@ public class OWMKlijent {
     }
     
     public MeteoPrognoza[] getWeatherForecast(String latitude, String longitude) {
-        MeteoPrognoza[] mprog = new MeteoPrognoza[36];
+        
         WebTarget webResource = client.target(OWMRESTHelper.getOWM_BASE_URI())
                 .path(OWMRESTHelper.getOWM_Forecast_Path());
         webResource = webResource.queryParam("lat", latitude);
@@ -128,6 +128,7 @@ public class OWMKlijent {
             JsonReader reader = Json.createReader(new StringReader(odgovor));
 
             JsonObject jo = reader.readObject();
+            MeteoPrognoza[] mprog = new MeteoPrognoza[jo.getJsonArray("list").size()];
 
             for (int i = 0; i < jo.getJsonArray("list").size(); i++) {
                 MeteoPodaci mp = new MeteoPodaci();

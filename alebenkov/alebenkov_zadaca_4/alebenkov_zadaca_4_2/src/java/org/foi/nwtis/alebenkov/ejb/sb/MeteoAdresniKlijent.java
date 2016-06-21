@@ -20,17 +20,16 @@ import org.foi.nwtis.alebenkov.web.podaci.MeteoPrognoza;
 @Stateless
 @LocalBean
 public class MeteoAdresniKlijent {
-    private String apiKey = "adsaasasa"; //TODO preuzeti iz datoteke postavki
-    
+
+    private String apiKey = "251fce21bdb88341273354e83b1f0b87"; //TODO preuzeti iz datoteke postavki
 
     // Add business logic below. (Right-click in editor and choose
     // "Insert Code > Add Business Method")
-
     public void postaviKorisnickePodatke(String apiKey) {
         this.apiKey = apiKey;
     }
 
-    public MeteoPodaci dajVazeceMeteoPodatke(String adresa) {      
+    public MeteoPodaci dajVazeceMeteoPodatke(String adresa) {
         Lokacija l = dajLokaciju(adresa);
         OWMKlijent owmk = new OWMKlijent(apiKey);
         MeteoPodaci mp = owmk.getRealTimeWeather(l.getLatitude(), l.getLongitude());
@@ -39,14 +38,14 @@ public class MeteoAdresniKlijent {
 
     public Lokacija dajLokaciju(String adresa) {
         GMKlijent gmk = new GMKlijent();
-        Lokacija l = gmk.getGeoLocation(adresa);        
+        Lokacija l = gmk.getGeoLocation(adresa);
         return l;
     }
 
     public MeteoPrognoza[] dajMeteoPrognoze(String adresa) {
         OWMKlijent owmk = new OWMKlijent(apiKey);
         Lokacija l = dajLokaciju(adresa);
-        owmk.getWeatherForecast(l.getLatitude(), l.getLongitude());
-        return null;
+
+        return owmk.getWeatherForecast(l.getLatitude(), l.getLongitude());
     }
 }
