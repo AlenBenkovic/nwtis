@@ -24,9 +24,52 @@
 
             <ui:define name="content">
                 <h:form id="obrazac">
+                    
+                    <h:commandButton value="Filtriranje" action="#{pregledDnevnika.prikaziFiltere()}" rendered="#{pregledDnevnika.filteri == false}">
+                        <f:ajax render="obrazac" execute="obrazac"/>
+                    </h:commandButton>
+                    <h:commandButton value="Sakrij filtriranje" action="#{pregledDnevnika.sakrijFiltere()}" rendered="#{pregledDnevnika.filteri}">
+                        <f:ajax render="obrazac" execute="obrazac"/>
+                    </h:commandButton>
+
+
+                    <h:panelGrid rendered="#{pregledDnevnika.filteri}">
+                        
+                        
+                        <h:panelGroup layout="block" >
+                            <h:outputLabel for="datumOd" value="Datum od: " />
+                            <h:selectOneMenu id ="datumOd" value="#{pregledDnevnika.odDatuma}" >
+                            <f:selectItems value="#{pregledDnevnika.datumi}"  />
+                            </h:selectOneMenu>
+                            
+                            <h:outputLabel for ="datumDo" value=" do: "/>
+                            <h:selectOneMenu id ="datumDo" value="#{pregledDnevnika.doDatuma}" >
+                            <f:selectItems value="#{pregledDnevnika.datumi}" />
+                            </h:selectOneMenu>
+                            <br/>
+                            <h:outputLabel for="korisnik" value="Korisnik:"/>
+                            <h:inputText id="korisnik" value="#{pregledDnevnika.korisnik}"/>
+
+                            <h:outputLabel for="ip" value="IP Adresa:"/>
+                            <h:inputText id="ip" value="#{pregledDnevnika.ip}"/>
+
+                            <h:outputLabel for="trajanje" value="Trajanje veće od:"/>
+                            <h:inputText id="trajanje" value="#{pregledDnevnika.trajanje}"/>
+
+                            <h:outputLabel for="status" value="Status:"/>
+                            <h:inputText id="status" value="#{pregledDnevnika.status}" />
+
+                            <h:commandButton value="Filtriraj" action="#{pregledDnevnika.filtriraj()}">
+                                <f:ajax render="obrazac" execute="obrazac"/>
+                            </h:commandButton>
+
+                        </h:panelGroup>
+                    </h:panelGrid>
+
+
                     <h:panelGroup layout="block" id="prikazDnevnika" >
 
-                        <h:dataTable value="#{pregledDnevnika.dnevnik}" var="d"  >
+                        <h:dataTable value="#{pregledDnevnika.dnevnik}" var="d" rendered="#{pregledDnevnika.filtriraniPodaci == false}" >
                             <h:column>
                                 <f:facet name="header">Datum</f:facet>
                                 <h:outputText value="#{d.vrijeme}" >
@@ -84,6 +127,66 @@
                                 </h:outputText>
                             </h:column>
                         </h:dataTable>
+                        
+                        <h:dataTable value="#{pregledDnevnika.dnevnikFiltrirano}" var="d" rendered="#{pregledDnevnika.filtriraniPodaci}" >
+                            <h:column>
+                                <f:facet name="header">Datum</f:facet>
+                                <h:outputText value="#{d.vrijeme}" >
+                                </h:outputText>
+                            </h:column>
+                            <h:column>
+                                <f:facet name="header"> | </f:facet>
+                                <h:outputText value=" | " >
+                                </h:outputText>
+                            </h:column>
+                            <h:column>
+                                <f:facet name="header">Korisnik</f:facet>
+                                <h:outputText value="#{d.korisnik}" >
+                                </h:outputText>
+                            </h:column>
+                            <h:column>
+                                <f:facet name="header"> | </f:facet>
+                                <h:outputText value=" | " >
+                                </h:outputText>
+                            </h:column>
+                            <h:column>
+                                <f:facet name="header">URL</f:facet>
+                                <h:outputText value="#{d.url}" />
+                            </h:column>
+                            <h:column>
+                                <f:facet name="header"> | </f:facet>
+                                <h:outputText value=" | " >
+                                </h:outputText>
+                            </h:column>
+                            <h:column>
+                                <f:facet name="header">IP</f:facet>
+                                <h:outputText value="#{d.ipadresa}" />
+                            </h:column>
+                            <h:column>
+                                <f:facet name="header"> | </f:facet>
+                                <h:outputText value=" | " >
+                                </h:outputText>
+                            </h:column>
+                            <h:column>
+                                <f:facet name="header">Trajanje</f:facet>
+                                <h:outputText value="#{d.trajanje}" />
+                            </h:column>
+                            <h:column>
+                                <f:facet name="header"> | </f:facet>
+                                <h:outputText value=" | " >
+                                </h:outputText>
+                            </h:column>
+                            <h:column>
+                                <f:facet name="header">Status</f:facet>
+                                <h:outputText value="#{d.status}" />
+                            </h:column>
+                            <h:column>
+                                <f:facet name="header"> | </f:facet>
+                                <h:outputText value=" | " >
+                                </h:outputText>
+                            </h:column>
+                        </h:dataTable>
+                        
                     </h:panelGroup>
                 </h:form>
             </ui:define>

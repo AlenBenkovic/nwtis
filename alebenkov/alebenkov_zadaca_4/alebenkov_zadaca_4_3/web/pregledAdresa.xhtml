@@ -54,7 +54,7 @@
 
                         <h:panelGroup layout="block">
                             <h:commandButton value=" Preuzmi " action="#{odabirAdresaPrognoza.preuzmiAdrese()}" >
-                                <f:ajax render="kandidiraneAdrese aktivneAdrese" execute="aktivneAdrese"/>
+                                <f:ajax render="obrazac" execute="aktivneAdrese"/>
                             </h:commandButton><br/>
                             <h:commandButton value=" Makni " action="#{odabirAdresaPrognoza.ukloniAdrese()}" >
                                 <f:ajax render="obrazac kandidiraneAdrese aktivneAdrese" execute="kandidiraneAdrese"/>
@@ -64,12 +64,12 @@
                             </h:commandButton><br/>
                         </h:panelGroup>
 
-                        <h:panelGroup layout="block">
-                            <h:selectManyListbox id="kandidiraneAdrese" value="#{odabirAdresaPrognoza.adreseZaBrisanje}" size="10">
+                        <h:panelGroup layout="block" rendered="#{odabirAdresaPrognoza.prikazOdabranihAdresa}">
+                            <h:selectManyListbox id="kandidiraneAdrese" value="#{odabirAdresaPrognoza.adreseZaBrisanje}" size="10" >
                                 <f:selectItems value="#{odabirAdresaPrognoza.kandidiraneAdrese}"/>
                             </h:selectManyListbox>
                             <h:commandButton value=" Prognoza " action="#{odabirAdresaPrognoza.dohvatiPrognozu()}">
-                                <f:ajax render="obrazac" execute="kandidiraneAdrese"/>
+                                <f:ajax render="obrazac" execute="obrazac"/>
                             </h:commandButton><br/>
                         </h:panelGroup>
 
