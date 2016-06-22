@@ -21,7 +21,7 @@ import org.foi.nwtis.alebenkov.web.podaci.MeteoPrognoza;
 @LocalBean
 public class MeteoAdresniKlijent {
 
-    private String apiKey = "251fce21bdb88341273354e83b1f0b87"; //TODO preuzeti iz datoteke postavki
+    private String apiKey = "251fce21bdb88341273354e83b1f0b87";
 
     // Add business logic below. (Right-click in editor and choose
     // "Insert Code > Add Business Method")

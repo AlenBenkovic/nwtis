@@ -45,18 +45,19 @@ public class GMKlijent {
             JsonReader reader = Json.createReader(new StringReader(odgovor));
 
             JsonObject jo = reader.readObject();
-                     
-            JsonObject obj = jo.getJsonArray("results")
-                    .getJsonObject(0)
-                    .getJsonObject("geometry")
-                    .getJsonObject("location");
 
-            Lokacija loc = new Lokacija(obj.getJsonNumber("lat").toString(), obj.getJsonNumber("lng").toString());
+            Lokacija loc = new Lokacija();
+            if (jo.getJsonArray("results").size() != 0) {
+                loc.setLatitude(jo.getJsonArray("results").getJsonObject(0).getJsonObject("geometry").getJsonObject("location").getJsonNumber("lat").toString());
+                loc.setLongitude(jo.getJsonArray("results").getJsonObject(0).getJsonObject("geometry").getJsonObject("location").getJsonNumber("lng").toString());
+            } else {
+                System.out.println("Ne postoji geolokacija za trazenu adresu");
+            }
 
             return loc;
 
         } catch (UnsupportedEncodingException ex) {
-            Logger.getLogger(OWMKlijent.class.getName()).log(Level.SEVERE, null, ex);
+            System.out.println("Greska " + ex.getMessage());
         }
         return null;
     }

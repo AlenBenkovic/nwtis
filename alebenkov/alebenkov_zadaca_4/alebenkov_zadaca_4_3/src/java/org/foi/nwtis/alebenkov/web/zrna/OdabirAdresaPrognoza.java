@@ -14,7 +14,6 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
-import javax.annotation.PreDestroy;
 import javax.ejb.EJB;
 import javax.faces.context.FacesContext;
 import javax.servlet.http.HttpServletRequest;
@@ -305,17 +304,24 @@ public class OdabirAdresaPrognoza implements Serializable {
         int statusAkcije = 999;
         long pocetakObrade = System.currentTimeMillis();
         Lokacija l = meteoAdresniKlijent.dajLokaciju(novaAdresa);
-        Adrese dodanaAdresa = new Adrese();
-        dodanaAdresa.setAdresa(novaAdresa);
-        dodanaAdresa.setLatitude(l.getLatitude());
-        dodanaAdresa.setLongitude(l.getLongitude());
-        System.out.println("LON: " + l.getLongitude() + " LAT: " + l.getLatitude());
-        adreseFacade.create(dodanaAdresa);
-        statusAkcije = 1;
-        long krajObrade = System.currentTimeMillis(); //biljezim kraj rada dretve
-        int trajanjeObrade = (int) (krajObrade - pocetakObrade);
-        recordLog("alen", getURL(), getIP(), trajanjeObrade, statusAkcije);
-
+        if (l.getLatitude() == null || l.getLongitude() == null) {
+            tekstGreske = "Ne postoji geolokacija za unesenu adresu. Pokusajte ponovno.";
+            prikazGreske = true;
+            long krajObrade = System.currentTimeMillis();
+            int trajanjeObrade = (int) (krajObrade - pocetakObrade);
+            recordLog("alen", getURL(), getIP(), trajanjeObrade, statusAkcije);
+        } else {
+            prikazGreske = false;
+            Adrese dodanaAdresa = new Adrese();
+            dodanaAdresa.setAdresa(novaAdresa);
+            dodanaAdresa.setLatitude(l.getLatitude());
+            dodanaAdresa.setLongitude(l.getLongitude());
+            adreseFacade.create(dodanaAdresa);
+            statusAkcije = 1;
+            long krajObrade = System.currentTimeMillis();
+            int trajanjeObrade = (int) (krajObrade - pocetakObrade);
+            recordLog("alen", getURL(), getIP(), trajanjeObrade, statusAkcije);
+        }
         return "";
     }
 
@@ -378,14 +384,22 @@ public class OdabirAdresaPrognoza implements Serializable {
         int statusAkcije = 999;
         long pocetakObrade = System.currentTimeMillis();
         Lokacija l = meteoAdresniKlijent.dajLokaciju(azuriranaAdresa);
-        Adrese ispravljenaAdresa = new Adrese(Integer.parseInt(idAzuriraneAdrese), azuriranaAdresa, l.getLatitude(), l.getLongitude());
-        adreseFacade.edit(ispravljenaAdresa);
-        prikazAzuriranjaAdrese = false;
-        statusAkcije = 1;
-        long krajObrade = System.currentTimeMillis(); //biljezim kraj rada dretve
-        int trajanjeObrade = (int) (krajObrade - pocetakObrade);
-        recordLog("alen", getURL(), getIP(), trajanjeObrade, statusAkcije);
-
+        if (l.getLatitude() == null || l.getLongitude() == null) {
+            tekstGreske = "Ne postoji geolokacija za novu adresu. Pokusajte ponovno.";
+            prikazGreske = true;
+            long krajObrade = System.currentTimeMillis();
+            int trajanjeObrade = (int) (krajObrade - pocetakObrade);
+            recordLog("alen", getURL(), getIP(), trajanjeObrade, statusAkcije);
+        } else {
+            Adrese ispravljenaAdresa = new Adrese(Integer.parseInt(idAzuriraneAdrese), azuriranaAdresa, l.getLatitude(), l.getLongitude());
+            adreseFacade.edit(ispravljenaAdresa);
+            prikazAzuriranjaAdrese = false;
+            prikazGreske = false;
+            statusAkcije = 1;
+            long krajObrade = System.currentTimeMillis(); //biljezim kraj rada dretve
+            int trajanjeObrade = (int) (krajObrade - pocetakObrade);
+            recordLog("alen", getURL(), getIP(), trajanjeObrade, statusAkcije);
+        }
         return "";
     }
 
