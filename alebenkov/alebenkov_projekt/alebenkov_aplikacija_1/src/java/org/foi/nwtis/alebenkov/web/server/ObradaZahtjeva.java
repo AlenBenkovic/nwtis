@@ -5,6 +5,7 @@
  */
 package org.foi.nwtis.alebenkov.web.server;
 
+import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStreamWriter;
 import java.net.Socket;
@@ -23,7 +24,6 @@ public class ObradaZahtjeva extends Thread {
     InputStream in = null;
     OutputStreamWriter out = null;
     private boolean radi = true;
-
 
     public ObradaZahtjeva(ThreadGroup group, String name, Konfiguracija konfig) {
         super(group, name);
@@ -49,10 +49,48 @@ public class ObradaZahtjeva extends Thread {
         stanjeDretve = 1;
         this.brojacRada += 1;
         long pocetakRadaDretve = System.currentTimeMillis(); //biljezim pocetak rada dretve
-        
         System.out.println(this.getName() + " | Brojac rada: " + this.brojacRada + ". | Stanje dretve: " + this.getState());
+        //POCETAK GLAVNE LOGIKE
+        StringBuilder naredba = null;
+        int c;
 
-        long trajanjeRadaDretve = System.currentTimeMillis() - pocetakRadaDretve;
+        try {
+            in = server.getInputStream();
+            out = new OutputStreamWriter(server.getOutputStream());
+            naredba = new StringBuilder();
+
+            //uzimam naredbu sa input streama
+            while ((c = in.read()) != -1) {
+                naredba.append((char) c);
+            }
+
+            if (naredba.toString().isEmpty()) {//ukoliko kojim slucajem nisam primio naredbu..
+                out.write("SERVER | ERROR: Nisam zaprimio nikakvu naredbu.\n");
+            } else {
+                System.out.println("SERVER | Primljena naredba od korisnika: " + naredba);
+            }
+
+        } catch (IOException ex) {
+            System.out.println("ERROR 01 | IOException: " + ex.getMessage());
+        } finally {
+            try {
+                if (in != null) {
+                    in.close();
+                }
+                if (out != null) {
+                    out.close();
+                }
+                if (server != null) {
+                    server.close();
+                }
+
+            } catch (IOException ex) {
+                System.out.println("ERROR 02 | IOException: " + ex.getMessage() + ex.toString());
+            }
+        }
+
+        //KRAJ GLAVNE LOGIKE
+        long trajanjeRadaDretve = System.currentTimeMillis() - pocetakRadaDretve;//kraj rada dretve
         try {
             System.out.println(this.getName() + " | Saljem dretvu na spavanje.");
             sleep(5000 - trajanjeRadaDretve);
@@ -84,13 +122,10 @@ public class ObradaZahtjeva extends Thread {
 
     public int brojacRada() {
         return this.brojacRada;
-    }   
+    }
 
     public void setRadi(boolean radi) {
         this.radi = radi;
     }
-    
-    
-    
 
 }

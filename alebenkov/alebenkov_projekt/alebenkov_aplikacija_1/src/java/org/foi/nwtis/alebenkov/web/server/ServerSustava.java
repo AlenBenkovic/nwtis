@@ -74,6 +74,7 @@ public class ServerSustava extends Thread {
         try {
             //kreiram server socket
             ss = new ServerSocket(port);
+            System.out.println("SERVER | Osluskujem na " + this.port);
             //ss.setSoTimeout(10000); //da ne blokira kod citanja do kraja vec 1000
             while (!zaustavljen) {
                 this.klijent = ss.accept(); //cekam da se korisnik spoji
