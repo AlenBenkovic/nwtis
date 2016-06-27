@@ -9,6 +9,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStreamWriter;
 import java.net.Socket;
+import java.text.SimpleDateFormat;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import org.foi.nwtis.alebenkov.konfiguracije.Konfiguracija;
@@ -28,8 +29,6 @@ public class ObradaZahtjeva extends Thread {
     private OutputStreamWriter out = null;
     private boolean radi = true;
     private PozadinskoPreuzimanje pozadinskaDretva = null;
-
-   
 
     public ObradaZahtjeva(ThreadGroup group, String name, Konfiguracija konfig) {
         super(group, name);
@@ -127,26 +126,47 @@ public class ObradaZahtjeva extends Thread {
                                     }
 
                                 } else if (ax.group(3).contains("STATUS")) {
-                                    if(pozadinskaDretva.isDretvaRadi() && pozadinskaDretva.isDretvaPreuzima()){
+                                    if (pozadinskaDretva.isDretvaRadi() && pozadinskaDretva.isDretvaPreuzima()) {
                                         out.write("OK 01.");
-                                    } else if(pozadinskaDretva.isDretvaRadi() && !pozadinskaDretva.isDretvaPreuzima()){
+                                    } else if (pozadinskaDretva.isDretvaRadi() && !pozadinskaDretva.isDretvaPreuzima()) {
                                         out.write("OK 00.");
                                     } else {
                                         out.write("OK 02.");
                                     }
                                 } else if (ax.group(3).contains("ADD")) {
+                                    SimpleDateFormat sdf = new SimpleDateFormat("dd-M-yyyy H:mm:ss");
+                                    long vrijemeZahtjeva = System.currentTimeMillis(); 
                                     String newUser = ax.group(4);
                                     String newPass = ax.group(5);
                                     String newRole = ax.group(6);
+                                    if (dbOp.dodajKorisnika(newUser, newPass, newRole)) {
+                                        out.write("OK 10.");
+                                        int[] statUser = dbOp.statistikaKorisnika();
+                                        SlanjePoruke poruka = new SlanjePoruke();
+                                        String tekstPoruke = "Dobivena naredba: " + naredba
+                                                + "\nVrijeme primanja zahtjeva: " + sdf.format(vrijemeZahtjeva)
+                                                + "\nUkupan broj korisnika: " + statUser[0]
+                                                + "\nBroj administratora: " + statUser[1]
+                                                + "\nBroj obicnih korisnika: " + statUser[2];
+                                        poruka.setPredmetPoruke(konfig.dajPostavku("mailNaslov"));
+                                        poruka.setTekstPoruke(tekstPoruke);
+                                        poruka.setTipPoruke("text/plain");
+                                        poruka.setPosluzitelj(konfig.dajPostavku("mailPosluzitelj"));
+                                        poruka.setTkoPrima(konfig.dajPostavku("mailPrima"));
+                                        poruka.setTkoSalje(konfig.dajPostavku("mailSalje"));
+                                        poruka.saljiPoruku();
+                                    } else {
+                                        out.write("ERR 33.");
+                                    }
                                     System.out.println("ADD " + newUser + newPass + newRole);
                                     //TODO pozovi metodu
                                 } else if (ax.group(7).contains("UP")) {
                                     //korisnik u  ax.group(8)
-                                    System.out.println("UP " + ax.group(8));
-                                    //TODO pozovi metodu
+                                    String odg = dbOp.povecajRang(ax.group(8));
+                                    out.write(odg);
                                 } else if (ax.group(7).contains("DOWN")) {
-                                    System.out.println("DOWN " + ax.group(8));
-                                    //TODO pozovi metodu
+                                    String odg = dbOp.smanjiRang(ax.group(8));
+                                    out.write(odg);
                                 }
 
                             }

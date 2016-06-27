@@ -10,6 +10,7 @@ import java.sql.DriverManager;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.text.DecimalFormat;
 import org.foi.nwtis.alebenkov.konfiguracije.bp.BP_konfiguracija;
 import org.foi.nwtis.alebenkov.web.slusaci.SlusacAplikacije;
 
@@ -27,6 +28,8 @@ public class DBOps {
     private Statement statemant = null;
     private ResultSet rs = null;
     private String sql = null;
+    private boolean sqlExe;
+    private int sqlUp;
 
     public DBOps() {
         this.bpConfig = SlusacAplikacije.getBpConfig();
@@ -42,7 +45,7 @@ public class DBOps {
     }
 
     public int[] provjeraKorisnika(String user, String pass) {
-        int[] korisnik = {0,0};
+        int[] korisnik = {0, 0};
 
         try {
             connection = DriverManager.getConnection(url, this.korisnik, this.lozinka);
@@ -72,7 +75,6 @@ public class DBOps {
                     System.out.println(ex.getMessage());
                 }
             }
-
             if (connection != null) {
                 try {
                     connection.close();
@@ -84,5 +86,221 @@ public class DBOps {
 
         return korisnik;
     }
+
+    public boolean dodajKorisnika(String newUser, String newPass, String newRole) {
+        int role = 2;
+        if (newRole.contains("ADMIN")) {
+            role = 1;
+        }
+        int brojRedaka = 0;
+
+        try {
+            connection = DriverManager.getConnection(url, korisnik, lozinka);
+            statemant = connection.createStatement();
+
+            sql = "SELECT * FROM alebenkov_korisnici where user = '" + newUser + "'";
+            rs = statemant.executeQuery(sql);
+            while (rs.next()) {
+                brojRedaka++; //ovo se moze rjesiti na elegantniji nacin ali ovo mi je trenutno najbrzi (getRow, beforeFirst,..) ali je potrebno podici odredjene zastavice na resultsetu
+            }
+            if (brojRedaka == 0) {
+
+                sql = "INSERT INTO alebenkov_korisnici(user, pass, role, rang) VALUES ('" + newUser + "','" + newPass + "','" + role + "', 1 )";
+                sqlExe = statemant.execute(sql);
+                System.out.println("SERVER | Korisnik dodan u bazu.");
+                return true;
+
+            }
+
+        } catch (SQLException ex) {
+            System.out.println("ERROR | Greska u radu s bazom: " + ex.getMessage());
+        } finally {
+            if (rs != null) {
+                try {
+                    rs.close();
+                } catch (SQLException ex) {
+                    System.out.println(ex.getMessage());
+                }
+            }
+            if (statemant != null) {
+                try {
+                    statemant.close();
+                } catch (SQLException ex) {
+                    System.out.println(ex.getMessage());
+                }
+            }
+            if (connection != null) {
+                try {
+                    connection.close();
+                } catch (SQLException ex) {
+                    System.out.println(ex.getMessage());
+                }
+            }
+        }
+
+        return false;
+    }
+
+    public String povecajRang(String user) {
+        String status = "";
+        int brojRedaka = 0;
+        int trenutniRang = 0;
+
+        try {
+            connection = DriverManager.getConnection(url, korisnik, lozinka);
+            statemant = connection.createStatement();
+
+            sql = "SELECT * FROM alebenkov_korisnici where user = '" + user + "'";
+            rs = statemant.executeQuery(sql);
+            while (rs.next()) {
+                brojRedaka++; //ovo se moze rjesiti na elegantniji nacin ali ovo mi je trenutno najbrzi (getRow, beforeFirst,..) ali je potrebno podici odredjene zastavice na resultsetu
+                trenutniRang = rs.getInt("rang");
+            }
+            if (trenutniRang == 0) {
+                status = "ERR 35.";
+            } else if (trenutniRang > 4) {
+                status = "ERR 34.";
+            } else {
+                int noviRang = trenutniRang + 1;
+                sql = "UPDATE alebenkov_korisnici SET rang='" + noviRang + "' WHERE user = '" + user + "'";
+                sqlUp = statemant.executeUpdate(sql);
+                System.out.println("SERVER | Rang korisnika povecan.");
+                status = "OK 10.";
+            }
+
+        } catch (SQLException ex) {
+            System.out.println("ERROR | Greska u radu s bazom: " + ex.getMessage());
+        } finally {
+            if (rs != null) {
+                try {
+                    rs.close();
+                } catch (SQLException ex) {
+                    System.out.println(ex.getMessage());
+                }
+            }
+            if (statemant != null) {
+                try {
+                    statemant.close();
+                } catch (SQLException ex) {
+                    System.out.println(ex.getMessage());
+                }
+            }
+            if (connection != null) {
+                try {
+                    connection.close();
+                } catch (SQLException ex) {
+                    System.out.println(ex.getMessage());
+                }
+            }
+        }
+        return status;
+    }
+
+    public String smanjiRang(String user) {
+        String status = "";
+        int brojRedaka = 0;
+        int trenutniRang = 0;
+
+        try {
+            connection = DriverManager.getConnection(url, korisnik, lozinka);
+            statemant = connection.createStatement();
+
+            sql = "SELECT * FROM alebenkov_korisnici where user = '" + user + "'";
+            rs = statemant.executeQuery(sql);
+            while (rs.next()) {
+                brojRedaka++; //ovo se moze rjesiti na elegantniji nacin ali ovo mi je trenutno najbrzi (getRow, beforeFirst,..) ali je potrebno podici odredjene zastavice na resultsetu
+                trenutniRang = rs.getInt("rang");
+            }
+            if (trenutniRang == 0) {
+                status = "ERR 35.";
+            } else if (trenutniRang < 2) {
+                status = "ERR 34.";
+            } else {
+                int noviRang = trenutniRang - 1;
+                sql = "UPDATE alebenkov_korisnici SET rang='" + noviRang + "' WHERE user = '" + user + "'";
+                sqlUp = statemant.executeUpdate(sql);
+                System.out.println("SERVER | Rang korisnika smanjen.");
+                status = "OK 10.";
+            }
+
+        } catch (SQLException ex) {
+            System.out.println("ERROR | Greska u radu s bazom: " + ex.getMessage());
+        } finally {
+            if (rs != null) {
+                try {
+                    rs.close();
+                } catch (SQLException ex) {
+                    System.out.println(ex.getMessage());
+                }
+            }
+            if (statemant != null) {
+                try {
+                    statemant.close();
+                } catch (SQLException ex) {
+                    System.out.println(ex.getMessage());
+                }
+            }
+            if (connection != null) {
+                try {
+                    connection.close();
+                } catch (SQLException ex) {
+                    System.out.println(ex.getMessage());
+                }
+            }
+        }
+
+        return status;
+    }
+    
+    public int[] statistikaKorisnika(){
+        
+        int[] statistika = {0,0,0};
+
+        try {
+            connection = DriverManager.getConnection(url, korisnik, lozinka);
+            statemant = connection.createStatement();
+
+            sql = "SELECT * FROM alebenkov_korisnici";
+            rs = statemant.executeQuery(sql);
+            while (rs.next()) {
+                statistika[0]++;
+                if(rs.getInt("role")==1){
+                    statistika[1]++;
+                }else{
+                    statistika[2]++;
+                }
+            }
+
+        } catch (SQLException ex) {
+            System.out.println("ERROR | Greska u radu s bazom: " + ex.getMessage());
+        } finally {
+            if (rs != null) {
+                try {
+                    rs.close();
+                } catch (SQLException ex) {
+                    System.out.println(ex.getMessage());
+                }
+            }
+            if (statemant != null) {
+                try {
+                    statemant.close();
+                } catch (SQLException ex) {
+                    System.out.println(ex.getMessage());
+                }
+            }
+            if (connection != null) {
+                try {
+                    connection.close();
+                } catch (SQLException ex) {
+                    System.out.println(ex.getMessage());
+                }
+            }
+        }
+
+        return statistika;
+        
+    }
+
+    
 
 }
