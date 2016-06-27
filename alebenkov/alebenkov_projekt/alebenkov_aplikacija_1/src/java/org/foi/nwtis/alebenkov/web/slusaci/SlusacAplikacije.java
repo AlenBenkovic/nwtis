@@ -22,6 +22,7 @@ import org.foi.nwtis.alebenkov.web.server.ServerSustava;
  */
 public class SlusacAplikacije implements ServletContextListener {
     private ServerSustava server = null;
+    static private BP_konfiguracija bpConfig = null;
     
 
     @Override
@@ -31,12 +32,12 @@ public class SlusacAplikacije implements ServletContextListener {
         String konfiguracija = context.getInitParameter("konfiguracija");
         String putanje = context.getRealPath("/WEB-INF") + File.separator;
 
-        BP_konfiguracija bpConfig = null;//konfiguracijski podaci za bp
+        //konfiguracijski podaci za bp
         Konfiguracija serverConfig = null;//ostali konfiguracijski podaci vezani uz rad servera
         
         try {
             bpConfig = new BP_konfiguracija(putanje + konfiguracija);
-            context.setAttribute("bpConfig", bpConfig);
+            //context.setAttribute("bpConfig", bpConfig);
             serverConfig = KonfiguracijaApstraktna.preuzmiKonfiguraciju(putanje + konfiguracija);
             context.setAttribute("serverConfig", serverConfig);
             System.out.println("Konfiguracija ucitana.");
@@ -60,6 +61,12 @@ public class SlusacAplikacije implements ServletContextListener {
         }
         
     }
+
+    public static BP_konfiguracija getBpConfig() {
+        return bpConfig;
+    }
+    
+    
     
     
 }

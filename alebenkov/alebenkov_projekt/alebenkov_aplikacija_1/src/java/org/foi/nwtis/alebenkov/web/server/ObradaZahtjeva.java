@@ -79,63 +79,81 @@ public class ObradaZahtjeva extends Thread {
                     String user = rx.group(1);
                     String pass = rx.group(2);
                     //TODO RADI PROVJERU IZ BAZE, neka vraca 1-admin, 2-user
-                    int vrstaKorisnika = 1; //ovdje ce funkcija iz bp vratiti 1 ili 2
+                    DBOps dbOp = new DBOps();
+                    int vrstaKorisnika = dbOp.provjeraKorisnika(user, pass);
                     out.write("Dobrodosao, " + user + ".\n");
-                    if (vrstaKorisnika == 1) {
-                        //OBRADA ADMIN ZAHTJEVA
-                        System.out.println("SERVER | Obrada admin zahtjeva.");
-                        Matcher ax = provjeraRegex(naredba, 1);
-                        if (ax == null) {
-                            out.write("SERVER | ERROR: Neispravni format naredbe.\n");
-                        } else if (ax.group(4).contains("PAUSE")) {
-                            System.out.println("PAUSE");
-                            //TODO pozovi metodu
-                        } else if (ax.group(4).contains("START")) {
-                            System.out.println("START");
-                            //TODO pozovi metodu
-                        } else if (ax.group(4).contains("STOP")) {
-                            System.out.println("STOP");
-                            //TODO pozovi metodu
-                        } else if (ax.group(4).contains("STATUS")) {
-                            System.out.println("STATUS");
-                            //TODO pozovi metodu
-                        } else if (ax.group(4).contains("ADD")) {
-                            String newUser = ax.group(5);
-                            String newPass = ax.group(6);
-                            String newRole = ax.group(7);
-                            System.out.println("ADD " + newUser + newPass + newRole);
-                            //TODO pozovi metodu
-                        } else if (ax.group(8).contains("UP")) {
-                            //korisnik u  ax.group(9)
-                            System.out.println("UP " + ax.group(9));
-                            //TODO pozovi metodu
-                        } else if (ax.group(8).contains("DOWN")) {
-                            System.out.println("DOWN " + ax.group(9));
-                            //TODO pozovi metodu
-                        }
+                    switch (vrstaKorisnika) {
+                        case 0:
+                            out.write("ERR 20");
+                            break;
+                        case 1:
+                            //OBRADA ADMIN ZAHTJEVA
+                            System.out.println("SERVER | Obrada admin zahtjeva.");
 
-                        //KRAJ OBRADE ADMIN ZAHTJEVA
-                    } else if (vrstaKorisnika == 2) {
-                        //OBRADA USER ZAHTJEVA
-                        System.out.println("SERVER | Obrada korisnickog zahtjeva.");
-                        Matcher ux = provjeraRegex(naredba, 2);
-                        //grupa 5-test, 6-get, 7-add
-                        if (ux == null) {
-                            out.write("SERVER | ERROR: Neispravni format naredbe.\n");
-                        } else if (ux.group(5) != null) {
-                            System.out.println("TEST: " + ux.group(5));
-                            //TODO pozovi metodu
-                        } else if (ux.group(6) != null) {
-                            System.out.println("GET: " + ux.group(6));
-                            //TODO pozovi metodu
-                        } else if (ux.group(7) != null) {
-                            System.out.println("ADD: " + ux.group(7));
-                            //TODO pozovi metodu
-                        }
+                            if (rx.group(3).trim().isEmpty()) {//ako su uneseni samo podaci za prijavu
+                                out.write("OK 10.");
+                            } else {
+                                Matcher ax = provjeraRegex(naredba, 1);
 
-                        //KRAJ OBRADE USER ZAHTJEVA
-                    } else {
+                                if (ax == null) {
+                                    out.write("ERR 21.\n");
+                                } else if (ax.group(3).contains("PAUSE")) {
+                                    System.out.println("PAUSE");
+                                    //TODO pozovi metodu
+                                } else if (ax.group(3).contains("START")) {
+                                    System.out.println("START");
+                                    //TODO pozovi metodu
+                                } else if (ax.group(3).contains("STOP")) {
+                                    System.out.println("STOP");
+                                    //TODO pozovi metodu
+                                } else if (ax.group(3).contains("STATUS")) {
+                                    System.out.println("STATUS");
+                                    //TODO pozovi metodu
+                                } else if (ax.group(3).contains("ADD")) {
+                                    String newUser = ax.group(4);
+                                    String newPass = ax.group(5);
+                                    String newRole = ax.group(6);
+                                    System.out.println("ADD " + newUser + newPass + newRole);
+                                    //TODO pozovi metodu
+                                } else if (ax.group(7).contains("UP")) {
+                                    //korisnik u  ax.group(8)
+                                    System.out.println("UP " + ax.group(8));
+                                    //TODO pozovi metodu
+                                } else if (ax.group(7).contains("DOWN")) {
+                                    System.out.println("DOWN " + ax.group(8));
+                                    //TODO pozovi metodu
+                                }
 
+                            }
+
+                            //KRAJ OBRADE ADMIN ZAHTJEVA
+                            break;
+                        case 2:
+                            //OBRADA USER ZAHTJEVA
+                            System.out.println("SERVER | Obrada korisnickog zahtjeva.");
+
+                            if (rx.group(3).trim().isEmpty()) {//ako su uneseni samo podaci za prijavu
+                                out.write("OK 10.");
+                            } else {
+                                Matcher ux = provjeraRegex(naredba, 2);
+                                //grupa 5-test, 6-get, 7-add
+                                if (ux == null) {
+                                    out.write("ERR 21.\n");
+                                } else if (ux.group(4) != null) {
+                                    System.out.println("TEST: " + ux.group(4));
+                                    //TODO pozovi metodu
+                                } else if (ux.group(5) != null) {
+                                    System.out.println("GET: " + ux.group(5));
+                                    //TODO pozovi metodu
+                                } else if (ux.group(6) != null) {
+                                    System.out.println("ADD: " + ux.group(6));
+                                    //TODO pozovi metodu
+                                }
+                            }
+                            //KRAJ OBRADE USER ZAHTJEVA
+                            break;
+                        default:
+                            break;
                     }
                 }
                 //KRAJ OBRADE DOBIVENE NAREDBE
@@ -204,11 +222,11 @@ public class ObradaZahtjeva extends Thread {
     public Matcher provjeraRegex(StringBuilder p, int i) {
         String regex = null;
         if (i == 0) {
-            regex = "^USER ([a-zA-Z0-9_]+)\\; PASSWD ([a-zA-Z0-9_]+)\\;(?:.*) *$";
+            regex = "^USER ([a-zA-Z0-9_]+)\\; PASSWD ([a-zA-Z0-9_]+)\\;((?:.*)) *$";
         } else if (i == 1) {
-            regex = "^USER ([a-zA-Z0-9_]+)\\; PASSWD ([a-zA-Z0-9_]+)\\;( (PAUSE|START|STOP|STATUS|ADD ([a-zA-Z0-9_]+)\\; PASSWD ([a-zA-Z0-9_]+)\\; ROLE (ADMIN|USER)|(UP|DOWN) ([a-zA-Z0-9_]+))\\;)? *$";
+            regex = "^USER ([a-zA-Z0-9_]+)\\; PASSWD ([a-zA-Z0-9_]+)\\; (PAUSE|START|STOP|STATUS|ADD ([a-zA-Z0-9_]+)\\; PASSWD ([a-zA-Z0-9_]+)\\; ROLE (ADMIN|USER)|(UP|DOWN) ([a-zA-Z0-9_]+))\\; *$";
         } else if (i == 2) {
-            regex = "^USER ([a-zA-Z0-9_]+)\\; PASSWD ([a-zA-Z0-9_]+)\\;( (TEST \"([^\\\\\\\\s]+)\"|GET \"([^\\\\\\\\s]+)\"|ADD \"([^\\\\\\\\s]+)\")\\;)? *$"; //za usera
+            regex = "^USER ([a-zA-Z0-9_]+)\\; PASSWD ([a-zA-Z0-9_]+)\\; (TEST \"((?:.*))\"|GET \"((?:.*))\"|ADD \"((?:.*))\")\\; *$"; //za usera
         }
 
         Pattern pattern = Pattern.compile(regex);
