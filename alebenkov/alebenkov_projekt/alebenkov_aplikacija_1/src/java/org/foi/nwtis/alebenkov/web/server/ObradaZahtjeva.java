@@ -12,6 +12,7 @@ import java.net.Socket;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import org.foi.nwtis.alebenkov.konfiguracije.Konfiguracija;
+import org.foi.nwtis.alebenkov.web.slusaci.SlusacAplikacije;
 
 /**
  *
@@ -22,10 +23,13 @@ public class ObradaZahtjeva extends Thread {
     private Socket server;
     private int stanjeDretve = 0; //0-slobodna, 1-zauzeta
     private int brojacRada = 0; //brojim koliko je puta dretva posluzila klijenta
-    Konfiguracija konfig = null;
-    InputStream in = null;
-    OutputStreamWriter out = null;
+    private Konfiguracija konfig = null;
+    private InputStream in = null;
+    private OutputStreamWriter out = null;
     private boolean radi = true;
+    private PozadinskoPreuzimanje pozadinskaDretva = null;
+
+   
 
     public ObradaZahtjeva(ThreadGroup group, String name, Konfiguracija konfig) {
         super(group, name);
@@ -41,6 +45,7 @@ public class ObradaZahtjeva extends Thread {
 
     @Override
     public void run() {
+        pozadinskaDretva = SlusacAplikacije.getPozadinskaDretva();
         while (radi) {
             this.pokreni();
         }
@@ -98,17 +103,37 @@ public class ObradaZahtjeva extends Thread {
                                 if (ax == null) {
                                     out.write("ERR 21.\n");
                                 } else if (ax.group(3).contains("PAUSE")) {
-                                    System.out.println("PAUSE");
-                                    //TODO pozovi metodu
+                                    if (!pozadinskaDretva.isDretvaPreuzima()) {
+                                        out.write("ERR 30.");
+                                    } else {
+                                        pozadinskaDretva.setDretvaPreuzima(false);
+                                        out.write("OK 10.");
+                                    }
+
                                 } else if (ax.group(3).contains("START")) {
-                                    System.out.println("START");
-                                    //TODO pozovi metodu
+                                    if (pozadinskaDretva.isDretvaPreuzima()) {
+                                        out.write("ERR 31.");
+                                    } else {
+                                        pozadinskaDretva.setDretvaPreuzima(true);
+                                        out.write("OK 10.");
+                                    }
+
                                 } else if (ax.group(3).contains("STOP")) {
-                                    System.out.println("STOP");
-                                    //TODO pozovi metodu
+                                    if (!pozadinskaDretva.isDretvaRadi()) {
+                                        out.write("ERR 32.");
+                                    } else {
+                                        pozadinskaDretva.setDretvaRadi(false);
+                                        out.write("OK 10.");
+                                    }
+
                                 } else if (ax.group(3).contains("STATUS")) {
-                                    System.out.println("STATUS");
-                                    //TODO pozovi metodu
+                                    if(pozadinskaDretva.isDretvaRadi() && pozadinskaDretva.isDretvaPreuzima()){
+                                        out.write("OK 01.");
+                                    } else if(pozadinskaDretva.isDretvaRadi() && !pozadinskaDretva.isDretvaPreuzima()){
+                                        out.write("OK 00.");
+                                    } else {
+                                        out.write("OK 02.");
+                                    }
                                 } else if (ax.group(3).contains("ADD")) {
                                     String newUser = ax.group(4);
                                     String newPass = ax.group(5);
@@ -130,26 +155,32 @@ public class ObradaZahtjeva extends Thread {
                             break;
                         case 2:
                             //OBRADA USER ZAHTJEVA
-                            System.out.println("SERVER | Obrada korisnickog zahtjeva.");
-
-                            if (rx.group(3).trim().isEmpty()) {//ako su uneseni samo podaci za prijavu
-                                out.write("OK 10.");
+                            if (!pozadinskaDretva.isDretvaRadi()) { //ako pozadinska ne radi, znaci da se nove naredbe ne primaju
+                                out.write("Server ne prima nove naredbe.");
                             } else {
-                                Matcher ux = provjeraRegex(naredba, 2);
-                                //grupa 5-test, 6-get, 7-add
-                                if (ux == null) {
-                                    out.write("ERR 21.\n");
-                                } else if (ux.group(4) != null) {
-                                    System.out.println("TEST: " + ux.group(4));
-                                    //TODO pozovi metodu
-                                } else if (ux.group(5) != null) {
-                                    System.out.println("GET: " + ux.group(5));
-                                    //TODO pozovi metodu
-                                } else if (ux.group(6) != null) {
-                                    System.out.println("ADD: " + ux.group(6));
-                                    //TODO pozovi metodu
+                                System.out.println("SERVER | Obrada korisnickog zahtjeva.");
+
+                                if (rx.group(3).trim().isEmpty()) {//ako su uneseni samo podaci za prijavu
+                                    out.write("OK 10.");
+                                } else {
+                                    Matcher ux = provjeraRegex(naredba, 2);
+                                    //grupa 5-test, 6-get, 7-add
+                                    if (ux == null) {
+                                        out.write("ERR 21.\n");
+                                    } else if (ux.group(4) != null) {
+                                        System.out.println("TEST: " + ux.group(4));
+                                        //TODO pozovi metodu
+                                    } else if (ux.group(5) != null) {
+                                        System.out.println("GET: " + ux.group(5));
+                                        //TODO pozovi metodu
+                                    } else if (ux.group(6) != null) {
+                                        System.out.println("ADD: " + ux.group(6));
+                                        //TODO pozovi metodu
+                                    }
                                 }
+
                             }
+
                             //KRAJ OBRADE USER ZAHTJEVA
                             break;
                         default:

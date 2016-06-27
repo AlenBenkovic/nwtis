@@ -13,6 +13,7 @@ import org.foi.nwtis.alebenkov.konfiguracije.Konfiguracija;
 import org.foi.nwtis.alebenkov.konfiguracije.KonfiguracijaApstraktna;
 import org.foi.nwtis.alebenkov.konfiguracije.NemaKonfiguracije;
 import org.foi.nwtis.alebenkov.konfiguracije.bp.BP_konfiguracija;
+import org.foi.nwtis.alebenkov.web.server.PozadinskoPreuzimanje;
 import org.foi.nwtis.alebenkov.web.server.ServerSustava;
 
 /**
@@ -22,6 +23,7 @@ import org.foi.nwtis.alebenkov.web.server.ServerSustava;
  */
 public class SlusacAplikacije implements ServletContextListener {
     private ServerSustava server = null;
+    static private PozadinskoPreuzimanje pozadinskaDretva = null;
     static private BP_konfiguracija bpConfig = null;
     
 
@@ -49,6 +51,9 @@ public class SlusacAplikacije implements ServletContextListener {
             System.out.println("Kreiram server");
             server = new ServerSustava(context);
             server.start();
+            pozadinskaDretva = new PozadinskoPreuzimanje();
+            pozadinskaDretva.start();
+            
         }
 
     }
@@ -59,12 +64,21 @@ public class SlusacAplikacije implements ServletContextListener {
         if(server.isAlive()){
             server.interrupt();
         }
+        if(pozadinskaDretva.isAlive()){
+            pozadinskaDretva.interrupt();
+        }
         
     }
 
     public static BP_konfiguracija getBpConfig() {
         return bpConfig;
     }
+
+    public static PozadinskoPreuzimanje getPozadinskaDretva() {
+        return pozadinskaDretva;
+    }
+
+    
     
     
     
