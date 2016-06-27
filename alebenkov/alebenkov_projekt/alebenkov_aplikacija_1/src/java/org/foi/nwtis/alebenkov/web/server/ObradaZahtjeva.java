@@ -80,9 +80,9 @@ public class ObradaZahtjeva extends Thread {
                     String pass = rx.group(2);
                     //TODO RADI PROVJERU IZ BAZE, neka vraca 1-admin, 2-user
                     DBOps dbOp = new DBOps();
-                    int vrstaKorisnika = dbOp.provjeraKorisnika(user, pass);
-                    out.write("Dobrodosao, " + user + ".\n");
-                    switch (vrstaKorisnika) {
+                    int[] vrstaKorisnika = dbOp.provjeraKorisnika(user, pass);
+                    System.out.println("SERVER | [Vrsta korisnika: " + vrstaKorisnika[0] + "]  [Rang korisnika: " + vrstaKorisnika[1] + "]");
+                    switch (vrstaKorisnika[0]) {
                         case 0:
                             out.write("ERR 20");
                             break;

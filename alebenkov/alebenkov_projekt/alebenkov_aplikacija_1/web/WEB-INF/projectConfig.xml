@@ -6,8 +6,8 @@
 <entry key="admin.username">nwtis_g0</entry>
 <entry key="admin.password">g0_nwtis</entry>
 <entry key="admin.database">nwtis_g0</entry>
-<entry key="user.username">nwtis_g0</entry>
-<entry key="user.password">g0_nwtis</entry>
+<entry key="user.username">nwtis_alebenkov</entry>
+<entry key="user.password">alebenkov_nwtis</entry>
 <entry key="user.database">nwtis_alebenkov_bp_1</entry>
 <entry key="driver.database.odbc">sun.jdbc.odbc.JdbcOdbcDriver</entry>
 <entry key="driver.database.mysql">com.mysql.jdbc.Driver</entry>
