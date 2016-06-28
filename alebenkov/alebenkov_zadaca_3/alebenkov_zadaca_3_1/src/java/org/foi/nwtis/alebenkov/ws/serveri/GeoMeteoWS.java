@@ -46,6 +46,7 @@ public class GeoMeteoWS {
         Lokacija lokacija = gmk.getGeoLocation(adresa);
         Adresa a = new Adresa(brojac++, adresa, lokacija);
 
+        
         return a;
     }
 

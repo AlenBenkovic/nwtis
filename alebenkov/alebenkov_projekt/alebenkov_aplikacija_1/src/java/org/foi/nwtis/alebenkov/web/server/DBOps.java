@@ -566,6 +566,50 @@ public class DBOps {
         }
         return adrese;
     }
+    
+    public List<Adresa> adreseKorisnika(String user) {
+        List<Adresa> adrese = new ArrayList<>();
+
+        try {
+            connection = DriverManager.getConnection(url, korisnik, lozinka);
+            statemant = connection.createStatement();
+
+             sql = "SELECT * FROM alebenkov_adrese where kreirao = '" + user + "'";
+            rs = statemant.executeQuery(sql);
+            while (rs.next()) {
+                Lokacija l = new Lokacija(rs.getString("latitude"), rs.getString("longitude"));
+                Adresa a = new Adresa(rs.getInt("id"), rs.getString("adresa"), l);
+                adrese.add(a);
+            }
+
+        } catch (SQLException ex) {
+            System.out.println("ERROR | Greska u radu s bazom: " + ex.getMessage());
+        } finally {
+            if (rs != null) {
+                try {
+                    rs.close();
+                } catch (SQLException ex) {
+                    System.out.println(ex.getMessage());
+                }
+            }
+            if (statemant != null) {
+                try {
+                    statemant.close();
+                } catch (SQLException ex) {
+                    System.out.println(ex.getMessage());
+                }
+            }
+
+            if (connection != null) {
+                try {
+                    connection.close();
+                } catch (SQLException ex) {
+                    System.out.println(ex.getMessage());
+                }
+            }
+        }
+        return adrese;
+    }
 
     public boolean spremiMeteo(Adresa a, MeteoPodaci mp) {
         String adresaStanice = mp.getCountry() + ", " + mp.getName();
@@ -676,6 +720,57 @@ public class DBOps {
             }
         }
         return false;
+    }
+    
+    public MeteoPodaci zadnjiMeteoPodaci(String adresa) {
+        MeteoPodaci mp = new MeteoPodaci();
+        sql = "select * from alebenkov_meteo as m, alebenkov_adrese as a where m.IDADRESA = a.id and a.ADRESA = '" + adresa + "' ORDER BY idMeteo DESC LIMIT 1";
+
+        try {
+            connection = DriverManager.getConnection(url, korisnik, lozinka);
+            statemant = connection.createStatement();
+
+            rs = statemant.executeQuery(sql);
+            while (rs.next()) {
+                mp.setWeatherMain(rs.getString("vrijeme"));
+                mp.setWeatherValue(rs.getString("vrijemeOpis"));
+                mp.setTemperatureValue(rs.getFloat("temp"));
+                mp.setTemperatureMin(rs.getFloat("tempMin"));
+                mp.setTemperatureMax(rs.getFloat("tempMax"));
+                mp.setHumidityValue(rs.getFloat("vlaga"));
+                mp.setPressureValue(rs.getFloat("tlak"));
+                mp.setWindSpeedValue(rs.getFloat("vjetar"));
+                mp.setWindDirectionValue(rs.getFloat("vjetarSmjer"));
+                mp.setLastUpdate(rs.getTimestamp("preuzeto"));
+            }
+
+        } catch (SQLException ex) {
+            System.out.println("ERROR | Greska u radu s bazom: " + ex.getMessage());
+        } finally {
+            if (rs != null) {
+                try {
+                    rs.close();
+                } catch (SQLException ex) {
+                    System.out.println(ex.getMessage());
+                }
+            }
+            if (statemant != null) {
+                try {
+                    statemant.close();
+                } catch (SQLException ex) {
+                    System.out.println(ex.getMessage());
+                }
+            }
+
+            if (connection != null) {
+                try {
+                    connection.close();
+                } catch (SQLException ex) {
+                    System.out.println(ex.getMessage());
+                }
+            }
+        }
+        return mp;
     }
 
 }
