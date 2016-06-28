@@ -10,10 +10,11 @@ import java.sql.DriverManager;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
-import java.text.DecimalFormat;
 import java.text.SimpleDateFormat;
 import org.foi.nwtis.alebenkov.konfiguracije.Konfiguracija;
 import org.foi.nwtis.alebenkov.konfiguracije.bp.BP_konfiguracija;
+import org.foi.nwtis.alebenkov.rest.klijenti.GMKlijent;
+import org.foi.nwtis.alebenkov.web.podaci.Lokacija;
 import org.foi.nwtis.alebenkov.web.slusaci.SlusacAplikacije;
 
 /**
@@ -37,7 +38,7 @@ public class DBOps {
     public DBOps() {
         this.bpConfig = SlusacAplikacije.getBpConfig();
         this.konfig = SlusacAplikacije.getServerConfig();
-        this.url = bpConfig.getServerDatabase() + bpConfig.getUserDatabase();
+        this.url = bpConfig.getServerDatabase() + bpConfig.getUserDatabase()+"?useUnicode=true&characterEncoding=utf-8";
         this.korisnik = bpConfig.getUserUsername();
         this.lozinka = bpConfig.getUserPassword();
 
@@ -378,11 +379,11 @@ public class DBOps {
             while (rs.next()) {
                 brojUpita++;
             }
-            
+
             System.out.println("BROJ UPITA: " + brojUpita + " KVOTA: " + kvota + " GRANICA: " + granica);
-            
+
             //ukoliko nije nadmasio kvotu saljem true
-            if(brojUpita<kvota){
+            if (brojUpita < kvota) {
                 return true;
             }
 
@@ -412,6 +413,109 @@ public class DBOps {
             }
         }
 
+        return false;
+    }
+
+    public boolean dodajAdresu(String adresa, String kreirao) {
+
+        int brojRedaka = 0;
+
+        try {
+            connection = DriverManager.getConnection(url, korisnik, lozinka);
+            statemant = connection.createStatement();
+
+            sql = "SELECT * FROM alebenkov_adrese where adresa = '" + adresa + "'";
+            rs = statemant.executeQuery(sql);
+            while (rs.next()) {
+                brojRedaka++; //ovo se moze rjesiti na elegantniji nacin ali ovo mi je trenutno najbrzi (getRow, beforeFirst,..) ali je potrebno podici odredjene zastavice na resultsetu
+            }
+
+            if (brojRedaka == 0) {
+
+                GMKlijent gmk = new GMKlijent();
+                Lokacija lokacija;
+                lokacija = gmk.getGeoLocation(adresa);
+
+                sql = "INSERT INTO alebenkov_adrese(adresa, latitude, longitude, kreirao) VALUES ('" + adresa + "','" + lokacija.getLatitude() + "','" + lokacija.getLongitude() + "','" + kreirao + "')";
+                sqlExe = statemant.execute(sql);
+                System.out.println("|| Adresa spremljena u bazu.");
+                return true;
+
+            }
+
+        } catch (SQLException ex) {
+            System.out.println("ERROR | Greska u radu s bazom: " + ex.getMessage());
+        } finally {
+            if (rs != null) {
+                try {
+                    rs.close();
+                } catch (SQLException ex) {
+                    System.out.println(ex.getMessage());
+                }
+            }
+            if (statemant != null) {
+                try {
+                    statemant.close();
+                } catch (SQLException ex) {
+                    System.out.println(ex.getMessage());
+                }
+            }
+
+            if (connection != null) {
+                try {
+                    connection.close();
+                } catch (SQLException ex) {
+                    System.out.println(ex.getMessage());
+                }
+            }
+        }
+        return false;
+    }
+    
+    public boolean testirajAdresu(String adresa) {
+
+        int brojRedaka = 0;
+
+        try {
+            connection = DriverManager.getConnection(url, korisnik, lozinka);
+            statemant = connection.createStatement();
+
+            sql = "SELECT * FROM alebenkov_adrese where adresa = '" + adresa + "'";
+            rs = statemant.executeQuery(sql);
+            while (rs.next()) {
+                brojRedaka++; //ovo se moze rjesiti na elegantniji nacin ali ovo mi je trenutno najbrzi (getRow, beforeFirst,..) ali je potrebno podici odredjene zastavice na resultsetu
+            }
+
+            if (brojRedaka > 0) {
+                return true;
+            }
+
+        } catch (SQLException ex) {
+            System.out.println("ERROR | Greska u radu s bazom: " + ex.getMessage());
+        } finally {
+            if (rs != null) {
+                try {
+                    rs.close();
+                } catch (SQLException ex) {
+                    System.out.println(ex.getMessage());
+                }
+            }
+            if (statemant != null) {
+                try {
+                    statemant.close();
+                } catch (SQLException ex) {
+                    System.out.println(ex.getMessage());
+                }
+            }
+
+            if (connection != null) {
+                try {
+                    connection.close();
+                } catch (SQLException ex) {
+                    System.out.println(ex.getMessage());
+                }
+            }
+        }
         return false;
     }
 

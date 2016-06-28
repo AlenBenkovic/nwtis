@@ -5,9 +5,12 @@
  */
 package org.foi.nwtis.alebenkov.web.server;
 
+import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
+import java.io.UnsupportedEncodingException;
 import java.net.Socket;
 import java.text.SimpleDateFormat;
 import java.util.regex.Matcher;
@@ -25,7 +28,7 @@ public class ObradaZahtjeva extends Thread {
     private int stanjeDretve = 0; //0-slobodna, 1-zauzeta
     private int brojacRada = 0; //brojim koliko je puta dretva posluzila klijenta
     private Konfiguracija konfig = null;
-    private InputStream in = null;
+    private BufferedReader in = null;
     private OutputStreamWriter out = null;
     private boolean radi = true;
     private PozadinskoPreuzimanje pozadinskaDretva = null;
@@ -57,20 +60,15 @@ public class ObradaZahtjeva extends Thread {
         long pocetakRadaDretve = System.currentTimeMillis(); //biljezim pocetak rada dretve
         System.out.println(this.getName() + " | Brojac rada: " + this.brojacRada + ". | Stanje dretve: " + this.getState());
         //POCETAK GLAVNE LOGIKE
-        StringBuilder naredba = null;
+        String naredba = "";
         int c;
 
         try {
-            in = server.getInputStream();
+            in = new BufferedReader(new InputStreamReader(server.getInputStream(), "UTF-8"));
             out = new OutputStreamWriter(server.getOutputStream());
-            naredba = new StringBuilder();
+            naredba = in.readLine();
 
-            //uzimam naredbu sa input streama
-            while ((c = in.read()) != -1) {
-                naredba.append((char) c);
-            }
-
-            if (naredba.toString().isEmpty()) {//ukoliko kojim slucajem nisam primio naredbu..
+            if (naredba.isEmpty()) {//ukoliko kojim slucajem nisam primio naredbu..
                 out.write("SERVER | ERROR: Nisam zaprimio nikakvu naredbu.\n");
             } else {
                 //OBRADA DOBIVENE NAREDBE
@@ -180,7 +178,7 @@ public class ObradaZahtjeva extends Thread {
                                     out.write(odg);
                                 } else if (ax.group(7).contains("DOWN")) {
                                     String odg = dbOp.smanjiRang(ax.group(8));
-                                    dbOp.dnevnik(user, naredba.toString(), odg);
+                                    dbOp.dnevnik(user, naredba, odg);
                                     out.write(odg);
                                 }
 
@@ -193,26 +191,38 @@ public class ObradaZahtjeva extends Thread {
                             if (!pozadinskaDretva.isDretvaRadi()) { //ako pozadinska ne radi, znaci da se nove naredbe ne primaju
                                 out.write("Server ne prima nove naredbe.");
                             } else if (!dbOp.provjeraKvote(user)) {
+                                dbOp.dnevnik(user, naredba, "ERR 40");
                                 out.write("ERR 40");
                             } else {
                                 System.out.println("SERVER | Obrada korisnickog zahtjeva.");
                                 if (rx.group(3).trim().isEmpty()) {//ako su uneseni samo podaci za prijavu
-                                    dbOp.dnevnik(user, naredba.toString(), "OK 10");
+                                    dbOp.dnevnik(user, naredba, "OK 10");
                                     out.write("OK 10.");
                                 } else {
                                     Matcher ux = provjeraRegex(naredba, 2);
-                                    //grupa 5-test, 6-get, 7-add
+                                    //grupa 4 -test, 5-get, 6-add
                                     if (ux == null) {
                                         out.write("ERR 21.\n");
                                     } else if (ux.group(4) != null) {
-                                        System.out.println("TEST: " + ux.group(4));
-                                        //TODO pozovi metodu
+                                        if (dbOp.testirajAdresu(ux.group(4))) {
+                                            dbOp.dnevnik(user, naredba, "OK 10");
+                                            out.write("OK 10.");
+                                        } else {
+                                            dbOp.dnevnik(user, naredba, "ERR 42");
+                                            out.write("ERR 42.");
+                                        }
                                     } else if (ux.group(5) != null) {
-                                        System.out.println("GET: " + ux.group(5));
-                                        //TODO pozovi metodu
+                                        dbOp.dnevnik(user, naredba, "OK 10");//prema uputama profesora (moodle)
+                                        out.write("OK 10.");
                                     } else if (ux.group(6) != null) {
-                                        System.out.println("ADD: " + ux.group(6));
-                                        //TODO pozovi metodu
+                                        if (dbOp.dodajAdresu(ux.group(6), user)) {
+                                            dbOp.dnevnik(user, naredba, "OK 10");
+                                            out.write("OK 10.");
+                                        } else {
+                                            dbOp.dnevnik(user, naredba, "ERR 41");
+                                            out.write("ERR 41.");
+                                        }
+
                                     }
                                 }
 
@@ -287,7 +297,7 @@ public class ObradaZahtjeva extends Thread {
         this.radi = radi;
     }
 
-    public Matcher provjeraRegex(StringBuilder p, int i) {
+    public Matcher provjeraRegex(String p, int i) {
         String regex = null;
         if (i == 0) {
             regex = "^USER ([a-zA-Z0-9_]+)\\; PASSWD ([a-zA-Z0-9_]+)\\;((?:.*)) *$";
@@ -306,6 +316,19 @@ public class ObradaZahtjeva extends Thread {
             System.out.println("ERROR | Parametri ne odgovaraju!");
             return null;
         }
+    }
+
+    public void konvertiraj(String original) {
+        try {
+            byte[] utf8Bytes = original.getBytes("UTF8");
+            byte[] defaultBytes = original.getBytes();
+
+            String roundTrip = new String(utf8Bytes, "UTF8");
+            System.out.println("roundTrip = " + roundTrip);
+        } catch (UnsupportedEncodingException e) {
+            e.printStackTrace();
+        }
+
     }
 
 }
