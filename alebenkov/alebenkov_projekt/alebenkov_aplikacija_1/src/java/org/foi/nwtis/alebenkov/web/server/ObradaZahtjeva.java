@@ -95,51 +95,63 @@ public class ObradaZahtjeva extends Thread {
                             System.out.println("SERVER | Obrada admin zahtjeva.");
 
                             if (rx.group(3).trim().isEmpty()) {//ako su uneseni samo podaci za prijavu
+                                dbOp.dnevnik(user, naredba.toString(), "OK 10");
                                 out.write("OK 10.");
                             } else {
                                 Matcher ax = provjeraRegex(naredba, 1);
 
                                 if (ax == null) {
+                                    dbOp.dnevnik(user, naredba.toString(), "ERR 21");
                                     out.write("ERR 21.\n");
                                 } else if (ax.group(3).contains("PAUSE")) {
                                     if (!pozadinskaDretva.isDretvaPreuzima()) {
+                                        dbOp.dnevnik(user, naredba.toString(), "ERR 30");
                                         out.write("ERR 30.");
                                     } else {
                                         pozadinskaDretva.setDretvaPreuzima(false);
+                                        dbOp.dnevnik(user, naredba.toString(), "OK 10");
                                         out.write("OK 10.");
                                     }
 
                                 } else if (ax.group(3).contains("START")) {
                                     if (pozadinskaDretva.isDretvaPreuzima()) {
+                                        dbOp.dnevnik(user, naredba.toString(), "ERR 31");
                                         out.write("ERR 31.");
                                     } else {
                                         pozadinskaDretva.setDretvaPreuzima(true);
+                                        dbOp.dnevnik(user, naredba.toString(), "OK 10");
                                         out.write("OK 10.");
                                     }
 
                                 } else if (ax.group(3).contains("STOP")) {
                                     if (!pozadinskaDretva.isDretvaRadi()) {
+                                        dbOp.dnevnik(user, naredba.toString(), "ERR 32");
                                         out.write("ERR 32.");
                                     } else {
                                         pozadinskaDretva.setDretvaRadi(false);
+                                        dbOp.dnevnik(user, naredba.toString(), "OK 10");
                                         out.write("OK 10.");
                                     }
 
                                 } else if (ax.group(3).contains("STATUS")) {
                                     if (pozadinskaDretva.isDretvaRadi() && pozadinskaDretva.isDretvaPreuzima()) {
+                                        dbOp.dnevnik(user, naredba.toString(), "OK 01");
                                         out.write("OK 01.");
                                     } else if (pozadinskaDretva.isDretvaRadi() && !pozadinskaDretva.isDretvaPreuzima()) {
+                                        dbOp.dnevnik(user, naredba.toString(), "OK 00");
                                         out.write("OK 00.");
                                     } else {
+                                        dbOp.dnevnik(user, naredba.toString(), "OK 02");
                                         out.write("OK 02.");
                                     }
                                 } else if (ax.group(3).contains("ADD")) {
                                     SimpleDateFormat sdf = new SimpleDateFormat("dd-M-yyyy H:mm:ss");
-                                    long vrijemeZahtjeva = System.currentTimeMillis(); 
+                                    long vrijemeZahtjeva = System.currentTimeMillis();
                                     String newUser = ax.group(4);
                                     String newPass = ax.group(5);
                                     String newRole = ax.group(6);
                                     if (dbOp.dodajKorisnika(newUser, newPass, newRole)) {
+                                        dbOp.dnevnik(user, naredba.toString(), "OK 10");
                                         out.write("OK 10.");
                                         int[] statUser = dbOp.statistikaKorisnika();
                                         SlanjePoruke poruka = new SlanjePoruke();
@@ -156,6 +168,7 @@ public class ObradaZahtjeva extends Thread {
                                         poruka.setTkoSalje(konfig.dajPostavku("mailSalje"));
                                         poruka.saljiPoruku();
                                     } else {
+                                        dbOp.dnevnik(user, naredba.toString(), "ERR 33");
                                         out.write("ERR 33.");
                                     }
                                     System.out.println("ADD " + newUser + newPass + newRole);
@@ -163,9 +176,11 @@ public class ObradaZahtjeva extends Thread {
                                 } else if (ax.group(7).contains("UP")) {
                                     //korisnik u  ax.group(8)
                                     String odg = dbOp.povecajRang(ax.group(8));
+                                    dbOp.dnevnik(user, naredba.toString(), odg);
                                     out.write(odg);
                                 } else if (ax.group(7).contains("DOWN")) {
                                     String odg = dbOp.smanjiRang(ax.group(8));
+                                    dbOp.dnevnik(user, naredba.toString(), odg);
                                     out.write(odg);
                                 }
 
@@ -177,10 +192,12 @@ public class ObradaZahtjeva extends Thread {
                             //OBRADA USER ZAHTJEVA
                             if (!pozadinskaDretva.isDretvaRadi()) { //ako pozadinska ne radi, znaci da se nove naredbe ne primaju
                                 out.write("Server ne prima nove naredbe.");
+                            } else if (!dbOp.provjeraKvote(user)) {
+                                out.write("ERR 40");
                             } else {
                                 System.out.println("SERVER | Obrada korisnickog zahtjeva.");
-
                                 if (rx.group(3).trim().isEmpty()) {//ako su uneseni samo podaci za prijavu
+                                    dbOp.dnevnik(user, naredba.toString(), "OK 10");
                                     out.write("OK 10.");
                                 } else {
                                     Matcher ux = provjeraRegex(naredba, 2);

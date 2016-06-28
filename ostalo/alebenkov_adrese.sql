@@ -3,6 +3,6 @@ CREATE TABLE alebenkov_adrese (
   adresa varchar(255) NOT NULL,
   latitude varchar(25) NOT NULL,
   longitude varchar(25) NOT NULL,
-  kreirao varchar(25) NOT NULL,
+  kreirao varchar(15) NOT NULL,
   PRIMARY KEY (id)
 );

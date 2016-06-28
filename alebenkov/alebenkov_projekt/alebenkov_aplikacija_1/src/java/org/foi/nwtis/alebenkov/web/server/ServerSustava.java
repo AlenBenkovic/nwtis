@@ -130,15 +130,13 @@ public class ServerSustava extends Thread {
         int slobodnaDretvaID = -1;
         int najmanjiBrojac = 9999;
         //radim posebnu petlju za ispis stanja dretvi kako bi izbjegao komplikacije kod samog izbora
-        for (int i = 0; i < dretve.length; i++) {
-            if (dretve[i].stanjeDretve() == 0) {
-
-                System.out.println("SERVER | Dretva " + dretve[i].getName() + " je slobodna.");
-
-            } else if (dretve[i].stanjeDretve() == 1) {
-                System.out.println("SERVER | Dretva " + dretve[i].getName() + " je zauzeta.");
-            }
-        }
+//        for (int i = 0; i < dretve.length; i++) {
+//            if (dretve[i].stanjeDretve() == 0) {
+//                System.out.println("SERVER | Dretva " + dretve[i].getName() + " je slobodna.");
+//            } else if (dretve[i].stanjeDretve() == 1) {
+//                System.out.println("SERVER | Dretva " + dretve[i].getName() + " je zauzeta.");
+//            }
+//        }
         for (int i = 0; i < dretve.length; i++) {
             if (dretve[i].stanjeDretve() == 0 & dretve[i].brojacRada() == 0) {
                 slobodnaDretvaID = i;

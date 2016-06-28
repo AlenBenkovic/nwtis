@@ -22,10 +22,11 @@ import org.foi.nwtis.alebenkov.web.server.ServerSustava;
  * @author abenkovic
  */
 public class SlusacAplikacije implements ServletContextListener {
+
     private ServerSustava server = null;
     static private PozadinskoPreuzimanje pozadinskaDretva = null;
-    static private BP_konfiguracija bpConfig = null;
-    
+    static private BP_konfiguracija bpConfig = null;//konfiguracijski podaci za bp
+    static private Konfiguracija serverConfig = null;//ostali konfiguracijski podaci vezani uz rad servera
 
     @Override
     public void contextInitialized(ServletContextEvent sce) {
@@ -34,8 +35,6 @@ public class SlusacAplikacije implements ServletContextListener {
         String konfiguracija = context.getInitParameter("konfiguracija");
         String putanje = context.getRealPath("/WEB-INF") + File.separator;
 
-        //konfiguracijski podaci za bp
-        Konfiguracija serverConfig = null;//ostali konfiguracijski podaci vezani uz rad servera
         
         try {
             bpConfig = new BP_konfiguracija(putanje + konfiguracija);
@@ -46,14 +45,14 @@ public class SlusacAplikacije implements ServletContextListener {
         } catch (NemaKonfiguracije ex) {
             System.out.println("Greska prilikom preuzimanja konfiguracije. " + ex.getMessage());
         }
-        
-        if(bpConfig.getStatus()){
+
+        if (bpConfig.getStatus()) {
             System.out.println("Kreiram server");
             server = new ServerSustava(context);
             server.start();
             pozadinskaDretva = new PozadinskoPreuzimanje();
             pozadinskaDretva.start();
-            
+
         }
 
     }
@@ -61,13 +60,13 @@ public class SlusacAplikacije implements ServletContextListener {
     @Override
     public void contextDestroyed(ServletContextEvent sce) {
         System.out.println("Gasim alebenkov_aplikacija_1");
-        if(server.isAlive()){
+        if (server.isAlive()) {
             server.interrupt();
         }
-        if(pozadinskaDretva.isAlive()){
+        if (pozadinskaDretva.isAlive()) {
             pozadinskaDretva.interrupt();
         }
-        
+
     }
 
     public static BP_konfiguracija getBpConfig() {
@@ -78,9 +77,9 @@ public class SlusacAplikacije implements ServletContextListener {
         return pozadinskaDretva;
     }
 
-    
-    
-    
-    
+    public static Konfiguracija getServerConfig() {
+        return serverConfig;
+    }
+
     
 }

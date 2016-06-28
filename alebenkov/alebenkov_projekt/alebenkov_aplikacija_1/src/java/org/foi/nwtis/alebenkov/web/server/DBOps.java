@@ -11,6 +11,8 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.text.DecimalFormat;
+import java.text.SimpleDateFormat;
+import org.foi.nwtis.alebenkov.konfiguracije.Konfiguracija;
 import org.foi.nwtis.alebenkov.konfiguracije.bp.BP_konfiguracija;
 import org.foi.nwtis.alebenkov.web.slusaci.SlusacAplikacije;
 
@@ -21,6 +23,7 @@ import org.foi.nwtis.alebenkov.web.slusaci.SlusacAplikacije;
 public class DBOps {
 
     private BP_konfiguracija bpConfig = null;
+    private Konfiguracija konfig = null;
     private String url = null;
     private String korisnik = null;
     private String lozinka = null;
@@ -33,6 +36,7 @@ public class DBOps {
 
     public DBOps() {
         this.bpConfig = SlusacAplikacije.getBpConfig();
+        this.konfig = SlusacAplikacije.getServerConfig();
         this.url = bpConfig.getServerDatabase() + bpConfig.getUserDatabase();
         this.korisnik = bpConfig.getUserUsername();
         this.lozinka = bpConfig.getUserPassword();
@@ -157,15 +161,15 @@ public class DBOps {
                 trenutniRang = rs.getInt("rang");
             }
             if (trenutniRang == 0) {
-                status = "ERR 35.";
+                status = "ERR 35";
             } else if (trenutniRang > 4) {
-                status = "ERR 34.";
+                status = "ERR 34";
             } else {
                 int noviRang = trenutniRang + 1;
                 sql = "UPDATE alebenkov_korisnici SET rang='" + noviRang + "' WHERE user = '" + user + "'";
                 sqlUp = statemant.executeUpdate(sql);
                 System.out.println("SERVER | Rang korisnika povecan.");
-                status = "OK 10.";
+                status = "OK 10";
             }
 
         } catch (SQLException ex) {
@@ -212,15 +216,15 @@ public class DBOps {
                 trenutniRang = rs.getInt("rang");
             }
             if (trenutniRang == 0) {
-                status = "ERR 35.";
+                status = "ERR 35";
             } else if (trenutniRang < 2) {
-                status = "ERR 34.";
+                status = "ERR 34";
             } else {
                 int noviRang = trenutniRang - 1;
                 sql = "UPDATE alebenkov_korisnici SET rang='" + noviRang + "' WHERE user = '" + user + "'";
                 sqlUp = statemant.executeUpdate(sql);
                 System.out.println("SERVER | Rang korisnika smanjen.");
-                status = "OK 10.";
+                status = "OK 10";
             }
 
         } catch (SQLException ex) {
@@ -251,10 +255,10 @@ public class DBOps {
 
         return status;
     }
-    
-    public int[] statistikaKorisnika(){
-        
-        int[] statistika = {0,0,0};
+
+    public int[] statistikaKorisnika() {
+
+        int[] statistika = {0, 0, 0};
 
         try {
             connection = DriverManager.getConnection(url, korisnik, lozinka);
@@ -264,9 +268,9 @@ public class DBOps {
             rs = statemant.executeQuery(sql);
             while (rs.next()) {
                 statistika[0]++;
-                if(rs.getInt("role")==1){
+                if (rs.getInt("role") == 1) {
                     statistika[1]++;
-                }else{
+                } else {
                     statistika[2]++;
                 }
             }
@@ -298,9 +302,117 @@ public class DBOps {
         }
 
         return statistika;
-        
+
     }
 
-    
+    public boolean dnevnik(String user, String naredba, String odgovor) {
+
+        try {
+            connection = DriverManager.getConnection(url, korisnik, lozinka);
+            statemant = connection.createStatement();
+
+            sql = "INSERT INTO alebenkov_dnevnik(user, naredba, odgovor) VALUES ('" + user + "','" + naredba + "','" + odgovor + "')";
+            sqlExe = statemant.execute(sql);
+            System.out.println("SERVER | Zapis dodan u dnevnik.");
+            return true;
+
+        } catch (SQLException ex) {
+            System.out.println("ERROR | Greska u radu s bazom: " + ex.getMessage());
+        } finally {
+            if (rs != null) {
+                try {
+                    rs.close();
+                } catch (SQLException ex) {
+                    System.out.println(ex.getMessage());
+                }
+            }
+            if (statemant != null) {
+                try {
+                    statemant.close();
+                } catch (SQLException ex) {
+                    System.out.println(ex.getMessage());
+                }
+            }
+            if (connection != null) {
+                try {
+                    connection.close();
+                } catch (SQLException ex) {
+                    System.out.println(ex.getMessage());
+                }
+            }
+        }
+
+        return false;
+    }
+
+    public boolean provjeraKvote(String user) {
+        int rang = 0;
+        int kvota = 0;
+        int brojUpita = 0;
+
+        try {
+            connection = DriverManager.getConnection(url, korisnik, lozinka);
+            statemant = connection.createStatement();
+
+            //uzimam rang zadanog korisnika
+            sql = "SELECT * FROM alebenkov_korisnici where user = '" + user + "'";
+            rs = statemant.executeQuery(sql);
+            while (rs.next()) {
+                rang = rs.getInt("rang");
+                break;
+            }
+
+            //uzimam kvotu za dobiveni rang
+            kvota = Integer.parseInt(konfig.dajPostavku("kvota" + rang));
+
+            //uzimam trenutno vrijeme i smanjujem ga za zadani interval korisnika
+            int intervalKorisnika = Integer.parseInt(konfig.dajPostavku("intervalKorisnika")) * 1000;
+            long trenutnoVrijeme = System.currentTimeMillis();
+            long granicaVremena = trenutnoVrijeme - intervalKorisnika;
+            SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd H:mm:ss.S");
+            String granica = sdf.format(granicaVremena);
+
+            //nakon sto imam krajnju vremensku granicu radim upit nad dnevnikom da vidim koliko je korisnik do sada napravio upita u tom razdoblju
+            sql = "SELECT * FROM alebenkov_dnevnik where user = '" + user + "' AND time > '" + granica + "'";
+            rs = statemant.executeQuery(sql);
+            while (rs.next()) {
+                brojUpita++;
+            }
+            
+            System.out.println("BROJ UPITA: " + brojUpita + " KVOTA: " + kvota + " GRANICA: " + granica);
+            
+            //ukoliko nije nadmasio kvotu saljem true
+            if(brojUpita<kvota){
+                return true;
+            }
+
+        } catch (SQLException ex) {
+            System.out.println("ERROR | Greska u radu s bazom: " + ex.getMessage());
+        } finally {
+            if (rs != null) {
+                try {
+                    rs.close();
+                } catch (SQLException ex) {
+                    System.out.println(ex.getMessage());
+                }
+            }
+            if (statemant != null) {
+                try {
+                    statemant.close();
+                } catch (SQLException ex) {
+                    System.out.println(ex.getMessage());
+                }
+            }
+            if (connection != null) {
+                try {
+                    connection.close();
+                } catch (SQLException ex) {
+                    System.out.println(ex.getMessage());
+                }
+            }
+        }
+
+        return false;
+    }
 
 }
