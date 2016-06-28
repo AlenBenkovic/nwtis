@@ -5,7 +5,13 @@
  */
 package org.foi.nwtis.alebenkov.web.server;
 
+import java.util.ArrayList;
+import java.util.List;
 import org.foi.nwtis.alebenkov.konfiguracije.Konfiguracija;
+import org.foi.nwtis.alebenkov.rest.klijenti.OWMKlijent;
+import org.foi.nwtis.alebenkov.web.podaci.Adresa;
+import org.foi.nwtis.alebenkov.web.podaci.MeteoPodaci;
+import org.foi.nwtis.alebenkov.web.podaci.MeteoPrognoza;
 import org.foi.nwtis.alebenkov.web.slusaci.SlusacAplikacije;
 
 /**
@@ -18,10 +24,14 @@ public class PozadinskoPreuzimanje extends Thread {
     private boolean dretvaPreuzima = true;
     private Konfiguracija serverConfig = null;
     private int intervalPreuzimanja;
+    private List<Adresa> adrese;
+    private String APPID;
 
     public PozadinskoPreuzimanje() {
         serverConfig = SlusacAplikacije.getServerConfig();
         intervalPreuzimanja = Integer.parseInt(serverConfig.dajPostavku("intervalPreuzimanja")) * 1000; //podatak je spremeljan u sekundama
+        this.adrese = new ArrayList<>();
+        this.APPID = serverConfig.dajPostavku("APPID");
     }
 
     @Override
@@ -37,6 +47,31 @@ public class PozadinskoPreuzimanje extends Thread {
             if (dretvaPreuzima) {
                 long pocetakRadaDretve = System.currentTimeMillis(); //biljezim pocetak rada dretve
                 System.out.println("|Preuzimam podatke i spremam ih u bazu...");
+
+                DBOps dbOps = new DBOps();
+                this.adrese = dbOps.ucitajAdrese();
+
+                for (int i = 0; i < adrese.size(); i++) {
+                    OWMKlijent owmk = new OWMKlijent(APPID);
+
+                    MeteoPrognoza[] mpp = owmk.getWeatherForecast(adrese.get(i).getGeoloc().getLatitude(), adrese.get(i).getGeoloc().getLongitude());
+                    MeteoPodaci mp = owmk.getRealTimeWeather(adrese.get(i).getGeoloc().getLatitude(), adrese.get(i).getGeoloc().getLongitude());
+                    if (dbOps.spremiMeteo(adrese.get(i), mp)) {
+                        System.out.println("Meteo podatak za " + adrese.get(i).getAdresa() + " uspjesno spremljen.");
+                    } else {
+                        System.out.println("Huston, we have a problem.");
+                    }
+                    for (int j = 0; j < mpp.length; j++) {
+                        MeteoPodaci mp2 = mpp[j].getPrognoza();
+                        if (dbOps.spremiMeteoPrognozu(adrese.get(i), mp2, mpp[j].getAdresa())) {
+                            System.out.println("Meteo prognoza za " + mp2.getName() + " " + adrese.get(i).getAdresa() + " uspjesno spremljena.");
+                        } else {
+                            System.out.println("Huston, we have one more problem.");
+                        }
+                    }
+
+                }
+
                 long krajRadaDretve = System.currentTimeMillis(); //biljezim kraj rada dretve
                 long trajanjeRadaDretve = krajRadaDretve - pocetakRadaDretve;
                 try {

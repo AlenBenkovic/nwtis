@@ -11,10 +11,14 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.List;
 import org.foi.nwtis.alebenkov.konfiguracije.Konfiguracija;
 import org.foi.nwtis.alebenkov.konfiguracije.bp.BP_konfiguracija;
 import org.foi.nwtis.alebenkov.rest.klijenti.GMKlijent;
+import org.foi.nwtis.alebenkov.web.podaci.Adresa;
 import org.foi.nwtis.alebenkov.web.podaci.Lokacija;
+import org.foi.nwtis.alebenkov.web.podaci.MeteoPodaci;
 import org.foi.nwtis.alebenkov.web.slusaci.SlusacAplikacije;
 
 /**
@@ -38,7 +42,7 @@ public class DBOps {
     public DBOps() {
         this.bpConfig = SlusacAplikacije.getBpConfig();
         this.konfig = SlusacAplikacije.getServerConfig();
-        this.url = bpConfig.getServerDatabase() + bpConfig.getUserDatabase()+"?useUnicode=true&characterEncoding=utf-8";
+        this.url = bpConfig.getServerDatabase() + bpConfig.getUserDatabase() + "?useUnicode=true&characterEncoding=utf-8";
         this.korisnik = bpConfig.getUserUsername();
         this.lozinka = bpConfig.getUserPassword();
 
@@ -471,7 +475,7 @@ public class DBOps {
         }
         return false;
     }
-    
+
     public boolean testirajAdresu(String adresa) {
 
         int brojRedaka = 0;
@@ -490,6 +494,161 @@ public class DBOps {
                 return true;
             }
 
+        } catch (SQLException ex) {
+            System.out.println("ERROR | Greska u radu s bazom: " + ex.getMessage());
+        } finally {
+            if (rs != null) {
+                try {
+                    rs.close();
+                } catch (SQLException ex) {
+                    System.out.println(ex.getMessage());
+                }
+            }
+            if (statemant != null) {
+                try {
+                    statemant.close();
+                } catch (SQLException ex) {
+                    System.out.println(ex.getMessage());
+                }
+            }
+
+            if (connection != null) {
+                try {
+                    connection.close();
+                } catch (SQLException ex) {
+                    System.out.println(ex.getMessage());
+                }
+            }
+        }
+        return false;
+    }
+
+    public List<Adresa> ucitajAdrese() {
+        List<Adresa> adrese = new ArrayList<>();
+
+        try {
+            connection = DriverManager.getConnection(url, korisnik, lozinka);
+            statemant = connection.createStatement();
+
+            sql = "SELECT * FROM alebenkov_adrese";
+            rs = statemant.executeQuery(sql);
+            while (rs.next()) {
+                Lokacija l = new Lokacija(rs.getString("latitude"), rs.getString("longitude"));
+                Adresa a = new Adresa(rs.getInt("id"), rs.getString("adresa"), l);
+                adrese.add(a);
+            }
+
+        } catch (SQLException ex) {
+            System.out.println("ERROR | Greska u radu s bazom: " + ex.getMessage());
+        } finally {
+            if (rs != null) {
+                try {
+                    rs.close();
+                } catch (SQLException ex) {
+                    System.out.println(ex.getMessage());
+                }
+            }
+            if (statemant != null) {
+                try {
+                    statemant.close();
+                } catch (SQLException ex) {
+                    System.out.println(ex.getMessage());
+                }
+            }
+
+            if (connection != null) {
+                try {
+                    connection.close();
+                } catch (SQLException ex) {
+                    System.out.println(ex.getMessage());
+                }
+            }
+        }
+        return adrese;
+    }
+
+    public boolean spremiMeteo(Adresa a, MeteoPodaci mp) {
+        String adresaStanice = mp.getCountry() + ", " + mp.getName();
+        int idAdresa = a.getIdadresa();
+        java.util.Date utilDate = new java.util.Date();
+        java.sql.Timestamp ts = new java.sql.Timestamp(utilDate.getTime());
+        sql = "INSERT INTO alebenkov_meteo(idadresa, adresastanice, latitude, longitude, vrijeme, vrijemeopis, temp, tempmin, tempmax, vlaga, tlak, vjetar, vjetarsmjer, preuzeto) "
+                + "VALUES ("
+                + idAdresa + ",'"
+                + adresaStanice + "','"
+                + a.getGeoloc().getLatitude() + "','"
+                + a.getGeoloc().getLongitude() + "','"
+                + mp.getWeatherMain() + "','"
+                + mp.getWeatherValue() + "',"
+                + mp.getTemperatureValue() + ","
+                + mp.getTemperatureMin() + ","
+                + mp.getTemperatureMax() + ","
+                + mp.getHumidityValue() + ","
+                + mp.getPressureValue() + ","
+                + mp.getWindSpeedValue() + ","
+                + mp.getWindDirectionValue() + ",'"
+                + ts + "')";
+        try {
+            connection = DriverManager.getConnection(url, korisnik, lozinka);
+            statemant = connection.createStatement();
+            sqlExe = statemant.execute(sql);
+            return true;
+        } catch (SQLException ex) {
+            System.out.println("ERROR | Greska u radu s bazom: " + ex.getMessage());
+        } finally {
+            if (rs != null) {
+                try {
+                    rs.close();
+                } catch (SQLException ex) {
+                    System.out.println(ex.getMessage());
+                }
+            }
+            if (statemant != null) {
+                try {
+                    statemant.close();
+                } catch (SQLException ex) {
+                    System.out.println(ex.getMessage());
+                }
+            }
+
+            if (connection != null) {
+                try {
+                    connection.close();
+                } catch (SQLException ex) {
+                    System.out.println(ex.getMessage());
+                }
+            }
+        }
+        return false;
+    }
+
+    public boolean spremiMeteoPrognozu(Adresa a, MeteoPodaci mp, String adr) {
+        String adresaStanice = adr;
+        int idAdresa = a.getIdadresa();
+        java.util.Date utilDate = new java.util.Date();
+        java.sql.Timestamp ts = new java.sql.Timestamp(utilDate.getTime());
+        sql = "INSERT INTO alebenkov_meteoPrognoza(idadresa, adresastanice, latitude, longitude, vrijeme, vrijemeopis, temp, tempmin, tempmax, vlaga, tlak, vjetar, vjetarsmjer,prognozaZa, preuzeto) "
+                + "VALUES ("
+                + idAdresa + ",'"
+                + adresaStanice + "','"
+                + a.getGeoloc().getLatitude() + "','"
+                + a.getGeoloc().getLongitude() + "','"
+                + mp.getWeatherMain() + "','"
+                + mp.getWeatherValue() + "',"
+                + mp.getTemperatureValue() + ","
+                + mp.getTemperatureMin() + ","
+                + mp.getTemperatureMax() + ","
+                + mp.getHumidityValue() + ","
+                + mp.getPressureValue() + ","
+                + mp.getWindSpeedValue() + ","
+                + mp.getWindDirectionValue() + ",'"
+                + mp.getName() + "','"
+                + ts + "')";
+        try {
+            connection = DriverManager.getConnection(url, korisnik, lozinka);
+            statemant = connection.createStatement();
+            sqlExe = statemant.execute(sql);
+            return true;
         } catch (SQLException ex) {
             System.out.println("ERROR | Greska u radu s bazom: " + ex.getMessage());
         } finally {
