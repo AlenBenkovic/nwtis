@@ -40,7 +40,7 @@ public class MeteoServis {
             return mp;
         } else if (!db.provjeraKvote(user)) {
             MeteoPodaci mp = new MeteoPodaci();
-              db.dnevnik(user, "MeteoServis/zadnjiMeteoPodaci", "Prekoracen limit");
+            db.dnevnik(user, "MeteoServis/zadnjiMeteoPodaci", "Prekoracen limit");
             mp.setName("Prekoracili ste dozvoljeni limit za upite.");
             return mp;
         } else {
@@ -75,6 +75,88 @@ public class MeteoServis {
             db.dnevnik(user, "MeteoServis/adreseKorisnika", "OK 10");
             List<Adresa> adrese = db.adreseKorisnika(user);
             return adrese;
+        }
+    }
+
+    /**
+     * Web service operation
+     */
+    @WebMethod(operationName = "rangLista")
+    public List<String> rangLista(@WebParam(name = "user") String user, @WebParam(name = "pass") String pass, @WebParam(name = "n") int n) {
+        DBOps db = new DBOps();
+        int[] korisnik = db.provjeraKorisnika(user, pass);
+        if (korisnik[0] < 1) {
+            List<String> a = new ArrayList<>();
+            db.dnevnik(user, "MeteoServis/rangLista", "Korisnicki podaci nisu ispravni");
+            a.add("Korisnicki podaci nisu ispravni");
+            return a;
+
+        } else if (!db.provjeraKvote(user)) {
+            List<String> a = new ArrayList<>();
+            db.dnevnik(user, "MeteoServis/rangLista", "Prekoracen limit");
+            a.add("Prekoracili ste dozvoljeni limit za upite.");//ovo je katastrofa ali trenutno najbrze jer ne znam drugacije :D
+            return a;
+
+        } else {
+            db.dnevnik(user, "MeteoServis/rangLista", "OK 10");
+            List<String> adrese = db.rangLista(n);
+            return adrese;
+        }
+    }
+
+    /**
+     * Web service operation
+     */
+    @WebMethod(operationName = "zadnjihNmeteo")
+    public List<MeteoPodaci> zadnjihNmeteo(@WebParam(name = "user") String user, @WebParam(name = "pass") String pass, @WebParam(name = "adresa") String adresa, @WebParam(name = "n") int n) {
+        DBOps db = new DBOps();
+        int[] korisnik = db.provjeraKorisnika(user, pass);
+        List<MeteoPodaci> mpl = new ArrayList<>();
+        MeteoPodaci mp = new MeteoPodaci();
+        if (korisnik[0] < 1) {
+            db.dnevnik(user, "MeteoServis/zadnjihNmeteo", "Korisnicki podaci nisu ispravni");
+            mp.setName("Korisnicki podaci nisu ispravni");
+            mpl.add(mp);
+            return mpl;
+
+        } else if (!db.provjeraKvote(user)) {
+            db.dnevnik(user, "MeteoServis/zadnjihNmeteo", "Prekoracen limit");
+            mp.setName("Prekoracen limit");
+            mpl.add(mp);
+            return mpl;
+
+        } else {
+            db.dnevnik(user, "MeteoServis/zadnjihNmeteo", "OK 10");
+            mpl = db.zadnjihN(n, adresa);
+            return mpl;
+        }
+    }
+
+    /**
+     * Web service operation
+     */
+    @WebMethod(operationName = "razdobljeMeteo")
+    public List<MeteoPodaci> razdobljeMeteo(@WebParam(name = "user") String user, @WebParam(name = "pass") String pass, @WebParam(name = "adresa") String adresa, @WebParam(name = "odD") String odD, @WebParam(name = "doD") String doD) {
+        DBOps db = new DBOps();
+        int[] korisnik = db.provjeraKorisnika(user, pass);
+        List<MeteoPodaci> mpl = new ArrayList<>();
+        MeteoPodaci mp = new MeteoPodaci();
+        if (korisnik[0] < 1) {
+            db.dnevnik(user, "MeteoServis/razdobljeMeteo", "Korisnicki podaci nisu ispravni");
+            mp.setName("Korisnicki podaci nisu ispravni");
+            mpl.add(mp);
+            return mpl;
+
+        } else if (!db.provjeraKvote(user)) {
+            db.dnevnik(user, "MeteoServis/razdobljeMeteo", "Prekoracen limit");
+            mp.setName("Prekoracen limit");
+            mpl.add(mp);
+            return mpl;
+
+        } else {
+            db.dnevnik(user, "MeteoServis/razdobljeMeteo", "OK 10");
+            mpl = db.razdobljeMeteo(adresa, odD, doD);
+            return mpl;
         }
     }
 
