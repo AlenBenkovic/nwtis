@@ -31,6 +31,7 @@ import org.foi.nwtis.alebenkov.web.podaci.Adresa;
 @Path("/meteoREST")
 public class MeteoRESTResourceContainer {
 
+    
     @Context
     private UriInfo context;
 

@@ -923,5 +923,115 @@ public class DBOps {
         }
         return mpl;
     }
+    
+    public List<MeteoPodaci> zadnjaMeteoPrognoza(String id){
+        List<MeteoPodaci> mpl = new ArrayList<>();
+        sql = "SELECT * FROM alebenkov_meteoPrognoza WHERE idAdresa=" + id +" ORDER BY idPrognoza DESC LIMIT 37";
+        
+        try {
+            connection = DriverManager.getConnection(url, korisnik, lozinka);
+            statemant = connection.createStatement();
+
+            rs = statemant.executeQuery(sql);
+            while (rs.next()) {
+                MeteoPodaci mp = new MeteoPodaci();
+                mp.setWeatherMain(rs.getString("vrijeme"));
+                mp.setWeatherValue(rs.getString("vrijemeOpis"));
+                mp.setTemperatureValue(rs.getFloat("temp"));
+                mp.setTemperatureMin(rs.getFloat("tempMin"));
+                mp.setTemperatureMax(rs.getFloat("tempMax"));
+                mp.setHumidityValue(rs.getFloat("vlaga"));
+                mp.setPressureValue(rs.getFloat("tlak"));
+                mp.setWindSpeedValue(rs.getFloat("vjetar"));
+                mp.setWindDirectionValue(rs.getFloat("vjetarSmjer"));
+                mp.setLastUpdate(rs.getTimestamp("preuzeto"));
+                mp.setName(rs.getString("prognozaZa"));
+                mp.setCountry(rs.getString("adresaStanice"));
+                mpl.add(mp);
+            }
+
+        } catch (SQLException ex) {
+            System.out.println("ERROR | Greska u radu s bazom: " + ex.getMessage());
+        } finally {
+            if (rs != null) {
+                try {
+                    rs.close();
+                } catch (SQLException ex) {
+                    System.out.println(ex.getMessage());
+                }
+            }
+            if (statemant != null) {
+                try {
+                    statemant.close();
+                } catch (SQLException ex) {
+                    System.out.println(ex.getMessage());
+                }
+            }
+
+            if (connection != null) {
+                try {
+                    connection.close();
+                } catch (SQLException ex) {
+                    System.out.println(ex.getMessage());
+                }
+            }
+        }
+        return mpl;
+    }
+    
+    public List<MeteoPodaci> prognozaZaDan(String id, String datum){
+        List<MeteoPodaci> mpl = new ArrayList<>();
+        sql = "SELECT * FROM alebenkov_meteoPrognoza WHERE idAdresa=" + id +" AND prognozaZa = '" + datum + "'";
+        
+        try {
+            connection = DriverManager.getConnection(url, korisnik, lozinka);
+            statemant = connection.createStatement();
+
+            rs = statemant.executeQuery(sql);
+            while (rs.next()) {
+                MeteoPodaci mp = new MeteoPodaci();
+                mp.setWeatherMain(rs.getString("vrijeme"));
+                mp.setWeatherValue(rs.getString("vrijemeOpis"));
+                mp.setTemperatureValue(rs.getFloat("temp"));
+                mp.setTemperatureMin(rs.getFloat("tempMin"));
+                mp.setTemperatureMax(rs.getFloat("tempMax"));
+                mp.setHumidityValue(rs.getFloat("vlaga"));
+                mp.setPressureValue(rs.getFloat("tlak"));
+                mp.setWindSpeedValue(rs.getFloat("vjetar"));
+                mp.setWindDirectionValue(rs.getFloat("vjetarSmjer"));
+                mp.setLastUpdate(rs.getTimestamp("preuzeto"));
+                mp.setName(rs.getString("prognozaZa"));
+                mp.setCountry(rs.getString("adresaStanice"));
+                mpl.add(mp);
+            }
+
+        } catch (SQLException ex) {
+            System.out.println("ERROR | Greska u radu s bazom: " + ex.getMessage());
+        } finally {
+            if (rs != null) {
+                try {
+                    rs.close();
+                } catch (SQLException ex) {
+                    System.out.println(ex.getMessage());
+                }
+            }
+            if (statemant != null) {
+                try {
+                    statemant.close();
+                } catch (SQLException ex) {
+                    System.out.println(ex.getMessage());
+                }
+            }
+
+            if (connection != null) {
+                try {
+                    connection.close();
+                } catch (SQLException ex) {
+                    System.out.println(ex.getMessage());
+                }
+            }
+        }
+        return mpl;
+    }
 
 }
