@@ -153,7 +153,7 @@ public class ObradaZahtjeva extends Thread {
                                         out.write("OK 10.");
                                         int[] statUser = dbOp.statistikaKorisnika();
                                         SlanjePoruke poruka = new SlanjePoruke();
-                                        String tekstPoruke = "Dobivena naredba: " + naredba
+                                        String tekstPoruke = naredba
                                                 + "\nVrijeme primanja zahtjeva: " + sdf.format(vrijemeZahtjeva)
                                                 + "\nUkupan broj korisnika: " + statUser[0]
                                                 + "\nBroj administratora: " + statUser[1]
@@ -169,8 +169,6 @@ public class ObradaZahtjeva extends Thread {
                                         dbOp.dnevnik(user, naredba.toString(), "ERR 33");
                                         out.write("ERR 33.");
                                     }
-                                    System.out.println("ADD " + newUser + newPass + newRole);
-                                    //TODO pozovi metodu
                                 } else if (ax.group(7).contains("UP")) {
                                     //korisnik u  ax.group(8)
                                     String odg = dbOp.povecajRang(ax.group(8));

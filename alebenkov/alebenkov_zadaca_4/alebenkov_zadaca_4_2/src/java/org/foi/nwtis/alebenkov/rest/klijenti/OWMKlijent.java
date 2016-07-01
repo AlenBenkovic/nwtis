@@ -114,7 +114,7 @@ public class OWMKlijent {
     }
     
     public MeteoPrognoza[] getWeatherForecast(String latitude, String longitude) {
-        
+
         WebTarget webResource = client.target(OWMRESTHelper.getOWM_BASE_URI())
                 .path(OWMRESTHelper.getOWM_Forecast_Path());
         webResource = webResource.queryParam("lat", latitude);
@@ -132,17 +132,42 @@ public class OWMKlijent {
 
             for (int i = 0; i < jo.getJsonArray("list").size(); i++) {
                 MeteoPodaci mp = new MeteoPodaci();
-                mp.setTemperatureValue(new Double(jo.getJsonArray("list").getJsonObject(i).getJsonObject("main").getJsonNumber("temp").doubleValue()).floatValue());
-                mp.setTemperatureMin(new Double(jo.getJsonArray("list").getJsonObject(i).getJsonObject("main").getJsonNumber("temp_min").doubleValue()).floatValue());
-                mp.setTemperatureMax(new Double(jo.getJsonArray("list").getJsonObject(i).getJsonObject("main").getJsonNumber("temp_max").doubleValue()).floatValue());
-                mp.setPressureValue(new Double(jo.getJsonArray("list").getJsonObject(i).getJsonObject("main").getJsonNumber("pressure").doubleValue()).floatValue());
-                mp.setHumidityValue(new Double(jo.getJsonArray("list").getJsonObject(i).getJsonObject("main").getJsonNumber("humidity").doubleValue()).floatValue());
-                mp.setWindSpeedValue(new Double(jo.getJsonArray("list").getJsonObject(i).getJsonObject("wind").getJsonNumber("speed").doubleValue()).floatValue());
-                mp.setWindDirectionValue(new Double(jo.getJsonArray("list").getJsonObject(i).getJsonObject("wind").getJsonNumber("deg").doubleValue()).floatValue());
-                mp.setWeatherValue(jo.getJsonArray("list").getJsonObject(i).getJsonArray("weather").getJsonObject(0).getString("description"));
-                mp.setWeatherMain(jo.getJsonArray("list").getJsonObject(i).getJsonArray("weather").getJsonObject(0).getString("main"));
-                mp.setName(jo.getJsonArray("list").getJsonObject(i).getString("dt_txt"));//mala prilagodna kako bi uzeo datum kao string i spremio ga u meteo podatke
+                JsonObject dan = jo.getJsonArray("list").getJsonObject(i);
 
+                if (dan.isNull("main")) {
+                    float a = 0;
+                    mp.setTemperatureValue(a);
+                    mp.setTemperatureMin(a);
+                    mp.setTemperatureMax(a);
+                    mp.setPressureValue(a);
+                    mp.setHumidityValue(a);
+                } else {
+                    mp.setTemperatureValue(new Double(jo.getJsonArray("list").getJsonObject(i).getJsonObject("main").getJsonNumber("temp").doubleValue()).floatValue());
+                    mp.setTemperatureMin(new Double(jo.getJsonArray("list").getJsonObject(i).getJsonObject("main").getJsonNumber("temp_min").doubleValue()).floatValue());
+                    mp.setTemperatureMax(new Double(jo.getJsonArray("list").getJsonObject(i).getJsonObject("main").getJsonNumber("temp_max").doubleValue()).floatValue());
+                    mp.setPressureValue(new Double(jo.getJsonArray("list").getJsonObject(i).getJsonObject("main").getJsonNumber("pressure").doubleValue()).floatValue());
+                    mp.setHumidityValue(new Double(jo.getJsonArray("list").getJsonObject(i).getJsonObject("main").getJsonNumber("humidity").doubleValue()).floatValue());
+                }
+
+                if (dan.isNull("wind") || dan.getJsonObject("wind").isNull("speed") || dan.getJsonObject("wind").isNull("deg")) {
+                    float b = 0;//ako ne stavim ništa onda javlja problem kod upisa u bazu zbog null vrijednosti
+                    mp.setWindSpeedValue(b);
+                    mp.setWindDirectionValue(b);
+                } else {
+                    mp.setWindSpeedValue(new Double(jo.getJsonArray("list").getJsonObject(i).getJsonObject("wind").getJsonNumber("speed").doubleValue()).floatValue());
+                    mp.setWindDirectionValue(new Double(jo.getJsonArray("list").getJsonObject(i).getJsonObject("wind").getJsonNumber("deg").doubleValue()).floatValue());
+
+                }
+
+                if (dan.isNull("weather")) {
+                    String c = "0";
+                    mp.setWeatherValue(c);
+                    mp.setWeatherMain(c);
+                } else {
+                    mp.setWeatherValue(jo.getJsonArray("list").getJsonObject(i).getJsonArray("weather").getJsonObject(0).getString("description"));
+                    mp.setWeatherMain(jo.getJsonArray("list").getJsonObject(i).getJsonArray("weather").getJsonObject(0).getString("main"));
+                }
+                mp.setName(jo.getJsonArray("list").getJsonObject(i).getString("dt_txt"));//mala prilagodna kako bi uzeo datum kao string i spremio ga u meteo podatke
                 String adresa = jo.getJsonObject("city").getString("name");
                 mprog[i] = new MeteoPrognoza(adresa, i, mp);
             }

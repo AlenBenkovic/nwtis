@@ -1,3 +1,4 @@
+1. Ako nije kreirano kreirati u web aplikaciji META-INF/context.xml sa sadrzajem
 <?xml version="1.0" encoding="UTF-8"?>
 <Context path="/alebenkov_aplikacija_1">
 
@@ -7,3 +8,5 @@
            userTable="alebenkov_korisnici" userNameCol="user" userCredCol="pass"
            userRoleTable="alebenkov_korisnici" roleNameCol="role"/>
 </Context>
+
+2. Potrebno skinuti mysql-connector-java-5.1.39-bin.jar sa http://dev.mysql.com/downloads/connector/j/ i staviti ga u lib direktoriji tomcat servera
