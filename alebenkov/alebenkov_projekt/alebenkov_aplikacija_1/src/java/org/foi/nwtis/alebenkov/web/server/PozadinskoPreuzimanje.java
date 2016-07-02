@@ -57,18 +57,20 @@ public class PozadinskoPreuzimanje extends Thread {
                     MeteoPrognoza[] mpp = owmk.getWeatherForecast(adrese.get(i).getGeoloc().getLatitude(), adrese.get(i).getGeoloc().getLongitude());
                     MeteoPodaci mp = owmk.getRealTimeWeather(adrese.get(i).getGeoloc().getLatitude(), adrese.get(i).getGeoloc().getLongitude());
                     if (dbOps.spremiMeteo(adrese.get(i), mp)) {
-                        System.out.println("Meteo podatak za " + adrese.get(i).getAdresa() + " uspjesno spremljen.");
+                        System.out.println("Meteo podatak za " + adrese.get(i).getAdresa() + " spremljen u bazu.");
                     } else {
                         System.out.println("Huston, we have a problem.");
                     }
                     for (int j = 0; j < mpp.length; j++) {
                         MeteoPodaci mp2 = mpp[j].getPrognoza();
                         if (dbOps.spremiMeteoPrognozu(adrese.get(i), mp2, mpp[j].getAdresa())) {
-                            System.out.println("Meteo prognoza za " + mp2.getName() + " " + adrese.get(i).getAdresa() + " uspjesno spremljena.");
+                            //System.out.println("Meteo prognoza za " + mp2.getName() + " " + adrese.get(i).getAdresa() + " uspjesno spremljena.");
                         } else {
                             System.out.println("Huston, we have one more problem.");
                         }
+                        
                     }
+                    System.out.println("Meteo prognoza za " + adrese.get(i).getAdresa() + " spremljena u bazu.");
 
                 }
 

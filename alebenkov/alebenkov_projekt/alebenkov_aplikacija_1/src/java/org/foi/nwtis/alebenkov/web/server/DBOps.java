@@ -25,7 +25,7 @@ import org.foi.nwtis.alebenkov.web.podaci.User;
 import org.foi.nwtis.alebenkov.web.slusaci.SlusacAplikacije;
 
 /**
- *
+ * Vrsi sve operacije koje su vezane uz bazu podataka
  * @author abenkovic
  */
 public class DBOps {
@@ -60,10 +60,10 @@ public class DBOps {
     }
 
     /**
-     *
+     * Provjera podataka korisnika
      * @param user
      * @param pass
-     * @return
+     * @return vraca polje, [0]-role, [1]-rang
      */
     public int[] provjeraKorisnika(String user, String pass) {
         int[] korisnik = {0, 0};
@@ -109,11 +109,11 @@ public class DBOps {
     }
 
     /**
-     *
+     * Kreira novog korisnika u bazi
      * @param newUser
      * @param newPass
-     * @param newRole
-     * @return
+     * @param newRole 1-admin, 2-user
+     * @return true ukoliko je korisnik uspjesno upisan u bp
      */
     public boolean dodajKorisnika(String newUser, String newPass, String newRole) {
         int role = 2;
@@ -170,9 +170,9 @@ public class DBOps {
     }
 
     /**
-     *
+     * Povecava rang korisnika
      * @param user
-     * @return
+     * @return Vraca String sa statusom upita (kako je zadano u zadatku)
      */
     public String povecajRang(String user) {
         String status = "";
@@ -230,9 +230,9 @@ public class DBOps {
     }
 
     /**
-     *
+     * Smanjuje rang korisnika
      * @param user
-     * @return
+     * @return Vraca String sa statusom upita (kako je zadano u zadatku)
      */
     public String smanjiRang(String user) {
         String status = "";
@@ -291,8 +291,8 @@ public class DBOps {
     }
 
     /**
-     *
-     * @return
+     * Dohvat statistike o korisnicima, njihovo ukupan broj, broj admin, broj usera
+     * @return int[] 0-ukupan broj, 1-broj admina, 2-broj usera
      */
     public int[] statistikaKorisnika() {
 
@@ -344,11 +344,11 @@ public class DBOps {
     }
 
     /**
-     *
+     * Upis u dnevnik svih zahtjeva
      * @param user
      * @param naredba
      * @param odgovor
-     * @return
+     * @return true ukoliko je upisano u bp
      */
     public boolean dnevnik(String user, String naredba, String odgovor) {
 
@@ -391,9 +391,9 @@ public class DBOps {
     }
 
     /**
-     *
+     * Provjera kvote za korisnika
      * @param user
-     * @return
+     * @return true ukoliko korisnik nije presao kvotu
      */
     public boolean provjeraKvote(String user) {
         int rang = 0;
@@ -466,10 +466,10 @@ public class DBOps {
     }
 
     /**
-     *
+     * Spremanje nove adrese u bp
      * @param adresa
-     * @param kreirao
-     * @return
+     * @param kreirao korisnik koji je poslao zahtjev
+     * @return true ukoliko je upisano u bp
      */
     public boolean dodajAdresu(String adresa, String kreirao) {
 
@@ -528,9 +528,9 @@ public class DBOps {
     }
 
     /**
-     *
+     * Provjera postoji li adresa u bazi
      * @param adresa
-     * @return
+     * @return true ukoliko postoji adresa u bp
      */
     public boolean testirajAdresu(String adresa) {
 
@@ -580,8 +580,8 @@ public class DBOps {
     }
 
     /**
-     *
-     * @return
+     * Dohvat svih adresa iz baze
+     * @return listu adresa
      */
     public List<Adresa> ucitajAdrese() {
         List<Adresa> adrese = new ArrayList<>();
@@ -628,9 +628,9 @@ public class DBOps {
     }
 
     /**
-     *
+     * Dohvat svih adresa koje je kreirao pojedini korisnik
      * @param user
-     * @return
+     * @return lista adresa
      */
     public List<Adresa> adreseKorisnika(String user) {
         List<Adresa> adrese = new ArrayList<>();
@@ -677,10 +677,10 @@ public class DBOps {
     }
 
     /**
-     *
-     * @param a
-     * @param mp
-     * @return
+     * Spremanje meteo podataka za odredjenu adresu
+     * @param a adresa
+     * @param mp meteo podaci
+     * @return true ukoliko je upisano
      */
     public boolean spremiMeteo(Adresa a, MeteoPodaci mp) {
         String adresaStanice = mp.getCountry() + ", " + mp.getName();
@@ -738,11 +738,11 @@ public class DBOps {
     }
 
     /**
-     *
+     * Spremanje meteo prognoze 
      * @param a
      * @param mp
      * @param adr
-     * @return
+     * @return true ukoliko je spremljeno u bp
      */
     public boolean spremiMeteoPrognozu(Adresa a, MeteoPodaci mp, String adr) {
         String adresaStanice = adr;
@@ -801,9 +801,9 @@ public class DBOps {
     }
 
     /**
-     *
+     * Dohvat zadnjih meteo podataka koji su upisani u bp za odredjenu adresu
      * @param adresa
-     * @return
+     * @return meteo podatci
      */
     public MeteoPodaci zadnjiMeteoPodaci(String adresa) {
         MeteoPodaci mp = new MeteoPodaci();
@@ -857,9 +857,9 @@ public class DBOps {
     }
 
     /**
-     *
+     * Vraca rang listu adresa sa najvise meteo zapisa
      * @param n
-     * @return
+     * @return rang listu 
      */
     public List<String> rangLista(int n) {
         List<String> adrese = new ArrayList<>();
@@ -904,7 +904,7 @@ public class DBOps {
     }
 
     /**
-     *
+     * Dohvat zadnjih N adresa kza koje su preuzeti podaci
      * @param n
      * @param adresa
      * @return
@@ -963,11 +963,11 @@ public class DBOps {
     }
 
     /**
-     *
+     * Dohvat meteo podataka za odredjeno razdoblje i adresu
      * @param adresa
      * @param odD
      * @param doD
-     * @return
+     * @return meteo podaci za razdoblje
      */
     public List<MeteoPodaci> razdobljeMeteo(String adresa, String odD, String doD) {
         List<MeteoPodaci> mpl = new ArrayList<>();
@@ -1024,9 +1024,9 @@ public class DBOps {
     }
 
     /**
-     *
+     * Vraca zadnju meteo prognozu
      * @param id
-     * @return
+     * @return listu meteo podataka
      */
     public List<MeteoPodaci> zadnjaMeteoPrognoza(String id) {
         List<MeteoPodaci> mpl = new ArrayList<>();
@@ -1084,10 +1084,10 @@ public class DBOps {
     }
 
     /**
-     *
+     * Vraca prognozu za odredjeni dan
      * @param id
      * @param datum
-     * @return
+     * @return list meteo podataka
      */
     public List<MeteoPodaci> prognozaZaDan(String id, String datum) {
         List<MeteoPodaci> mpl = new ArrayList<>();
@@ -1145,8 +1145,8 @@ public class DBOps {
     }
 
     /**
-     *
-     * @return
+     * Ucitava sve korisnike
+     * @return lista korisnika
      */
     public List<User> ucitajKorisnike() {
         List<User> korisnici = new ArrayList<>();
@@ -1192,9 +1192,9 @@ public class DBOps {
     }
 
     /**
-     *
-     * @param i 1-za dnevnik rada servisa, 2-za pregled zahjtjeva socker servera
-     * @return
+     * Ucitava sve zapise za dnevnik
+     * @param i 1-za dnevnik rada servisa, 2-za pregled zahtjeva socker servera
+     * @return lista zapisa
      */
     public List<Dnevnik> ucitajDnevnik(int i) {
         List<Dnevnik> dnevnik = new ArrayList<>();
@@ -1247,6 +1247,11 @@ public class DBOps {
         return dnevnik;
     }
 
+    /**
+     * ucitava sve zahtjeve odrejednog korisnika
+     * @param user
+     * @return lista zahtjeva
+     */
     public List<Dnevnik> ucitajZahtjeveKorisnika(String user) {
         List<Dnevnik> dnevnik = new ArrayList<>();
 

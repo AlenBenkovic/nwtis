@@ -19,5 +19,7 @@
         <a href="${pageContext.servletContext.contextPath}/jsp/admin/zahtjevi.jsp" >Pregled zahtjeva korisnika</a><br/>
         <h2>User:</h2>
         <a href="${pageContext.servletContext.contextPath}/jsp/user/zahtjevi.jsp" >Pregled vlastitih zahtjeva</a>
+        <br/>
+        <a href="${pageContext.servletContext.contextPath}/jsp/logout.jsp" >Odjava</a>
     </body>
 </html>

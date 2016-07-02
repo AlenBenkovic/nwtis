@@ -24,7 +24,7 @@
                 <option value="MeteoREST">REST</option>
                 <option value="MeteoServis">SOAP</option>
             </select>
-            Vrsta servisa: 
+            Naziv servisa: 
             <select name="naziv">
                 <option value=""></option>
                 <option value="adreseKorisnika">Lista adresa korisnika</option>
