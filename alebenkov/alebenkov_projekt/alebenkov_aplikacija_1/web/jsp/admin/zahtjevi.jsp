@@ -7,13 +7,13 @@
 <%@taglib prefix="display" uri="http://displaytag.sf.net"%> 
 <%@page contentType="text/html" pageEncoding="UTF-8"%>
 <!DOCTYPE html>
-<jsp:useBean id="use" class="org.foi.nwtis.alebenkov.jsp.beans.ZahtjeviUserBean"/>
+<jsp:useBean id="use" class="org.foi.nwtis.alebenkov.jsp.beans.ZahtjeviAdminBean"/>
 <jsp:setProperty name="use" property="request" value="${pageContext.request}"/>
 <html>
     <head>
         <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
         <link rel="stylesheet" href="${pageContext.servletContext.contextPath}/css/displaytag.css" />
-        <title>Pregled dnevnika</title>
+        <title>Pregled zahtjeva</title>
     </head>
     <body>
         <h1>Zahtjevi za socket server</h1>

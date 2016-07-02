@@ -8,11 +8,11 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>Login Error</title>
+    <title>Error 403.</title>
 </head>
 <body>
-    <h2>Pogrešno korisničko ime ili lozinka.</h2>
+    <h2>Nemate dovoljna prava za pristup traženoj stranici.</h2>
 
-   <a href="${pageContext.servletContext.contextPath}/jsp/login.jsp">Pokušajte ponovno.</a></p>
+   <a href="${pageContext.servletContext.contextPath}/jsp/index.jsp">Nazad.</a></p>
 </body>
 </html>

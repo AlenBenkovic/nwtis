@@ -12,13 +12,16 @@ import java.sql.SQLException;
 import java.sql.Statement;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 import org.foi.nwtis.alebenkov.konfiguracije.Konfiguracija;
 import org.foi.nwtis.alebenkov.konfiguracije.bp.BP_konfiguracija;
 import org.foi.nwtis.alebenkov.rest.klijenti.GMKlijent;
 import org.foi.nwtis.alebenkov.web.podaci.Adresa;
+import org.foi.nwtis.alebenkov.web.podaci.Dnevnik;
 import org.foi.nwtis.alebenkov.web.podaci.Lokacija;
 import org.foi.nwtis.alebenkov.web.podaci.MeteoPodaci;
+import org.foi.nwtis.alebenkov.web.podaci.User;
 import org.foi.nwtis.alebenkov.web.slusaci.SlusacAplikacije;
 
 /**
@@ -39,6 +42,9 @@ public class DBOps {
     private boolean sqlExe;
     private int sqlUp;
 
+    /**
+     *
+     */
     public DBOps() {
         this.bpConfig = SlusacAplikacije.getBpConfig();
         this.konfig = SlusacAplikacije.getServerConfig();
@@ -53,6 +59,12 @@ public class DBOps {
         }
     }
 
+    /**
+     *
+     * @param user
+     * @param pass
+     * @return
+     */
     public int[] provjeraKorisnika(String user, String pass) {
         int[] korisnik = {0, 0};
 
@@ -96,6 +108,13 @@ public class DBOps {
         return korisnik;
     }
 
+    /**
+     *
+     * @param newUser
+     * @param newPass
+     * @param newRole
+     * @return
+     */
     public boolean dodajKorisnika(String newUser, String newPass, String newRole) {
         int role = 2;
         if (newRole.contains("ADMIN")) {
@@ -150,6 +169,11 @@ public class DBOps {
         return false;
     }
 
+    /**
+     *
+     * @param user
+     * @return
+     */
     public String povecajRang(String user) {
         String status = "";
         int brojRedaka = 0;
@@ -205,6 +229,11 @@ public class DBOps {
         return status;
     }
 
+    /**
+     *
+     * @param user
+     * @return
+     */
     public String smanjiRang(String user) {
         String status = "";
         int brojRedaka = 0;
@@ -261,6 +290,10 @@ public class DBOps {
         return status;
     }
 
+    /**
+     *
+     * @return
+     */
     public int[] statistikaKorisnika() {
 
         int[] statistika = {0, 0, 0};
@@ -310,6 +343,13 @@ public class DBOps {
 
     }
 
+    /**
+     *
+     * @param user
+     * @param naredba
+     * @param odgovor
+     * @return
+     */
     public boolean dnevnik(String user, String naredba, String odgovor) {
 
         try {
@@ -350,6 +390,11 @@ public class DBOps {
         return false;
     }
 
+    /**
+     *
+     * @param user
+     * @return
+     */
     public boolean provjeraKvote(String user) {
         int rang = 0;
         int kvota = 0;
@@ -420,6 +465,12 @@ public class DBOps {
         return false;
     }
 
+    /**
+     *
+     * @param adresa
+     * @param kreirao
+     * @return
+     */
     public boolean dodajAdresu(String adresa, String kreirao) {
 
         int brojRedaka = 0;
@@ -476,6 +527,11 @@ public class DBOps {
         return false;
     }
 
+    /**
+     *
+     * @param adresa
+     * @return
+     */
     public boolean testirajAdresu(String adresa) {
 
         int brojRedaka = 0;
@@ -523,6 +579,10 @@ public class DBOps {
         return false;
     }
 
+    /**
+     *
+     * @return
+     */
     public List<Adresa> ucitajAdrese() {
         List<Adresa> adrese = new ArrayList<>();
 
@@ -566,7 +626,12 @@ public class DBOps {
         }
         return adrese;
     }
-    
+
+    /**
+     *
+     * @param user
+     * @return
+     */
     public List<Adresa> adreseKorisnika(String user) {
         List<Adresa> adrese = new ArrayList<>();
 
@@ -574,7 +639,7 @@ public class DBOps {
             connection = DriverManager.getConnection(url, korisnik, lozinka);
             statemant = connection.createStatement();
 
-             sql = "SELECT * FROM alebenkov_adrese where kreirao = '" + user + "'";
+            sql = "SELECT * FROM alebenkov_adrese where kreirao = '" + user + "'";
             rs = statemant.executeQuery(sql);
             while (rs.next()) {
                 Lokacija l = new Lokacija(rs.getString("latitude"), rs.getString("longitude"));
@@ -611,6 +676,12 @@ public class DBOps {
         return adrese;
     }
 
+    /**
+     *
+     * @param a
+     * @param mp
+     * @return
+     */
     public boolean spremiMeteo(Adresa a, MeteoPodaci mp) {
         String adresaStanice = mp.getCountry() + ", " + mp.getName();
         int idAdresa = a.getIdadresa();
@@ -666,6 +737,13 @@ public class DBOps {
         return false;
     }
 
+    /**
+     *
+     * @param a
+     * @param mp
+     * @param adr
+     * @return
+     */
     public boolean spremiMeteoPrognozu(Adresa a, MeteoPodaci mp, String adr) {
         String adresaStanice = adr;
         int idAdresa = a.getIdadresa();
@@ -721,7 +799,12 @@ public class DBOps {
         }
         return false;
     }
-    
+
+    /**
+     *
+     * @param adresa
+     * @return
+     */
     public MeteoPodaci zadnjiMeteoPodaci(String adresa) {
         MeteoPodaci mp = new MeteoPodaci();
         sql = "select * from alebenkov_meteo as m, alebenkov_adrese as a where m.IDADRESA = a.id and a.ADRESA = '" + adresa + "' ORDER BY idMeteo DESC LIMIT 1";
@@ -772,12 +855,16 @@ public class DBOps {
         }
         return mp;
     }
-    
-    public List<String> rangLista(int n){
+
+    /**
+     *
+     * @param n
+     * @return
+     */
+    public List<String> rangLista(int n) {
         List<String> adrese = new ArrayList<>();
         sql = "select *, COUNT(*) as ukupno from alebenkov_meteo as m, alebenkov_adrese as a where m.IDADRESA = a.id GROUP by a.adresa ORDER BY ukupno DESC LIMIT " + n + "";
-        
-        
+
         try {
             connection = DriverManager.getConnection(url, korisnik, lozinka);
             statemant = connection.createStatement();
@@ -815,12 +902,17 @@ public class DBOps {
         }
         return adrese;
     }
-    
-    public List<MeteoPodaci> zadnjihN(int n, String adresa){
+
+    /**
+     *
+     * @param n
+     * @param adresa
+     * @return
+     */
+    public List<MeteoPodaci> zadnjihN(int n, String adresa) {
         List<MeteoPodaci> mpl = new ArrayList<>();
         sql = "select * from alebenkov_meteo as m, alebenkov_adrese as a where m.IDADRESA = a.id and a.ADRESA = '" + adresa + "' ORDER BY m.preuzeto DESC LIMIT " + n + "";
-        
-        
+
         try {
             connection = DriverManager.getConnection(url, korisnik, lozinka);
             statemant = connection.createStatement();
@@ -869,12 +961,19 @@ public class DBOps {
         }
         return mpl;
     }
-    
-    public List<MeteoPodaci> razdobljeMeteo(String adresa, String odD, String doD ){
+
+    /**
+     *
+     * @param adresa
+     * @param odD
+     * @param doD
+     * @return
+     */
+    public List<MeteoPodaci> razdobljeMeteo(String adresa, String odD, String doD) {
         List<MeteoPodaci> mpl = new ArrayList<>();
         System.out.println("OD: " + odD);
         sql = "select * from alebenkov_meteo as m, alebenkov_adrese as a where m.IDADRESA = a.id and a.ADRESA = '" + adresa + "' AND m.preuzeto>'" + odD + "' AND m.preuzeto<'" + doD + "'";
-        
+
         try {
             connection = DriverManager.getConnection(url, korisnik, lozinka);
             statemant = connection.createStatement();
@@ -923,11 +1022,16 @@ public class DBOps {
         }
         return mpl;
     }
-    
-    public List<MeteoPodaci> zadnjaMeteoPrognoza(String id){
+
+    /**
+     *
+     * @param id
+     * @return
+     */
+    public List<MeteoPodaci> zadnjaMeteoPrognoza(String id) {
         List<MeteoPodaci> mpl = new ArrayList<>();
-        sql = "SELECT * FROM alebenkov_meteoPrognoza WHERE idAdresa=" + id +" ORDER BY idPrognoza DESC LIMIT 37";
-        
+        sql = "SELECT * FROM alebenkov_meteoPrognoza WHERE idAdresa=" + id + " ORDER BY idPrognoza DESC LIMIT 37";
+
         try {
             connection = DriverManager.getConnection(url, korisnik, lozinka);
             statemant = connection.createStatement();
@@ -978,11 +1082,17 @@ public class DBOps {
         }
         return mpl;
     }
-    
-    public List<MeteoPodaci> prognozaZaDan(String id, String datum){
+
+    /**
+     *
+     * @param id
+     * @param datum
+     * @return
+     */
+    public List<MeteoPodaci> prognozaZaDan(String id, String datum) {
         List<MeteoPodaci> mpl = new ArrayList<>();
-        sql = "SELECT * FROM alebenkov_meteoPrognoza WHERE idAdresa=" + id +" AND prognozaZa = '" + datum + "'";
-        
+        sql = "SELECT * FROM alebenkov_meteoPrognoza WHERE idAdresa=" + id + " AND prognozaZa = '" + datum + "'";
+
         try {
             connection = DriverManager.getConnection(url, korisnik, lozinka);
             statemant = connection.createStatement();
@@ -1032,6 +1142,156 @@ public class DBOps {
             }
         }
         return mpl;
+    }
+
+    /**
+     *
+     * @return
+     */
+    public List<User> ucitajKorisnike() {
+        List<User> korisnici = new ArrayList<>();
+
+        try {
+            connection = DriverManager.getConnection(url, korisnik, lozinka);
+            statemant = connection.createStatement();
+
+            sql = "SELECT * FROM alebenkov_korisnici";
+            rs = statemant.executeQuery(sql);
+            while (rs.next()) {
+                User u = new User(rs.getString("user"), rs.getString("pass"), rs.getInt("role"), rs.getInt("rang"));
+                korisnici.add(u);
+            }
+
+        } catch (SQLException ex) {
+            System.out.println("ERROR | Greska u radu s bazom: " + ex.getMessage());
+        } finally {
+            if (rs != null) {
+                try {
+                    rs.close();
+                } catch (SQLException ex) {
+                    System.out.println(ex.getMessage());
+                }
+            }
+            if (statemant != null) {
+                try {
+                    statemant.close();
+                } catch (SQLException ex) {
+                    System.out.println(ex.getMessage());
+                }
+            }
+
+            if (connection != null) {
+                try {
+                    connection.close();
+                } catch (SQLException ex) {
+                    System.out.println(ex.getMessage());
+                }
+            }
+        }
+        return korisnici;
+    }
+
+    /**
+     *
+     * @param i 1-za dnevnik rada servisa, 2-za pregled zahjtjeva socker servera
+     * @return
+     */
+    public List<Dnevnik> ucitajDnevnik(int i) {
+        List<Dnevnik> dnevnik = new ArrayList<>();
+
+        try {
+            connection = DriverManager.getConnection(url, korisnik, lozinka);
+            statemant = connection.createStatement();
+
+            sql = "SELECT * FROM alebenkov_dnevnik";
+            rs = statemant.executeQuery(sql);
+            while (rs.next()) {
+                Date date = rs.getTimestamp("time");
+                if (i == 1 && !rs.getString("naredba").contains("PASSWD")) {
+                    Dnevnik d = new Dnevnik(rs.getInt("id"), rs.getString("user"), rs.getString("naredba"), rs.getString("odgovor"), date);
+                    dnevnik.add(d);
+
+                } else if (i == 2 && rs.getString("naredba").contains("PASSWD")) {
+                    Dnevnik d = new Dnevnik(rs.getInt("id"), rs.getString("user"), rs.getString("naredba"), rs.getString("odgovor"), date);
+                    dnevnik.add(d);
+                }
+
+            }
+
+        } catch (SQLException ex) {
+            System.out.println("ERROR | Greska u radu s bazom: " + ex.getMessage());
+        } finally {
+            if (rs != null) {
+                try {
+                    rs.close();
+                } catch (SQLException ex) {
+                    System.out.println(ex.getMessage());
+                }
+            }
+            if (statemant != null) {
+                try {
+                    statemant.close();
+                } catch (SQLException ex) {
+                    System.out.println(ex.getMessage());
+                }
+            }
+
+            if (connection != null) {
+                try {
+                    connection.close();
+                } catch (SQLException ex) {
+                    System.out.println(ex.getMessage());
+                }
+            }
+        }
+        return dnevnik;
+    }
+
+    public List<Dnevnik> ucitajZahtjeveKorisnika(String user) {
+        List<Dnevnik> dnevnik = new ArrayList<>();
+
+        try {
+            connection = DriverManager.getConnection(url, korisnik, lozinka);
+            statemant = connection.createStatement();
+
+            sql = "SELECT * FROM alebenkov_dnevnik where user='" + user + "'";
+            rs = statemant.executeQuery(sql);
+            while (rs.next()) {
+                Date date = rs.getTimestamp("time");
+                if (rs.getString("naredba").contains("PASSWD")) {
+                    Dnevnik d = new Dnevnik(rs.getInt("id"), rs.getString("user"), rs.getString("naredba"), rs.getString("odgovor"), date);
+                    dnevnik.add(d);
+                }
+
+            }
+
+        } catch (SQLException ex) {
+            System.out.println("ERROR | Greska u radu s bazom: " + ex.getMessage());
+        } finally {
+            if (rs != null) {
+                try {
+                    rs.close();
+                } catch (SQLException ex) {
+                    System.out.println(ex.getMessage());
+                }
+            }
+            if (statemant != null) {
+                try {
+                    statemant.close();
+                } catch (SQLException ex) {
+                    System.out.println(ex.getMessage());
+                }
+            }
+
+            if (connection != null) {
+                try {
+                    connection.close();
+                } catch (SQLException ex) {
+                    System.out.println(ex.getMessage());
+                }
+            }
+        }
+        return dnevnik;
     }
 
 }
