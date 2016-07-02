@@ -6,4 +6,5 @@
            connectionURL="jdbc:mysql://localhost:3306/nwtis_alebenkov_bp_1?user=nwtis_alebenkov&amp;password=alebenkov_nwtis"
            userTable="alebenkov_korisnici" userNameCol="user" userCredCol="pass"
            userRoleTable="alebenkov_korisnici" roleNameCol="role"/>
+
 </Context>
