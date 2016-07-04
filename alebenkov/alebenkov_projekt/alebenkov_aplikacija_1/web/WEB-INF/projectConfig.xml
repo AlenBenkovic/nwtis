@@ -22,8 +22,8 @@
 <entry key="kvota5">80</entry>
 <entry key="intervalKorisnika">60</entry>
 <entry key="intervalPreuzimanja">600</entry>
-<entry key="mailSalje">servis@nwtis.nastava.foi.hr</entry>
-<entry key="mailPrima">admin@nwtis.nastava.foi.hr</entry>
+<entry key="mailSalje">admin@nwtis.nastava.foi.hr</entry>
+<entry key="mailPrima">servis@nwtis.nastava.foi.hr</entry>
 <entry key="mailNaslov">alebenkov_aplikacija_1 Izvjestaj o korisnicima</entry>
 <entry key="mailPosluzitelj">nwtis.nastava.foi.hr</entry>
 <entry key="APPID">251fce21bdb88341273354e83b1f0b87</entry>
