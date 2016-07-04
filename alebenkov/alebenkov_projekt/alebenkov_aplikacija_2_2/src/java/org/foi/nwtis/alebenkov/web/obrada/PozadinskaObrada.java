@@ -34,9 +34,9 @@ public class PozadinskaObrada extends Thread {
     private String korisnickoIme;
     private String korisnickaLozinka;
 
-    private String nazivIspravnogDirektorija;
+    private String nazivUspjesnogDirektorija;
+    private String nazivNeuspjesnogDirektorija;
     private String nazivNeispravnogDirektorija;
-    private String nazivOstalogDirektorija;
 
     private String naslovPoruke;
 
@@ -50,9 +50,9 @@ public class PozadinskaObrada extends Thread {
         this.korisnickoIme = mailConfig.dajPostavku("korisnickoIme");
         this.korisnickaLozinka = mailConfig.dajPostavku("korisnickaLozinka");
 
-        this.nazivIspravnogDirektorija = mailConfig.dajPostavku("nazivIspravnogDirektorija");
+        this.nazivUspjesnogDirektorija = mailConfig.dajPostavku("nazivUspjesnogDirektorija");
+        this.nazivNeuspjesnogDirektorija = mailConfig.dajPostavku("nazivNeuspjesnogDirektorija");
         this.nazivNeispravnogDirektorija = mailConfig.dajPostavku("nazivNeispravnogDirektorija");
-        this.nazivOstalogDirektorija = mailConfig.dajPostavku("nazivOstalogDirektorija");
 
         this.naslovPoruke = mailConfig.dajPostavku("naslovPoruke");
 
@@ -96,19 +96,35 @@ public class PozadinskaObrada extends Thread {
 
                 //Prolazim kroz sve poruke
                 for (int messageNumber = 0; messageNumber < messages.length; messageNumber++) {
+                    String user;
+                    String pass;
+                    String role;
                     ukupnoPoruka++;
                     message = messages[messageNumber]; //uzimam trenutnu poruku kroz koju prolazim
                     String vrstaPoruke = message.getContentType().toLowerCase();//stavljam u mala slova kako god da pise radi kasnije probjere
                     String naslovPoruke = message.getSubject();
                     String sadrzajPoruke = message.getContent().toString();
-                    String naredba = (String) sadrzajPoruke.subSequence(0, sadrzajPoruke.indexOf("\n"));
+                    String naredba = "";
+                    if (sadrzajPoruke.indexOf("\n") > 0) {
+                        naredba = (String) sadrzajPoruke.subSequence(0, sadrzajPoruke.indexOf("\n"));
+                    }
                     System.out.println("|| " + this.getName() + " | Poruka No." + messageNumber + " | Vrsta poruke: " + vrstaPoruke + "\nNaslov: " + naslovPoruke + "\nNaredba: " + naredba);
                     Matcher mSadrzaj = provjeraNaredbe(naredba.trim());
-                    
+
                     if (vrstaPoruke.startsWith("text/plain") && naslovPoruke.equalsIgnoreCase(this.naslovPoruke) && mSadrzaj != null) {
-                        
-                        //TODO provjeri postoji li korisnik u bazi
-                        
+                        user = mSadrzaj.group(4);
+                        pass = mSadrzaj.group(5);
+                        role = mSadrzaj.group(6);
+                        if (korisnikCeka(user)) {
+                            System.out.println(this.getName() + " | Poruka " + messageNumber + " | USPJESNA");
+                            uspjesnePoruke++;
+                            premjestiPoruku(nazivUspjesnogDirektorija, store, message, folder);
+
+                        } else {
+                            System.out.println(this.getName() + " | Poruka No." + messageNumber + " | NEUSPJESNA");
+                            premjestiPoruku(nazivNeuspjesnogDirektorija, store, message, folder);
+                            neuspjesnePoruke++;
+                        }
                     } else {
                         premjestiPoruku(nazivNeispravnogDirektorija, store, message, folder);
                         neispravnePoruke++;
@@ -171,7 +187,7 @@ public class PozadinskaObrada extends Thread {
     }
 
     public Matcher provjeraNaredbe(String p) {
-        String regex = "(GRAD|TVRTKA) (\\w+); (ADD|UPDATE);"; //group 1 grad ili tvrtka, group 2 naziv, group 3 operacija
+        String regex = "^USER ([a-zA-Z0-9_]+)\\; PASSWD ([a-zA-Z0-9_]+)\\; (ADD ([a-zA-Z0-9_]+)\\; PASSWD ([a-zA-Z0-9_]+)\\; ROLE (ADMIN|USER))\\; *$"; //4-ime, 5-pass, 6-role
         Pattern pattern = Pattern.compile(regex);
         Matcher m = pattern.matcher(p);
         boolean status = m.matches();
@@ -180,6 +196,11 @@ public class PozadinskaObrada extends Thread {
         } else {
             return null;
         }
+    }
+
+    public boolean korisnikCeka(String user) {
+        //provjera ceka li korisnik na odobrenje, ako ceka ide true i odobravanje, ako ne ceka ide false
+        return true;
     }
 
     public boolean isDretvaRadi() {
