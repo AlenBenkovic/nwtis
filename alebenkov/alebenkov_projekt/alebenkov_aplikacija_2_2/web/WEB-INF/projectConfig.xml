@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE properties SYSTEM "http://java.sun.com/dtd/properties.dtd">
+<properties>
+<comment>NWTIS konfiguracija - 2</comment>
+<entry key="server.database">jdbc:mysql://localhost:3306/</entry>
+<entry key="admin.username">nwtis_g0</entry>
+<entry key="admin.password">g0_nwtis</entry>
+<entry key="admin.database">nwtis_g0</entry>
+<entry key="user.username">nwtis_alebenkov</entry>
+<entry key="user.password">alebenkov_nwtis</entry>
+<entry key="user.database">nwtis_alebenkov_bp_1</entry>
+<entry key="driver.database.odbc">sun.jdbc.odbc.JdbcOdbcDriver</entry>
+<entry key="driver.database.mysql">com.mysql.jdbc.Driver</entry>
+<entry key="driver.database.derby">org.apache.derby.jdbc.ClientDriver</entry>
+<entry key="driver.database.postgresql">org.postgresql.Driver</entry>
+<entry key="port">8000</entry>
+<entry key="brojDretvi">5</entry>
+<entry key="kvota1">5</entry>
+<entry key="kvota2">10</entry>
+<entry key="kvota3">20</entry>
+<entry key="kvota4">40</entry>
+<entry key="kvota5">80</entry>
+<entry key="intervalKorisnika">60</entry>
+<entry key="intervalPreuzimanja">60</entry>
+<entry key="mailSalje">servis@nwtis.nastava.foi.hr</entry>
+<entry key="mailPrima">admin@nwtis.nastava.foi.hr</entry>
+<entry key="mailNaslov">alebenkov_aplikacija_1 Izvjestaj o korisnicima</entry>
+<entry key="mailPosluzitelj">nwtis.nastava.foi.hr</entry>
+<entry key="APPID">251fce21bdb88341273354e83b1f0b87</entry>
+<entry key="stranicenje">10</entry>
+</properties>
