@@ -10,6 +10,12 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import javax.jms.Connection;
+import javax.jms.ConnectionFactory;
+import javax.jms.Destination;
+import javax.jms.JMSException;
+import javax.jms.MessageProducer;
+import javax.jms.TextMessage;
 import javax.mail.Session;
 import javax.mail.Flags;
 import javax.mail.Folder;
@@ -23,6 +29,7 @@ import javax.naming.NamingException;
 import org.foi.nwtis.alebenkov.ejb.eb.Korisnik;
 import org.foi.nwtis.alebenkov.ejb.sb.KorisnikFacade;
 import org.foi.nwtis.alebenkov.konfiguracije.Konfiguracija;
+import org.foi.nwtis.alebenkov.web.podaci.JMSporuka;
 import org.foi.nwtis.alebenkov.web.slusaci.SlusacAplikacije;
 
 /**
@@ -148,6 +155,10 @@ public class PozadinskaObrada extends Thread {
                 if (ukupnoPoruka == 0) {
                     System.out.println("2 | Nema novih poruka.");
                 }
+                
+                //SALJEM JMS poruku na kraju
+                JMSporuka jms = new JMSporuka(pocetakRadaDretve, pocetakRadaDretve, ukupnoPoruka, uspjesnePoruke, neuspjesnePoruke, neispravnePoruke);
+                sendJMSMessageToNWTiS_aplikacija_2(jms);
 
                 //KRAJ GLAVNE LOGIKE
                 long krajRadaDretve = System.currentTimeMillis(); //biljezim kraj rada dretve
@@ -164,6 +175,10 @@ public class PozadinskaObrada extends Thread {
             } catch (MessagingException ex) {
                 Logger.getLogger(PozadinskaObrada.class.getName()).log(Level.SEVERE, null, ex);
             } catch (IOException ex) {
+                Logger.getLogger(PozadinskaObrada.class.getName()).log(Level.SEVERE, null, ex);
+            } catch (JMSException ex) {
+                Logger.getLogger(PozadinskaObrada.class.getName()).log(Level.SEVERE, null, ex);
+            } catch (NamingException ex) {
                 Logger.getLogger(PozadinskaObrada.class.getName()).log(Level.SEVERE, null, ex);
             }
 
@@ -207,10 +222,14 @@ public class PozadinskaObrada extends Thread {
 
     public boolean korisnikCeka(String user) {
         //provjera ceka li korisnik na odobrenje, ako ceka ide true i odobravanje, ako ne ceka ide false
+        //0-nije odobren, 1-odobren
         Korisnik k = korisnikFacade.dohvatiKorisnika(user);
-        if(k != null){
-            korisnikFacade.odobriKorisnika(user);
-            return true;
+        if (k != null) {
+            if (k.getOdobreno() == 0) {
+                korisnikFacade.odobriKorisnika(user);
+                return true;
+            } else return false;
+
         }
         return false;
     }
@@ -230,6 +249,38 @@ public class PozadinskaObrada extends Thread {
         } catch (NamingException ne) {
             Logger.getLogger(getClass().getName()).log(Level.SEVERE, "exception caught", ne);
             throw new RuntimeException(ne);
+        }
+    }
+
+    private javax.jms.Message createJMSMessageForjmsNWTiS_aplikacija_2(javax.jms.Session session, Object messageData) throws JMSException {
+        // TODO create and populate message to send
+        TextMessage tm = session.createTextMessage();
+        tm.setText(messageData.toString());
+        return tm;
+    }
+
+    private void sendJMSMessageToNWTiS_aplikacija_2(Object messageData) throws JMSException, NamingException {
+        Context c = new InitialContext();
+        ConnectionFactory cf = (ConnectionFactory) c.lookup("java:comp/env/jms/NWTIS_QF_aplikacija_2");
+        Connection conn = null;
+        javax.jms.Session s = null;
+        try {
+            conn = cf.createConnection();
+            s = conn.createSession(false, s.AUTO_ACKNOWLEDGE);
+            Destination destination = (Destination) c.lookup("java:comp/env/jms/NWTiS_aplikacija_2");
+            MessageProducer mp = s.createProducer(destination);
+            mp.send(createJMSMessageForjmsNWTiS_aplikacija_2(s, messageData));
+        } finally {
+            if (s != null) {
+                try {
+                    s.close();
+                } catch (JMSException e) {
+                    Logger.getLogger(this.getClass().getName()).log(Level.WARNING, "Cannot close session", e);
+                }
+            }
+            if (conn != null) {
+                conn.close();
+            }
         }
     }
 
