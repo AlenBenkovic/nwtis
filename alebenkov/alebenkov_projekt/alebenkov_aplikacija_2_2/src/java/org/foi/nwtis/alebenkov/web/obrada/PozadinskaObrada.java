@@ -17,6 +17,11 @@ import javax.mail.Message;
 import javax.mail.MessagingException;
 import javax.mail.NoSuchProviderException;
 import javax.mail.Store;
+import javax.naming.Context;
+import javax.naming.InitialContext;
+import javax.naming.NamingException;
+import org.foi.nwtis.alebenkov.ejb.eb.Korisnik;
+import org.foi.nwtis.alebenkov.ejb.sb.KorisnikFacade;
 import org.foi.nwtis.alebenkov.konfiguracije.Konfiguracija;
 import org.foi.nwtis.alebenkov.web.slusaci.SlusacAplikacije;
 
@@ -25,6 +30,8 @@ import org.foi.nwtis.alebenkov.web.slusaci.SlusacAplikacije;
  * @author abenkovic
  */
 public class PozadinskaObrada extends Thread {
+
+    KorisnikFacade korisnikFacade = lookupKorisnikFacadeBean();
 
     private boolean dretvaRadi = true;
     private Konfiguracija mailConfig = null;
@@ -200,7 +207,12 @@ public class PozadinskaObrada extends Thread {
 
     public boolean korisnikCeka(String user) {
         //provjera ceka li korisnik na odobrenje, ako ceka ide true i odobravanje, ako ne ceka ide false
-        return true;
+        Korisnik k = korisnikFacade.dohvatiKorisnika(user);
+        if(k != null){
+            korisnikFacade.odobriKorisnika(user);
+            return true;
+        }
+        return false;
     }
 
     public boolean isDretvaRadi() {
@@ -209,6 +221,16 @@ public class PozadinskaObrada extends Thread {
 
     public void setDretvaRadi(boolean dretvaRadi) {
         this.dretvaRadi = dretvaRadi;
+    }
+
+    private KorisnikFacade lookupKorisnikFacadeBean() {
+        try {
+            Context c = new InitialContext();
+            return (KorisnikFacade) c.lookup("java:global/alebenkov_aplikacija_2/alebenkov_aplikacija_2_1/KorisnikFacade!org.foi.nwtis.alebenkov.ejb.sb.KorisnikFacade");
+        } catch (NamingException ne) {
+            Logger.getLogger(getClass().getName()).log(Level.SEVERE, "exception caught", ne);
+            throw new RuntimeException(ne);
+        }
     }
 
 }

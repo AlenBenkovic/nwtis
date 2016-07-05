@@ -8,14 +8,14 @@ package org.foi.nwtis.alebenkov.ejb.sb;
 import javax.ejb.Stateless;
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
-import org.foi.nwtis.alebenkov.ejb.eb.AlebenkovDnevnik;
+import org.foi.nwtis.alebenkov.ejb.eb.Dnevnik;
 
 /**
  *
  * @author alebenkov
  */
 @Stateless
-public class AlebenkovDnevnikFacade extends AbstractFacade<AlebenkovDnevnik> {
+public class DnevnikFacade extends AbstractFacade<Dnevnik> {
 
     @PersistenceContext(unitName = "alebenkov_aplikacija_2_1PU")
     private EntityManager em;
@@ -25,8 +25,8 @@ public class AlebenkovDnevnikFacade extends AbstractFacade<AlebenkovDnevnik> {
         return em;
     }
 
-    public AlebenkovDnevnikFacade() {
-        super(AlebenkovDnevnik.class);
+    public DnevnikFacade() {
+        super(Dnevnik.class);
     }
     
 }

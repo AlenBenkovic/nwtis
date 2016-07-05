@@ -30,13 +30,13 @@ import javax.xml.bind.annotation.XmlRootElement;
 @Table(name = "ALEBENKOV_DNEVNIK")
 @XmlRootElement
 @NamedQueries({
-    @NamedQuery(name = "AlebenkovDnevnik.findAll", query = "SELECT a FROM AlebenkovDnevnik a"),
-    @NamedQuery(name = "AlebenkovDnevnik.findById", query = "SELECT a FROM AlebenkovDnevnik a WHERE a.id = :id"),
-    @NamedQuery(name = "AlebenkovDnevnik.findByKorisnik", query = "SELECT a FROM AlebenkovDnevnik a WHERE a.korisnik = :korisnik"),
-    @NamedQuery(name = "AlebenkovDnevnik.findByAkcija", query = "SELECT a FROM AlebenkovDnevnik a WHERE a.akcija = :akcija"),
-    @NamedQuery(name = "AlebenkovDnevnik.findByTrajanje", query = "SELECT a FROM AlebenkovDnevnik a WHERE a.trajanje = :trajanje"),
-    @NamedQuery(name = "AlebenkovDnevnik.findByVrijeme", query = "SELECT a FROM AlebenkovDnevnik a WHERE a.vrijeme = :vrijeme")})
-public class AlebenkovDnevnik implements Serializable {
+    @NamedQuery(name = "Dnevnik.findAll", query = "SELECT d FROM Dnevnik d"),
+    @NamedQuery(name = "Dnevnik.findById", query = "SELECT d FROM Dnevnik d WHERE d.id = :id"),
+    @NamedQuery(name = "Dnevnik.findByKorisnik", query = "SELECT d FROM Dnevnik d WHERE d.korisnik = :korisnik"),
+    @NamedQuery(name = "Dnevnik.findByAkcija", query = "SELECT d FROM Dnevnik d WHERE d.akcija = :akcija"),
+    @NamedQuery(name = "Dnevnik.findByTrajanje", query = "SELECT d FROM Dnevnik d WHERE d.trajanje = :trajanje"),
+    @NamedQuery(name = "Dnevnik.findByVrijeme", query = "SELECT d FROM Dnevnik d WHERE d.vrijeme = :vrijeme")})
+public class Dnevnik implements Serializable {
 
     private static final long serialVersionUID = 1L;
     @Id
@@ -64,14 +64,14 @@ public class AlebenkovDnevnik implements Serializable {
     @Temporal(TemporalType.TIMESTAMP)
     private Date vrijeme;
 
-    public AlebenkovDnevnik() {
+    public Dnevnik() {
     }
 
-    public AlebenkovDnevnik(Integer id) {
+    public Dnevnik(Integer id) {
         this.id = id;
     }
 
-    public AlebenkovDnevnik(Integer id, String korisnik, String akcija, int trajanje, Date vrijeme) {
+    public Dnevnik(Integer id, String korisnik, String akcija, int trajanje, Date vrijeme) {
         this.id = id;
         this.korisnik = korisnik;
         this.akcija = akcija;
@@ -129,10 +129,10 @@ public class AlebenkovDnevnik implements Serializable {
     @Override
     public boolean equals(Object object) {
         // TODO: Warning - this method won't work in the case the id fields are not set
-        if (!(object instanceof AlebenkovDnevnik)) {
+        if (!(object instanceof Dnevnik)) {
             return false;
         }
-        AlebenkovDnevnik other = (AlebenkovDnevnik) object;
+        Dnevnik other = (Dnevnik) object;
         if ((this.id == null && other.id != null) || (this.id != null && !this.id.equals(other.id))) {
             return false;
         }
@@ -141,7 +141,7 @@ public class AlebenkovDnevnik implements Serializable {
 
     @Override
     public String toString() {
-        return "org.foi.nwtis.alebenkov.ejb.eb.AlebenkovDnevnik[ id=" + id + " ]";
+        return "org.foi.nwtis.alebenkov.ejb.eb.Dnevnik[ id=" + id + " ]";
     }
     
 }

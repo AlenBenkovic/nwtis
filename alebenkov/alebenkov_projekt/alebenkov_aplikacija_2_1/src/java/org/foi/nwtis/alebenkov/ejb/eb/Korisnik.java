@@ -9,8 +9,6 @@ import java.io.Serializable;
 import javax.persistence.Basic;
 import javax.persistence.Column;
 import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.NamedQueries;
 import javax.persistence.NamedQuery;
@@ -27,21 +25,16 @@ import javax.xml.bind.annotation.XmlRootElement;
 @Table(name = "ALEBENKOV_KORISNICI")
 @XmlRootElement
 @NamedQueries({
-    @NamedQuery(name = "AlebenkovKorisnici.findAll", query = "SELECT a FROM AlebenkovKorisnici a"),
-    @NamedQuery(name = "AlebenkovKorisnici.findById", query = "SELECT a FROM AlebenkovKorisnici a WHERE a.id = :id"),
-    @NamedQuery(name = "AlebenkovKorisnici.findByKorisnik", query = "SELECT a FROM AlebenkovKorisnici a WHERE a.korisnik = :korisnik"),
-    @NamedQuery(name = "AlebenkovKorisnici.findByPass", query = "SELECT a FROM AlebenkovKorisnici a WHERE a.pass = :pass"),
-    @NamedQuery(name = "AlebenkovKorisnici.findByRole", query = "SELECT a FROM AlebenkovKorisnici a WHERE a.role = :role"),
-    @NamedQuery(name = "AlebenkovKorisnici.findByRang", query = "SELECT a FROM AlebenkovKorisnici a WHERE a.rang = :rang"),
-    @NamedQuery(name = "AlebenkovKorisnici.findByOdobreno", query = "SELECT a FROM AlebenkovKorisnici a WHERE a.odobreno = :odobreno")})
-public class AlebenkovKorisnici implements Serializable {
+    @NamedQuery(name = "Korisnik.findAll", query = "SELECT k FROM Korisnik k"),
+    @NamedQuery(name = "Korisnik.findByKorisnik", query = "SELECT k FROM Korisnik k WHERE k.korisnik = :korisnik"),
+    @NamedQuery(name = "Korisnik.findByPass", query = "SELECT k FROM Korisnik k WHERE k.pass = :pass"),
+    @NamedQuery(name = "Korisnik.findByRole", query = "SELECT k FROM Korisnik k WHERE k.role = :role"),
+    @NamedQuery(name = "Korisnik.findByRang", query = "SELECT k FROM Korisnik k WHERE k.rang = :rang"),
+    @NamedQuery(name = "Korisnik.findByOdobreno", query = "SELECT k FROM Korisnik k WHERE k.odobreno = :odobreno")})
+public class Korisnik implements Serializable {
 
     private static final long serialVersionUID = 1L;
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Basic(optional = false)
-    @Column(name = "ID")
-    private Integer id;
     @Basic(optional = false)
     @NotNull
     @Size(min = 1, max = 15)
@@ -65,28 +58,19 @@ public class AlebenkovKorisnici implements Serializable {
     @Column(name = "ODOBRENO")
     private int odobreno;
 
-    public AlebenkovKorisnici() {
+    public Korisnik() {
     }
 
-    public AlebenkovKorisnici(Integer id) {
-        this.id = id;
+    public Korisnik(String korisnik) {
+        this.korisnik = korisnik;
     }
 
-    public AlebenkovKorisnici(Integer id, String korisnik, String pass, int role, int rang, int odobreno) {
-        this.id = id;
+    public Korisnik(String korisnik, String pass, int role, int rang, int odobreno) {
         this.korisnik = korisnik;
         this.pass = pass;
         this.role = role;
         this.rang = rang;
         this.odobreno = odobreno;
-    }
-
-    public Integer getId() {
-        return id;
-    }
-
-    public void setId(Integer id) {
-        this.id = id;
     }
 
     public String getKorisnik() {
@@ -132,18 +116,18 @@ public class AlebenkovKorisnici implements Serializable {
     @Override
     public int hashCode() {
         int hash = 0;
-        hash += (id != null ? id.hashCode() : 0);
+        hash += (korisnik != null ? korisnik.hashCode() : 0);
         return hash;
     }
 
     @Override
     public boolean equals(Object object) {
         // TODO: Warning - this method won't work in the case the id fields are not set
-        if (!(object instanceof AlebenkovKorisnici)) {
+        if (!(object instanceof Korisnik)) {
             return false;
         }
-        AlebenkovKorisnici other = (AlebenkovKorisnici) object;
-        if ((this.id == null && other.id != null) || (this.id != null && !this.id.equals(other.id))) {
+        Korisnik other = (Korisnik) object;
+        if ((this.korisnik == null && other.korisnik != null) || (this.korisnik != null && !this.korisnik.equals(other.korisnik))) {
             return false;
         }
         return true;
@@ -151,7 +135,7 @@ public class AlebenkovKorisnici implements Serializable {
 
     @Override
     public String toString() {
-        return "org.foi.nwtis.alebenkov.ejb.eb.AlebenkovKorisnici[ id=" + id + " ]";
+        return "org.foi.nwtis.alebenkov.ejb.eb.Korisnik[ korisnik=" + korisnik + " ]";
     }
     
 }
