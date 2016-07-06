@@ -174,6 +174,8 @@ public class PozadinskaObrada extends Thread {
                 System.out.println("2 | Pozadinska dretva se budi...");
             } catch (MessagingException ex) {
                 Logger.getLogger(PozadinskaObrada.class.getName()).log(Level.SEVERE, null, ex);
+                dretvaRadi=false;
+                interrupt();
             } catch (IOException ex) {
                 Logger.getLogger(PozadinskaObrada.class.getName()).log(Level.SEVERE, null, ex);
             } catch (JMSException ex) {
