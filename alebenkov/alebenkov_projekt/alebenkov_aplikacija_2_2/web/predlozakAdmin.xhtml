@@ -5,7 +5,7 @@
       xmlns:ui="http://java.sun.com/jsf/facelets"
       xmlns:p="http://primefaces.org/ui">
 
-    <f:view contentType="text/html" locale="#{lokalizacija.vazeciJezik}">
+    <f:view contentType="text/html" locale="#{lokalizacija.vazeciJezik}" >
         <h:head>
             <f:facet name="first">
                 <meta content='text/html; charset=UTF-8' http-equiv="Content-Type"/>
@@ -13,7 +13,7 @@
             </f:facet>
         </h:head>
 
-        <h:body>
+        <h:body rendered="#{userBean.admin}">
 
             <p:layout fullPage="true">
 
@@ -25,18 +25,25 @@
                     <ui:insert name="footer">Alen Benković - NWTiS &copy; 2016.</ui:insert>
                 </p:layoutUnit>
 
-                <p:layoutUnit position="west" size="360" header="#{m.menu_naslov}" collapsible="true">
+                <p:layoutUnit position="west" size="360" header="${m.menu_naslov}" collapsible="true">
                     <p:menu>
+                        <p:submenu label="#{m.menu_admin}" >
+                            <p:menuitem value="#{m.menu_stanje}" url="stanje.xhtml" />
+                            <p:menuitem value="#{m.menu_zahtjevi}" url="registracije.xhtml" />
+                            <p:menuitem value="#{m.menu_kategorije}" url="kategorije.xhtml" />
+                            <p:menuitem value="#{m.menu_poruke}" url="poruke.xhtml" />
+                            <p:menuitem value="#{m.menu_dnevnik}" url="dnevnik.xhtml" />
+                        </p:submenu>
                         <p:submenu label="#{m.menu_user}">
                             <p:menuitem value="#{m.menu_user_meteo}" url="http://www.primefaces.org/showcase-labs/ui/home.jsf" />
                         </p:submenu>
                         <p:submenu label="#{m.menu_ostalo}">
-                            
-                            <p:menuitem value="#{m.menu_logout}" url="http://www.primefaces.org/showcase-labs/ui/home.jsf" />
+                          <p:menuitem value="#{m.menu_logout}" url="http://www.primefaces.org/showcase-labs/ui/home.jsf" />
                         </p:submenu>
 
                     </p:menu>
-                     <h:form>
+                    <br/>
+                    <h:form>
                         <h:selectOneRadio value="#{lokalizacija.odabraniJezik}">
                             <f:selectItems value="#{lokalizacija.jezici}"/>
                         </h:selectOneRadio>

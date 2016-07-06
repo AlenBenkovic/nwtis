@@ -8,6 +8,9 @@ package org.foi.nwtis.alebenkov.web.zrna;
 import javax.ejb.EJB;
 import javax.inject.Named;
 import javax.enterprise.context.RequestScoped;
+import javax.faces.context.FacesContext;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpSession;
 import org.foi.nwtis.alebenkov.ejb.eb.Korisnik;
 import org.foi.nwtis.alebenkov.ejb.sb.KorisnikFacade;
 
@@ -23,6 +26,7 @@ public class PrijavaBean {
     private KorisnikFacade korisnikFacade;
     private String user;
     private String pass;
+    private String poruka;
 
     /**
      * Creates a new instance of PrijavaBean
@@ -48,16 +52,36 @@ public class PrijavaBean {
         System.out.println("Korisnicko lozinka: " + pass);
     }
 
+    public String getPoruka() {
+        return poruka;
+    }
+
+    public void setPoruka(String poruka) {
+        this.poruka = poruka;
+    }
+
     public String provjeraKorisnika() {
         Korisnik k = korisnikFacade.find(this.user);
         if (k != null && k.getPass().equals(pass)) {
-            if (k.getRang() == 1) {
+            HttpServletRequest request = (HttpServletRequest) (FacesContext.getCurrentInstance().getExternalContext().getRequest());
+            HttpSession s = request.getSession();
+            if (k.getOdobreno() == 0) {
+                poruka = "Vaš račun još nije odobren!";
+                return "prijava.xhtml";
+            } else if (k.getRole() == 1) {
+                s.setAttribute("user", k.getKorisnik());
+                s.setAttribute("role", k.getRole());
+                s.setAttribute("rang", k.getRang());
                 return "OK_ADMIN";
             } else {
+                s.setAttribute("user", k.getKorisnik());
+                s.setAttribute("role", k.getRole());
+                s.setAttribute("rang", k.getRang());
                 return "OK_USER";
             }
         } else {
-            return "NOT_OK";
+            poruka = "Neispravno korisničko ime ili lozinka!";
+            return "prijava.xhtml";
         }
     }
 

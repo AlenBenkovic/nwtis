@@ -27,7 +27,7 @@
         </session-timeout>
     </session-config>
     <welcome-file-list>
-        <welcome-file>faces/index.xhtml</welcome-file>
+        <welcome-file>faces/prijava.xhtml</welcome-file>
     </welcome-file-list>
     <resource-ref>
         <res-ref-name>jms/NWTIS_QF_aplikacija_2</res-ref-name>

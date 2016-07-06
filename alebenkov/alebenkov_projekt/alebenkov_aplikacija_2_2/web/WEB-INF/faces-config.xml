@@ -3,5 +3,30 @@
               xmlns="http://xmlns.jcp.org/xml/ns/javaee"
               xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
               xsi:schemaLocation="http://xmlns.jcp.org/xml/ns/javaee http://xmlns.jcp.org/xml/ns/javaee/web-facesconfig_2_2.xsd">
-
+    <application>
+        <resource-bundle>
+            <base-name>org.foi.nwtis.alebenkov.i18n</base-name>
+            <var>m</var>       
+        </resource-bundle>
+        <locale-config>
+            <default-locale>hr</default-locale>
+            <supported-locale>en</supported-locale>
+        </locale-config>
+    </application>
+    <navigation-rule>
+        <description>Prijava korisnika</description>
+        <from-view-id>/prijava.xhtml</from-view-id>
+        <navigation-case>
+            <from-action>#{prijavaBean.provjeraKorisnika()}</from-action>
+            <from-outcome>OK_ADMIN</from-outcome>
+            <to-view-id>/admin/stanje.xhtml</to-view-id>
+            <redirect/>
+        </navigation-case>
+        <navigation-case>
+            <from-action>#{prijavaBean.provjeraKorisnika()}</from-action>
+            <from-outcome>OK_USER</from-outcome>
+            <to-view-id>/user/meteo.xhtml</to-view-id>
+            <redirect/>
+        </navigation-case>
+    </navigation-rule>
 </faces-config>
