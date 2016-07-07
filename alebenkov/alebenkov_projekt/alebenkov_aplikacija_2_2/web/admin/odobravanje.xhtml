@@ -9,40 +9,36 @@
         <ui:composition template=".././predlozakAdmin.xhtml">
 
             <ui:define name="naslov">
-                #{m.kat_naslov}
+                #{m.cekanje_naslov}
             </ui:define>
 
             <ui:define name="header">
-                #{m.kat_naslov}
+                #{m.cekanje_naslov}
             </ui:define>
 
             <ui:define name="sadrzaj">
                 <h:form> 
-                    <h:dataTable id="kategorije" value="#{kategorijeBean.korisnici}" var="c"  >
+                    <h:dataTable id="naCekanju" value="#{odobravanjeBean.naCekanju}" var="c" >
                         <h:column>
-                            <f:facet name="header">#{m.kat_ime} \ </f:facet>
+                            <f:facet name="header">#{m.cekanje_ime} \</f:facet>
                                 ${c.korisnik} 
                         </h:column>
                         <h:column>
-                            <f:facet name="header">#{m.kat_role} \ </f:facet>
+                            <f:facet name="header">#{m.cekanje_role}</f:facet>
                                 ${c.role eq '1'? 'Admin' :'User'}
-                        </h:column>
-                        <h:column>
-                            <f:facet name="header">#{m.kat_rang} </f:facet>
-                                ${c.rang} 
                         </h:column>
                         <h:column>  </h:column>
                         <h:column>
                             <f:facet name="header"></f:facet>
-                            <h:commandButton id="povecaj" value=" ${m.kat_up}" action="${kategorijeBean.povecaj(c)}"  />
+                            <h:commandButton id="odobri" value=" ${m.cekanje_odobri}" action="${odobravanjeBean.odobri(c)}"  />
                         </h:column>
                         <h:column>
-                            <f:facet name="header" rendered="#{kategorijeBean.prikaziOdgovor}">#{kategorijeBean.odgovor} </f:facet>
-                            <h:commandButton id="odbaci" value=" ${m.kat_down}" action="${kategorijeBean.smanji(c)}"  />
+                            <f:facet name="header" rendered="#{odobravanjeBean.prikaziOdgovor}">#{odobravanjeBean.odgovor} </f:facet>
+                            <h:commandButton id="odbaci" value=" ${m.cekanje_odbaci}" action="${odobravanjeBean.odbaci(c)}"  />
                         </h:column>
-
+                     
                     </h:dataTable>
-
+                    
                 </h:form>
             </ui:define>
         </ui:composition>

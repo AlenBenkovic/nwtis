@@ -14,7 +14,7 @@
 <entry key="driver.database.derby">org.apache.derby.jdbc.ClientDriver</entry>
 <entry key="driver.database.postgresql">org.postgresql.Driver</entry>
 <entry key="port">8000</entry>
-<entry key="brojDretvi">5</entry>
+<entry key="brojDretvi">20</entry>
 <entry key="kvota1">5</entry>
 <entry key="kvota2">10</entry>
 <entry key="kvota3">20</entry>

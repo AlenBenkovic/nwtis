@@ -33,7 +33,7 @@
                             <f:selectItem itemValue="1" itemLabel="#{m.reg_role1}" />
                             <f:selectItem itemValue="2" itemLabel="#{m.reg_role2}" />
                         </h:selectOneMenu><br/><br/>
-                        <h:commandButton value="#{m.prijava_login}" action="#{registracijaBean.registriraj()}" /><br/><br/>
+                        <h:commandButton value="#{m.reg_regaj}" action="#{registracijaBean.registriraj()}" /><br/><br/>
                         <h:outputText value="#{m.reg_passWrong}" rendered="#{registracijaBean.passWrong}" /><br/>
                         <h:outputText value="#{m.reg_mailWrong}" rendered="#{registracijaBean.emailWrong}" />
                         

@@ -26,8 +26,9 @@ public class PrijavaBean {
     private KorisnikFacade korisnikFacade;
     private String user;
     private String pass;
-    private boolean odobren=false;
-    private boolean greska=false;
+    private boolean odobren = false;
+    private boolean greska = false;
+    private boolean odbijeno = false;
 
     /**
      * Creates a new instance of PrijavaBean
@@ -41,7 +42,6 @@ public class PrijavaBean {
 
     public void setUser(String user) {
         this.user = user;
-        System.out.println("Korisnicko ime: " + user);
     }
 
     public String getPass() {
@@ -50,7 +50,6 @@ public class PrijavaBean {
 
     public void setPass(String pass) {
         this.pass = pass;
-        System.out.println("Korisnicko lozinka: " + pass);
     }
 
     public boolean isOdobren() {
@@ -69,8 +68,13 @@ public class PrijavaBean {
         this.greska = greska;
     }
 
+    public boolean isOdbijeno() {
+        return odbijeno;
+    }
 
-
+    public void setOdbijeno(boolean odbijeno) {
+        this.odbijeno = odbijeno;
+    }
 
     public String provjeraKorisnika() {
         Korisnik k = korisnikFacade.find(this.user);
@@ -80,13 +84,18 @@ public class PrijavaBean {
             if (k.getOdobreno() == 0) {
                 odobren = true;
                 return "prijava.xhtml";
+            } else if (k.getOdobreno() == 2) {
+                odbijeno = true;
+                return "prijava.xhtml";
             } else if (k.getRole() == 1) {
                 s.setAttribute("user", k.getKorisnik());
+                s.setAttribute("pass", k.getPass());
                 s.setAttribute("role", k.getRole());
                 s.setAttribute("rang", k.getRang());
                 return "OK_ADMIN";
             } else {
                 s.setAttribute("user", k.getKorisnik());
+                s.setAttribute("pass", k.getPass());
                 s.setAttribute("role", k.getRole());
                 s.setAttribute("rang", k.getRang());
                 return "OK_USER";

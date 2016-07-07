@@ -25,6 +25,7 @@
                         <h:commandButton value="#{m.prijava_login}" action="#{prijavaBean.provjeraKorisnika()}"  /><br/><br/>
                         <h:outputText value="#{m.prijava_odobren}" rendered="#{prijavaBean.odobren}" />
                         <h:outputText value="#{m.prijava_greska}" rendered="#{prijavaBean.greska}" />
+                        <h:outputText value="#{m.prijava_odbijen}" rendered="#{prijavaBean.odbijeno}" />
                         <br/><h:link outcome="registracija" value="#{m.prijava_registracija}" />
                     </h:form>
                 </ui:define>

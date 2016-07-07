@@ -77,7 +77,7 @@ public class ObradaZahtjeva extends Thread {
                 if (rx == null) {
                     out.write("SERVER | ERROR: Neispravni format naredbe.\n");
                 } else {
-                    out.write("Provjeravam podatke za prijavu...\n");
+                    //out.write("Provjeravam podatke za prijavu...\n");
                     String user = rx.group(1);
                     String pass = rx.group(2);
                     //TODO RADI PROVJERU IZ BAZE, neka vraca 1-admin, 2-user

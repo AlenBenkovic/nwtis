@@ -9,15 +9,22 @@
         <ui:composition template=".././predlozakAdmin.xhtml">
 
             <ui:define name="naslov">
-                Stanje servera
+                #{m.stanje_naslov}
             </ui:define>
 
             <ui:define name="header">
-                Stanje servera
+                #{m.stanje_naslov}
             </ui:define>
 
             <ui:define name="sadrzaj" >
-                Sadrzaj
+                #{m.stanje_trenutno}: <h:outputText value="#{stanjeBean.stanje}" /><br/>
+                <h:outputText value="#{stanjeBean.odgovor}" /><br/><br/>
+                
+                <h:form id="stanje">
+                    <h:commandButton value="${m.stanje_pause}" action="#{stanjeBean.pause()}"  />
+                    <h:commandButton value="${m.stanje_stop}" action="#{stanjeBean.stop()}"  />
+                    <h:commandButton value="${m.stanje_start}" action="#{stanjeBean.start()}"  />
+                </h:form>
             </ui:define>
         </ui:composition>
     </h:body>
