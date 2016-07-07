@@ -18,10 +18,14 @@
 
                 <ui:define name="sadrzaj">
                     <h:form id="prijava">
-                        #{m.prijava_user}: <h:inputText value="#{prijavaBean.user}" /> <br/><br/>
-                        #{m.prijava_pass}: <h:inputSecret value="#{prijavaBean.pass}" /><br/><br/>
-                        <h:commandButton value="#{m.prijava_login}" action="#{prijavaBean.provjeraKorisnika()}" /><br/><br/>
-                        <h:outputText value="#{prijavaBean.poruka}" />
+                        #{m.prijava_user}: <br/>
+                        <h:inputText value="#{prijavaBean.user}" required="true" /> <br/><br/>
+                        #{m.prijava_pass}: <br/>
+                        <h:inputSecret value="#{prijavaBean.pass}" required="true" /><br/><br/>
+                        <h:commandButton value="#{m.prijava_login}" action="#{prijavaBean.provjeraKorisnika()}"  /><br/><br/>
+                        <h:outputText value="#{m.prijava_odobren}" rendered="#{prijavaBean.odobren}" />
+                        <h:outputText value="#{m.prijava_greska}" rendered="#{prijavaBean.greska}" />
+                        <br/><h:link outcome="registracija" value="#{m.prijava_registracija}" />
                     </h:form>
                 </ui:define>
             </ui:composition>

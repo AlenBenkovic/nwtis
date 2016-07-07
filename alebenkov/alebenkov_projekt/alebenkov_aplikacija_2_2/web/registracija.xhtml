@@ -1,0 +1,47 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:h="http://xmlns.jcp.org/jsf/html"
+      xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+      xmlns:f="http://xmlns.jcp.org/jsf/core">
+    <f:view locale="#{lokalizacija.vazeciJezik}">
+        <h:body>
+            <ui:composition template="./predlozak.xhtml">
+
+
+                <ui:define name="naslov">
+                    #{m.reg_regaj}
+                </ui:define>
+                <ui:define name="header">
+                    #{m.reg_regaj}
+                </ui:define>
+
+                <ui:define name="sadrzaj">
+                    <h:form id="registracija" rendered="#{registracijaBean.prikazi}" >
+                        #{m.reg_user}: <br/>
+                        <h:inputText value="#{registracijaBean.user}" required="true" /> <br/>
+                        #{m.reg_prezime}: <br/>
+                        <h:inputText value="#{registracijaBean.prezime}" required="true"/> <br/>
+                        #{m.reg_pass}: <br/>
+                        <h:inputSecret value="#{registracijaBean.pass}" required="true" /><br/>
+                        #{m.reg_pass2}: <br/>
+                        <h:inputSecret value="#{registracijaBean.pass2}" required="true"/><br/>
+                        #{m.reg_mail}: <br/>
+                        <h:inputText value="#{registracijaBean.mail}" required="true" /> <br/>
+                        #{m.reg_role}:<br/>
+                        <h:selectOneMenu value="#{registracijaBean.role}" required="true">
+                            <f:selectItem itemValue="1" itemLabel="#{m.reg_role1}" />
+                            <f:selectItem itemValue="2" itemLabel="#{m.reg_role2}" />
+                        </h:selectOneMenu><br/><br/>
+                        <h:commandButton value="#{m.prijava_login}" action="#{registracijaBean.registriraj()}" /><br/><br/>
+                        <h:outputText value="#{m.reg_passWrong}" rendered="#{registracijaBean.passWrong}" /><br/>
+                        <h:outputText value="#{m.reg_mailWrong}" rendered="#{registracijaBean.emailWrong}" />
+                        
+                    </h:form>
+                    <h:outputText value="#{m.reg_kreiran}" rendered="#{registracijaBean.sakrij}" />
+                </ui:define>
+            </ui:composition>
+        </h:body>
+    </f:view>
+</html>
+

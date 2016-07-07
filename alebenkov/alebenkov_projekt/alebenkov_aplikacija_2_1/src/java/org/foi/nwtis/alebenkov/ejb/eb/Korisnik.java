@@ -27,7 +27,9 @@ import javax.xml.bind.annotation.XmlRootElement;
 @NamedQueries({
     @NamedQuery(name = "Korisnik.findAll", query = "SELECT k FROM Korisnik k"),
     @NamedQuery(name = "Korisnik.findByKorisnik", query = "SELECT k FROM Korisnik k WHERE k.korisnik = :korisnik"),
+    @NamedQuery(name = "Korisnik.findByPrezime", query = "SELECT k FROM Korisnik k WHERE k.prezime = :prezime"),
     @NamedQuery(name = "Korisnik.findByPass", query = "SELECT k FROM Korisnik k WHERE k.pass = :pass"),
+    @NamedQuery(name = "Korisnik.findByMail", query = "SELECT k FROM Korisnik k WHERE k.mail = :mail"),
     @NamedQuery(name = "Korisnik.findByRole", query = "SELECT k FROM Korisnik k WHERE k.role = :role"),
     @NamedQuery(name = "Korisnik.findByRang", query = "SELECT k FROM Korisnik k WHERE k.rang = :rang"),
     @NamedQuery(name = "Korisnik.findByOdobreno", query = "SELECT k FROM Korisnik k WHERE k.odobreno = :odobreno")})
@@ -42,9 +44,19 @@ public class Korisnik implements Serializable {
     private String korisnik;
     @Basic(optional = false)
     @NotNull
+    @Size(min = 1, max = 15)
+    @Column(name = "PREZIME")
+    private String prezime;
+    @Basic(optional = false)
+    @NotNull
     @Size(min = 1, max = 25)
     @Column(name = "PASS")
     private String pass;
+    @Basic(optional = false)
+    @NotNull
+    @Size(min = 1, max = 25)
+    @Column(name = "MAIL")
+    private String mail;
     @Basic(optional = false)
     @NotNull
     @Column(name = "ROLE")
@@ -65,9 +77,11 @@ public class Korisnik implements Serializable {
         this.korisnik = korisnik;
     }
 
-    public Korisnik(String korisnik, String pass, int role, int rang, int odobreno) {
+    public Korisnik(String korisnik, String prezime, String pass, String mail, int role, int rang, int odobreno) {
         this.korisnik = korisnik;
+        this.prezime = prezime;
         this.pass = pass;
+        this.mail = mail;
         this.role = role;
         this.rang = rang;
         this.odobreno = odobreno;
@@ -81,12 +95,28 @@ public class Korisnik implements Serializable {
         this.korisnik = korisnik;
     }
 
+    public String getPrezime() {
+        return prezime;
+    }
+
+    public void setPrezime(String prezime) {
+        this.prezime = prezime;
+    }
+
     public String getPass() {
         return pass;
     }
 
     public void setPass(String pass) {
         this.pass = pass;
+    }
+
+    public String getMail() {
+        return mail;
+    }
+
+    public void setMail(String mail) {
+        this.mail = mail;
     }
 
     public int getRole() {

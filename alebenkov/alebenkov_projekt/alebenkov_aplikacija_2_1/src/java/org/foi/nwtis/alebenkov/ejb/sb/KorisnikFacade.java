@@ -5,18 +5,10 @@
  */
 package org.foi.nwtis.alebenkov.ejb.sb;
 
-import java.util.ArrayList;
-import java.util.List;
 import javax.ejb.Stateless;
 import javax.persistence.EntityManager;
-import javax.persistence.NoResultException;
 import javax.persistence.PersistenceContext;
-import javax.persistence.criteria.CriteriaBuilder;
-import javax.persistence.criteria.CriteriaQuery;
-import javax.persistence.criteria.Predicate;
-import javax.persistence.criteria.Root;
 import org.foi.nwtis.alebenkov.ejb.eb.Korisnik;
-import org.foi.nwtis.alebenkov.ejb.eb.Korisnik_;
 
 /**
  *
@@ -37,7 +29,6 @@ public class KorisnikFacade extends AbstractFacade<Korisnik> {
         super(Korisnik.class);
     }
 
-
     public Korisnik dohvatiKorisnika(String user) {
         Korisnik k = this.find(user);
         return k;
@@ -48,5 +39,10 @@ public class KorisnikFacade extends AbstractFacade<Korisnik> {
         Korisnik k = this.find(user);
         k.setOdobreno(1);
     }
-
+    
+    public Korisnik kreirajKorisnika(String user, String surname, String pass, String mail, int role){
+        Korisnik k = new Korisnik(user, surname, pass, mail, role, 1, 0);
+        em.persist(k);
+        return k;
+    }
 }

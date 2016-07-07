@@ -26,7 +26,8 @@ public class PrijavaBean {
     private KorisnikFacade korisnikFacade;
     private String user;
     private String pass;
-    private String poruka;
+    private boolean odobren=false;
+    private boolean greska=false;
 
     /**
      * Creates a new instance of PrijavaBean
@@ -52,13 +53,24 @@ public class PrijavaBean {
         System.out.println("Korisnicko lozinka: " + pass);
     }
 
-    public String getPoruka() {
-        return poruka;
+    public boolean isOdobren() {
+        return odobren;
     }
 
-    public void setPoruka(String poruka) {
-        this.poruka = poruka;
+    public void setOdobren(boolean odobren) {
+        this.odobren = odobren;
     }
+
+    public boolean isGreska() {
+        return greska;
+    }
+
+    public void setGreska(boolean greska) {
+        this.greska = greska;
+    }
+
+
+
 
     public String provjeraKorisnika() {
         Korisnik k = korisnikFacade.find(this.user);
@@ -66,7 +78,7 @@ public class PrijavaBean {
             HttpServletRequest request = (HttpServletRequest) (FacesContext.getCurrentInstance().getExternalContext().getRequest());
             HttpSession s = request.getSession();
             if (k.getOdobreno() == 0) {
-                poruka = "Vaš račun još nije odobren!";
+                odobren = true;
                 return "prijava.xhtml";
             } else if (k.getRole() == 1) {
                 s.setAttribute("user", k.getKorisnik());
@@ -80,7 +92,7 @@ public class PrijavaBean {
                 return "OK_USER";
             }
         } else {
-            poruka = "Neispravno korisničko ime ili lozinka!";
+            greska = true;
             return "prijava.xhtml";
         }
     }
