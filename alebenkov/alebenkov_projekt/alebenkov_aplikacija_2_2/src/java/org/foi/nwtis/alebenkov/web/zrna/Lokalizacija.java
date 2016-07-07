@@ -53,13 +53,11 @@ public class Lokalizacija implements Serializable {
         return vazeciJezik;
     }
 
-    public Object odaberiJezik() {
+    public void odaberiJezik() {
         if (jezici.get(odabraniJezik) != null) {
             FacesContext.getCurrentInstance().getViewRoot().setLocale((Locale) jezici.get(odabraniJezik));
             vazeciJezik = (Locale) jezici.get(odabraniJezik);
-            return "OK";
-        } else {
-            return "ERROR";
+            
         }
     }
 }

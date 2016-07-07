@@ -88,5 +88,18 @@ public class KorisnikFacade extends AbstractFacade<Korisnik> {
         return naCekanju;
 
     }
+    
+    public boolean provjeraMail(String mail) {
+        init();
+        List adrese = null;
+        p.add(cb.equal(r.get(Korisnik_.mail), mail));
+        cq.select(r).where(p.toArray(new Predicate[]{}));
+        adrese = em.createQuery(cq).getResultList();
+        if(adrese.size()<1){
+            return false;
+        }
+        return true;
+
+    }
 
 }

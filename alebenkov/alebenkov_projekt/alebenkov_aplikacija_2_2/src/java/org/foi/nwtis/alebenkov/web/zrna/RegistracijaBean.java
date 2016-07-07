@@ -29,6 +29,8 @@ public class RegistracijaBean {
     private int role;
     private boolean passWrong = false;
     private boolean emailWrong = false;
+    private boolean emailWrong2 = false;
+    private boolean userWrong = false;
     private boolean sakrij = false;
     private boolean prikazi = true;
 
@@ -114,24 +116,33 @@ public class RegistracijaBean {
         return prikazi;
     }
 
+    public boolean isUserWrong() {
+        return userWrong;
+    }
+
     public void setPrikazi(boolean prikazi) {
         this.prikazi = prikazi;
     }
 
-    public String registriraj() {
+    public boolean isEmailWrong2() {
+        return emailWrong2;
+    }
+    
+
+    public void registriraj() {
         if (!pass.equals(pass2)) {
             passWrong = true;
         } else if (!mail.contains("@")) {//lose ali bar nesta
             emailWrong = true;
+        } else if (korisnikFacade.provjeriUsername(this.user)) {
+            userWrong = true;
+
+        } else if (korisnikFacade.provjeraMail(mail)) {
+            emailWrong2 = true;
         } else {
             korisnikFacade.kreirajKorisnika(user, prezime, pass, mail, role);
             sakrij = true;
             prikazi = false;
-        }
-        if (role == 0) {
-            return "OK_ADMIN";
-        } else {
-            return "OK_USER";
         }
     }
 

@@ -34,8 +34,10 @@
                             <f:selectItem itemValue="2" itemLabel="#{m.reg_role2}" />
                         </h:selectOneMenu><br/><br/>
                         <h:commandButton value="#{m.reg_regaj}" action="#{registracijaBean.registriraj()}" /><br/><br/>
+                        <h:outputText value="#{m.reg_userWrong}" rendered="#{registracijaBean.userWrong}" /><br/>
                         <h:outputText value="#{m.reg_passWrong}" rendered="#{registracijaBean.passWrong}" /><br/>
                         <h:outputText value="#{m.reg_mailWrong}" rendered="#{registracijaBean.emailWrong}" />
+                        <h:outputText value="#{m.reg_mailWrong2}" rendered="#{registracijaBean.emailWrong2}" />
                         
                     </h:form>
                     <h:outputText value="#{m.reg_kreiran}" rendered="#{registracijaBean.sakrij}" />
