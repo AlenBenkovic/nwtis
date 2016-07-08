@@ -28,8 +28,8 @@ public class KategorijeBean {
     private KorisnikFacade korisnikFacade;
     private List<Korisnik> korisnici;
     private String odgovor = "";
-    private String user;
-    private String pass;
+    private String user = "";
+    private String pass = "";
     private SocketServer server;
     private Korisnik k;
     private boolean prikaziOdgovor = false;
@@ -40,8 +40,11 @@ public class KategorijeBean {
     public KategorijeBean() {
         HttpServletRequest request = (HttpServletRequest) (FacesContext.getCurrentInstance().getExternalContext().getRequest());
         HttpSession s = request.getSession(false);
-        user = s.getAttribute("user").toString();
-        pass = s.getAttribute("pass").toString();
+        if (!s.isNew()) {
+            user = s.getAttribute("user").toString();
+            pass = s.getAttribute("pass").toString();
+        }
+
         this.server = new SocketServer();
     }
 
