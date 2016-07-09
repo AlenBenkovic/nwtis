@@ -12,6 +12,7 @@ import java.util.logging.Logger;
 import javax.inject.Named;
 import javax.enterprise.context.SessionScoped;
 import javax.mail.Address;
+import javax.mail.Flags;
 import javax.mail.Folder;
 import javax.mail.Message;
 import javax.mail.MessagingException;
@@ -45,7 +46,7 @@ public class MailBean implements Serializable {
     private String tekstPoruke = "";
     private String posiljateljPoruke = "";
     private Message[] messages = null;
-    private String nazivOdabranogFoldera;
+    private String nazivOdabranogFoldera = "INBOX";
 
     private Folder[] folderi;
 
@@ -63,7 +64,17 @@ public class MailBean implements Serializable {
         this.korisnickaLozinka = mailConfig.dajPostavku("korisnickaLozinka");
 
         this.mailPosluzitelj = mailConfig.dajPostavku("mailPosluzitelj");
+        if (store != null) {
+            if (!store.isConnected()) {
+                init();
+            }
+        } else {
+            init();
+        }
 
+    }
+
+    public void init() {
         try {
             session = Session.getDefaultInstance(System.getProperties(), null); //procesiranje maila pocinje
             store = session.getStore("imap"); //spremam sesiju za pristup mailu
@@ -73,15 +84,15 @@ public class MailBean implements Serializable {
         } catch (MessagingException ex) {
             Logger.getLogger(MailBean.class.getName()).log(Level.SEVERE, null, ex);
         }
-
     }
 
     public void dohvatiPoruke() {
+
         try {
             this.odabraniFolder = this.folder.getFolder(nazivOdabranogFoldera);
             this.odabraniFolder.open(Folder.READ_WRITE); //citam postu u index folderu u RW modu
             this.messages = this.odabraniFolder.getMessages();//uzimam poruke iz foldera
-            tekstPoruke="";//mali fix da sakrijem zadnju citanu poruku
+            tekstPoruke = "";//mali fix da sakrijem zadnju citanu poruku
         } catch (MessagingException ex) {
             Logger.getLogger(MailBean.class.getName()).log(Level.SEVERE, null, ex);
         }
@@ -89,17 +100,31 @@ public class MailBean implements Serializable {
     }
 
     public void dohvatiPoruku(int id) {
+
         this.message = this.messages[id - 1];
         try {
             this.tekstPoruke = this.message.getContent().toString();
             Address[] froms = message.getFrom();
             this.posiljateljPoruke = froms == null ? null : ((InternetAddress) froms[0]).getAddress();
-            if(this.tekstPoruke!=""){
+            if (this.tekstPoruke != "") {
                 prikaziPoruku = true;
             }
 
         } catch (IOException ex) {
             Logger.getLogger(MailBean.class.getName()).log(Level.SEVERE, null, ex);
+        } catch (MessagingException ex) {
+            Logger.getLogger(MailBean.class.getName()).log(Level.SEVERE, null, ex);
+        }
+    }
+
+    public void obrisiPoruku(int id) {
+
+        this.message = this.messages[id - 1];
+        try {
+            this.message.setFlag(Flags.Flag.DELETED, true);
+            odabraniFolder.close(true);
+            store.close();
+            dohvatiPoruke();
         } catch (MessagingException ex) {
             Logger.getLogger(MailBean.class.getName()).log(Level.SEVERE, null, ex);
         }
@@ -139,7 +164,6 @@ public class MailBean implements Serializable {
     }
 
     public Message getMessage() {
-
         return message;
     }
 
@@ -152,12 +176,12 @@ public class MailBean implements Serializable {
     }
 
     public boolean isPrikaziPoruku() {
-        if(this.tekstPoruke!=""){
-                prikaziPoruku = true;
-            } else prikaziPoruku = false;
+        if (this.tekstPoruke != "") {
+            prikaziPoruku = true;
+        } else {
+            prikaziPoruku = false;
+        }
         return prikaziPoruku;
     }
-    
-    
 
 }

@@ -3,7 +3,8 @@
 <html xmlns="http://www.w3.org/1999/xhtml"
       xmlns:h="http://xmlns.jcp.org/jsf/html"
       xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
-      xmlns:f="http://xmlns.jcp.org/jsf/core">
+      xmlns:f="http://xmlns.jcp.org/jsf/core"
+      xmlns:p="http://primefaces.org/ui">
 
     <h:body>
         <ui:composition template=".././predlozakAdmin.xhtml">
@@ -21,43 +22,45 @@
                     <h:selectOneRadio value="#{mailBean.nazivOdabranogFoldera}">
                         <f:selectItems value="#{mailBean.folderi}"/>
                     </h:selectOneRadio>
-                    <h:commandButton value="#{m.mail_folder}" action="#{mailBean.dohvatiPoruke()}"/>
+                    <h:commandButton value="#{m.mail_folder}" action="#{mailBean.dohvatiPoruke()}"/><br/>
 
-                    <h:dataTable id="poruke" value="#{mailBean.messages}" var="c" rendered="#{mailBean.prikaziPoruke}"  >
-                        <h:column>
-                            <f:facet name="header">#</f:facet>
-                                ${c.messageNumber}
-                        </h:column>
-                        <h:column>
+                    <p:dataTable id="poruke" value="#{mailBean.messages}" var="c" rendered="#{mailBean.prikaziPoruke}" paginator="true" rows="10"
 
-                        </h:column>
-                        <h:column>
+                                 paginatorTemplate="{CurrentPageReport} {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} {RowsPerPageDropdown}"
+
+                                 rowsPerPageTemplate="5,10,15" >
+                       
+                       
+                        <p:column>
                             <f:facet name="header"> #{m.mail_naslov}</f:facet>
-                                ${c.subject}
-                        </h:column>
-                        <h:column>
-
-                        </h:column>
-                        <h:column>
+                                <center>${c.subject}</center>
+                        </p:column>
+                        
+                        <p:column width="300">
                             <f:facet name="header"> #{m.mail_datum}</f:facet>
+                            <center>
                             <h:outputText value="${c.receivedDate}" >
                                 <f:convertDateTime pattern="dd.MM.yyyy HH:mm" />
-                            </h:outputText>
+                            </h:outputText></center>
 
-                        </h:column>
-                        <h:column>
-                            <h:commandButton value="#{m.mail_prikazi}" action="#{mailBean.dohvatiPoruku(c.messageNumber)}"/>
+                        </p:column>
+                        <p:column width="100">
+                           <center> <h:commandButton value="#{m.mail_prikazi}" action="#{mailBean.dohvatiPoruku(c.messageNumber)}"/></center>
 
-                        </h:column>
-                    </h:dataTable>
+                        </p:column>
+                        <p:column width="100" >
+                          <center>  <h:commandButton value="#{m.mail_obrisi}" action="#{mailBean.obrisiPoruku(c.messageNumber)}" /></center>
+                        </p:column>
+                    </p:dataTable>
 
-                    
+
 
                 </h:form>
                 <ui:fragment  id="poruka" rendered="#{mailBean.prikaziPoruku}">
-                        <br/>
-                        ${m.mail_from}: <br/> ${mailBean.posiljateljPoruke}<br/>
-                        ${m.mail_poruka}:<br/> ${mailBean.tekstPoruke}
+                    
+                    <br/>
+                    ${m.mail_from}: <br/> ${mailBean.posiljateljPoruke}<br/>
+                    ${m.mail_poruka}:<br/> ${mailBean.tekstPoruke}
                 </ui:fragment>
             </ui:define>
         </ui:composition>
