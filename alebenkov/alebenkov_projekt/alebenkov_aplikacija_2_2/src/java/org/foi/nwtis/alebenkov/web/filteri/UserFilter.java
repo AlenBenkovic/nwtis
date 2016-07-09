@@ -6,6 +6,13 @@
 package org.foi.nwtis.alebenkov.web.filteri;
 
 import java.io.IOException;
+import static java.lang.Math.toIntExact;
+import java.util.Date;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+import javax.naming.Context;
+import javax.naming.InitialContext;
+import javax.naming.NamingException;
 import javax.servlet.Filter;
 import javax.servlet.FilterChain;
 import javax.servlet.FilterConfig;
@@ -16,6 +23,8 @@ import javax.servlet.ServletResponse;
 import javax.servlet.annotation.WebFilter;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
+import org.foi.nwtis.alebenkov.ejb.eb.Dnevnik;
+import org.foi.nwtis.alebenkov.ejb.sb.DnevnikFacade;
 
 /**
  *
@@ -23,6 +32,9 @@ import javax.servlet.http.HttpSession;
  */
 @WebFilter(filterName = "UserFilter", urlPatterns = {"/faces/user/meteo.xhtml"})
 public class UserFilter implements Filter {
+
+    DnevnikFacade dnevnikFacade = lookupDnevnikFacadeBean();
+    Dnevnik dnevnik;
 
     private static final boolean debug = true;
 
@@ -34,37 +46,45 @@ public class UserFilter implements Filter {
     public UserFilter() {
     }
 
-    
-
     public void doFilter(ServletRequest request, ServletResponse response,
             FilterChain chain)
             throws IOException, ServletException {
+        long pocetak = System.currentTimeMillis();
 
         if (debug) {
             log("AdminFilter:doFilter()");
         }
 
-
         boolean nastavi = true;
 
         HttpSession sesija = ((HttpServletRequest) request).getSession(false);
+        String url = ((HttpServletRequest) request).getRequestURL().toString();
         if (sesija == null) {
             nastavi = false;
-        } else {
-            if (sesija.getAttribute("user") == null) {
-                nastavi = false;
-            }  else if (Integer.parseInt(sesija.getAttribute("role").toString()) != 2) {
-                nastavi = false;
-            }
+        } else if (sesija.getAttribute("user") == null) {
+            nastavi = false;
+        } else if (Integer.parseInt(sesija.getAttribute("role").toString()) != 2) {
+            nastavi = false;
         }
 
         if (!nastavi) {
             RequestDispatcher rd = filterConfig.getServletContext().getRequestDispatcher("/faces/prijava.xhtml");
             rd.forward(request, response);
+            dnevnik = new Dnevnik();
+            dnevnik.setAkcija(url);
+            dnevnik.setKorisnik("N/A");
+            dnevnik.setTrajanje(toIntExact(System.currentTimeMillis() - pocetak));
+            dnevnik.setVrijeme(new Date());
+            dnevnikFacade.create(dnevnik);
         } else {
             chain.doFilter(request, response);
+            dnevnik = new Dnevnik();
+            dnevnik.setAkcija(url);
+            dnevnik.setKorisnik(sesija.getAttribute("user").toString());
+            dnevnik.setTrajanje(toIntExact(System.currentTimeMillis() - pocetak));
+            dnevnik.setVrijeme(new Date());
+            dnevnikFacade.create(dnevnik);
         }
-
 
     }
 
@@ -104,6 +124,16 @@ public class UserFilter implements Filter {
 
     public void log(String msg) {
         filterConfig.getServletContext().log(msg);
+    }
+
+    private DnevnikFacade lookupDnevnikFacadeBean() {
+        try {
+            Context c = new InitialContext();
+            return (DnevnikFacade) c.lookup("java:global/alebenkov_aplikacija_2/alebenkov_aplikacija_2_1/DnevnikFacade!org.foi.nwtis.alebenkov.ejb.sb.DnevnikFacade");
+        } catch (NamingException ne) {
+            Logger.getLogger(getClass().getName()).log(Level.SEVERE, "exception caught", ne);
+            throw new RuntimeException(ne);
+        }
     }
 
 }
