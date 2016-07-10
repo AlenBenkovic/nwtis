@@ -9,7 +9,7 @@
 <html>
     <head>
         <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
-        <title>JSP Page</title>
+        <title>alebenkov_aplikacija_1</title>
     </head>
     <body>
         <h1>alebenkov_aplikacija_1</h1>

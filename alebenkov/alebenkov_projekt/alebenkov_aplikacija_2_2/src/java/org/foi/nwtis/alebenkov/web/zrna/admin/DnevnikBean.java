@@ -69,7 +69,7 @@ public class DnevnikBean {
     public void filtrirajDatum() throws ParseException {
         System.out.println("DNEVNIK: " + dnevnik.size() + "\nOD: " + odDatuma + "\nDO: " + doDatuma);
         //za brisanje prilikom iteracije http://stackoverflow.com/questions/223918/iterating-through-a-collection-avoiding-concurrentmodificationexception-when-re
-        DateFormat df = new SimpleDateFormat("dd.MM.yyyy HH:mm");
+        DateFormat df = new SimpleDateFormat("dd.MM.yyyy HH:mm:ss");
 
         if (!odDatuma.equals("")) {
     

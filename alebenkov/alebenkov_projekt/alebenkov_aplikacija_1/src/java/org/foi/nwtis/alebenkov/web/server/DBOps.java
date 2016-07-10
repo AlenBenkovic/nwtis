@@ -397,6 +397,7 @@ public class DBOps {
      */
     public boolean provjeraKvote(String user) {
         int rang = 0;
+        int role = 0;
         int kvota = 0;
         int brojUpita = 0;
 
@@ -409,7 +410,13 @@ public class DBOps {
             rs = statemant.executeQuery(sql);
             while (rs.next()) {
                 rang = rs.getInt("rang");
+                role = rs.getInt("role");
                 break;
+            }
+            
+            //ukoliko se radi o adminu ne zanima me kvota, iako ne bi bilo lose i njih ograniciti
+            if(role==1){
+                return true;
             }
 
             //uzimam kvotu za dobiveni rang
