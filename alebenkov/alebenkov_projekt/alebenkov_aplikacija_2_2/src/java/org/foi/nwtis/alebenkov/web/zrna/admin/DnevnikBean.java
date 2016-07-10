@@ -30,10 +30,10 @@ public class DnevnikBean {
     @EJB
     private DnevnikFacade dnevnikFacade;
     private List<Dnevnik> dnevnik;
-    private String odDatuma;
-    private String doDatuma;
-    private Date odD;
-    private Date doD;
+    private String odDatuma = "";
+    private String doDatuma = "";
+    private Date odD = null;
+    private Date doD = null;
     private boolean f = false;
 
     /**
@@ -66,27 +66,41 @@ public class DnevnikBean {
         return dnevnik;
     }
 
-    public void filtrirajDatum() {
+    public void filtrirajDatum() throws ParseException {
+        System.out.println("DNEVNIK: " + dnevnik.size() + "\nOD: " + odDatuma + "\nDO: " + doDatuma);
+        //za brisanje prilikom iteracije http://stackoverflow.com/questions/223918/iterating-through-a-collection-avoiding-concurrentmodificationexception-when-re
+        DateFormat df = new SimpleDateFormat("dd.MM.yyyy HH:mm");
 
-        try {
-            //za brisanje prilikom iteracije http://stackoverflow.com/questions/223918/iterating-through-a-collection-avoiding-concurrentmodificationexception-when-re
-            System.out.println("OD: " + odDatuma + " DO: " + doDatuma);
-            DateFormat df = new SimpleDateFormat("dd.MM.yyyy HH:mm");
-
+        if (!odDatuma.equals("")) {
+    
             odD = df.parse(odDatuma);
+        }
+        if (!doDatuma.equals("")) {
+        
             doD = df.parse(doDatuma);
+        } 
 
-            for (Iterator<Dnevnik> iterator = dnevnik.iterator(); iterator.hasNext();) {
-                Dnevnik d = iterator.next();
-                if ( d.getVrijeme().before(odD) || d.getVrijeme().after(doD) ) {
+        for (Iterator<Dnevnik> iterator = dnevnik.iterator(); iterator.hasNext();) {
+            Dnevnik d = iterator.next();
+
+            if (odD != null) {
+                if (d.getVrijeme().before(odD)) {
                     iterator.remove();
+                  
                 }
             }
-            f = true;
 
-        } catch (ParseException ex) {
-            //krivo uneseni datum ne radi nista...
+            if (doD != null) {
+                System.out.println("NIJE NULL");
+                if (d.getVrijeme().after(doD)) {
+                    iterator.remove();
+                  
+                }
+            }
+
         }
+
+        f = true;
 
     }
 

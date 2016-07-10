@@ -19,18 +19,18 @@
 
             <ui:define name="sadrzaj">
                 <h:form id="obrazac"> 
-                    <h:outputLabel for="od" value="Od:"/>
+                    <h:outputLabel for="od" value=" #{m.dnevnik_od}: "/>
                     <h:inputText id="od" value="#{dnevnikBean.odDatuma}"/>
-                    <h:outputLabel for="do" value="Do:"/>
+                    <h:outputLabel for="do" value=" #{m.dnevnik_do}: "/>
                     <h:inputText id="do" value="#{dnevnikBean.doDatuma}"/>
-                    <h:commandButton value="Filtriraj" action="#{dnevnikBean.filtrirajDatum()}" />
+                    <h:commandButton value="#{m.dnevnik_filtriraj}" action="#{dnevnikBean.filtrirajDatum()}" />
                     (dd.MM.yyyy HH:mm)
 
                     <p:dataTable id="poruke" value="#{dnevnikBean.dnevnik}" var="c"  paginator="true" rows="10"
 
                                  paginatorTemplate="{CurrentPageReport} {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} {RowsPerPageDropdown}"
 
-                                 rowsPerPageTemplate="5,10,15" >
+                                 rowsPerPageTemplate="5,10,15" resizableColumns="true">
 
                         <p:column width="20">
                             <f:facet name="header"> # </f:facet>
@@ -40,11 +40,10 @@
                             <center><h:outputText value="${c.korisnik}" /></center>
                         </p:column>
 
-                        <p:column >
-                            <f:facet name="header"> #{m.dnevnik_url} </f:facet>
-                            <center>${c.akcija}</center>
+                        <p:column headerText="#{m.dnevnik_url}"  filterBy="#{c.akcija}">
+                            <center><h:outputText value="${c.akcija}" /></center>
                         </p:column>
-                        <p:column width="50">
+                        <p:column width="100">
                             <f:facet name="header"> #{m.dnevnik_trajanje}</f:facet>
                             <center>${c.trajanje}</center>
                         </p:column>
