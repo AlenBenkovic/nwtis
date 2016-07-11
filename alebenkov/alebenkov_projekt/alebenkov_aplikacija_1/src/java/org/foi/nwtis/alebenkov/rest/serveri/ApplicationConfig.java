@@ -10,7 +10,7 @@ import javax.ws.rs.core.Application;
 
 /**
  *
- * @author grupa_1
+ * @author alebenkov
  */
 @javax.ws.rs.ApplicationPath("webresources")
 public class ApplicationConfig extends Application {
@@ -29,7 +29,6 @@ public class ApplicationConfig extends Application {
      * If required, comment out calling this method in getClasses().
      */
     private void addRestResourceClasses(Set<Class<?>> resources) {
-        resources.add(org.foi.nwtis.alebenkov.rest.serveri.MeteoRESTResource.class);
         resources.add(org.foi.nwtis.alebenkov.rest.serveri.MeteoRESTsResourceContainer.class);
     }
     

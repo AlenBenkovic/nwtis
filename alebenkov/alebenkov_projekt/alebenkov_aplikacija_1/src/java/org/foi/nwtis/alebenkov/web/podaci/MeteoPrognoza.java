@@ -5,8 +5,6 @@
  */
 package org.foi.nwtis.alebenkov.web.podaci;
 
-import java.util.Date;
-
 /**
  *
  * @author dkermek

@@ -5,7 +5,6 @@
  */
 package org.foi.nwtis.alebenkov.rest.serveri;
 
-import java.util.ArrayList;
 import java.util.List;
 import javax.json.Json;
 import javax.json.JsonArrayBuilder;
