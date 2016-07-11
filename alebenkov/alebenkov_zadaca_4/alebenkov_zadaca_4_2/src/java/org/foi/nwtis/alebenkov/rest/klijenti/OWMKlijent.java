@@ -26,17 +26,17 @@ import org.foi.nwtis.alebenkov.web.podaci.MeteoPrognoza;
  * @author nwtis_1
  */
 public class OWMKlijent {
-
+    
     String apiKey;
     OWMRESTHelper helper;
     Client client;
-
+    
     public OWMKlijent(String apiKey) {
         this.apiKey = apiKey;
         helper = new OWMRESTHelper(apiKey);
         client = ClientBuilder.newClient();
     }
-
+    
     public MeteoPodaci getRealTimeWeather(String latitude, String longitude) {
         WebTarget webResource = client.target(OWMRESTHelper.getOWM_BASE_URI())
                 .path(OWMRESTHelper.getOWM_Current_Path());
@@ -45,13 +45,13 @@ public class OWMKlijent {
         webResource = webResource.queryParam("lang", "hr");
         webResource = webResource.queryParam("units", "metric");
         webResource = webResource.queryParam("APIKEY", apiKey);
-
+        
         String odgovor = webResource.request(MediaType.APPLICATION_JSON).get(String.class);
         try {
             JsonReader reader = Json.createReader(new StringReader(odgovor));
-
+            
             JsonObject jo = reader.readObject();
-
+            
             MeteoPodaci mp = new MeteoPodaci();
             if (jo.getJsonObject("sys").getJsonNumber("sunrise") != null) {
                 mp.setSunRise(new Date(jo.getJsonObject("sys").getJsonNumber("sunrise").bigDecimalValue().longValue() * 1000));
@@ -63,37 +63,37 @@ public class OWMKlijent {
             } else {
                 //
             }
-
+            
             mp.setTemperatureValue(new Double(jo.getJsonObject("main").getJsonNumber("temp").doubleValue()).floatValue());
             mp.setTemperatureMin(new Double(jo.getJsonObject("main").getJsonNumber("temp_min").doubleValue()).floatValue());
             mp.setTemperatureMax(new Double(jo.getJsonObject("main").getJsonNumber("temp_max").doubleValue()).floatValue());
             mp.setTemperatureUnit("celsius");
-
+            
             mp.setHumidityValue(new Double(jo.getJsonObject("main").getJsonNumber("humidity").doubleValue()).floatValue());
             mp.setHumidityUnit("%");
-
+            
             mp.setPressureValue(new Double(jo.getJsonObject("main").getJsonNumber("pressure").doubleValue()).floatValue());
             mp.setPressureUnit("hPa");
-
+            
             mp.setWindSpeedValue(new Double(jo.getJsonObject("wind").getJsonNumber("speed").doubleValue()).floatValue());
             mp.setWindSpeedName("");
-
+            
             if (jo.getJsonObject("wind").getJsonNumber("deg") != null) { // za neke gradove ne postoji vrijednost pa mi javlja gresku
                 mp.setWindDirectionValue(new Double(jo.getJsonObject("wind").getJsonNumber("deg").doubleValue()).floatValue());
                 mp.setWindDirectionCode("");
                 mp.setWindDirectionName("");
-
+                
             } else {
                 float a = 0;//ako ne stavim ništa onda javlja problem kod upisa u bazu zbog null vrijednosti
                 mp.setWindDirectionValue(a);
                 mp.setWindDirectionCode("");
                 mp.setWindDirectionName("");
             }
-
+            
             mp.setCloudsValue(jo.getJsonObject("clouds").getInt("all"));
             mp.setCloudsName(jo.getJsonArray("weather").getJsonObject(0).getString("description"));
             mp.setPrecipitationMode("");
-
+            
             mp.setWeatherNumber(jo.getJsonArray("weather").getJsonObject(0).getInt("id"));
             mp.setWeatherValue(jo.getJsonArray("weather").getJsonObject(0).getString("description"));
             mp.setWeatherIcon(jo.getJsonArray("weather").getJsonObject(0).getString("icon"));
@@ -102,10 +102,10 @@ public class OWMKlijent {
             //mp.setCountry(new String(jo.getJsonObject("sys").getJsonString("country").getString()));
             mp.setCountry(jo.getJsonObject("sys").getString("country"));
             mp.setName(jo.getString("name"));
-
+            
             mp.setLastUpdate(new Date(jo.getJsonNumber("dt").bigDecimalValue().longValue() * 1000));
             return mp;
-
+            
         } catch (Exception ex) {
             System.out.println("GRESKA: " + ex.getMessage());
             Logger.getLogger(OWMKlijent.class.getName()).log(Level.SEVERE, null, ex);
@@ -114,7 +114,7 @@ public class OWMKlijent {
     }
     
     public MeteoPrognoza[] getWeatherForecast(String latitude, String longitude) {
-
+        
         WebTarget webResource = client.target(OWMRESTHelper.getOWM_BASE_URI())
                 .path(OWMRESTHelper.getOWM_Forecast_Path());
         webResource = webResource.queryParam("lat", latitude);
@@ -122,20 +122,21 @@ public class OWMKlijent {
         webResource = webResource.queryParam("lang", "hr");
         webResource = webResource.queryParam("units", "metric");
         webResource = webResource.queryParam("APIKEY", apiKey);
-
+        
         String odgovor = webResource.request(MediaType.APPLICATION_JSON).get(String.class);
         try {
             JsonReader reader = Json.createReader(new StringReader(odgovor));
-
+            
             JsonObject jo = reader.readObject();
             MeteoPrognoza[] mprog = new MeteoPrognoza[jo.getJsonArray("list").size()];
-
+            
             for (int i = 0; i < jo.getJsonArray("list").size(); i++) {
                 MeteoPodaci mp = new MeteoPodaci();
                 JsonObject dan = jo.getJsonArray("list").getJsonObject(i);
-
+                float a = 0;
+                
                 if (dan.isNull("main")) {
-                    float a = 0;
+                    
                     mp.setTemperatureValue(a);
                     mp.setTemperatureMin(a);
                     mp.setTemperatureMax(a);
@@ -145,10 +146,20 @@ public class OWMKlijent {
                     mp.setTemperatureValue(new Double(jo.getJsonArray("list").getJsonObject(i).getJsonObject("main").getJsonNumber("temp").doubleValue()).floatValue());
                     mp.setTemperatureMin(new Double(jo.getJsonArray("list").getJsonObject(i).getJsonObject("main").getJsonNumber("temp_min").doubleValue()).floatValue());
                     mp.setTemperatureMax(new Double(jo.getJsonArray("list").getJsonObject(i).getJsonObject("main").getJsonNumber("temp_max").doubleValue()).floatValue());
-                    mp.setPressureValue(new Double(jo.getJsonArray("list").getJsonObject(i).getJsonObject("main").getJsonNumber("pressure").doubleValue()).floatValue());
-                    mp.setHumidityValue(new Double(jo.getJsonArray("list").getJsonObject(i).getJsonObject("main").getJsonNumber("humidity").doubleValue()).floatValue());
+                    
+                    if (jo.getJsonArray("list").getJsonObject(i).getJsonObject("main").getJsonNumber("pressure") != null) {
+                        mp.setPressureValue(new Double(jo.getJsonArray("list").getJsonObject(i).getJsonObject("main").getJsonNumber("pressure").doubleValue()).floatValue());
+                    } else {
+                        mp.setPressureValue(a);
+                    }
+                    if (jo.getJsonArray("list").getJsonObject(i).getJsonObject("main").getJsonNumber("humidity") != null) {
+                        mp.setHumidityValue(new Double(jo.getJsonArray("list").getJsonObject(i).getJsonObject("main").getJsonNumber("humidity").doubleValue()).floatValue());
+                        
+                    } else {
+                        mp.setHumidityValue(a);
+                    }
                 }
-
+                
                 if (dan.isNull("wind") || dan.getJsonObject("wind").isNull("speed") || dan.getJsonObject("wind").isNull("deg")) {
                     float b = 0;//ako ne stavim ništa onda javlja problem kod upisa u bazu zbog null vrijednosti
                     mp.setWindSpeedValue(b);
@@ -156,9 +167,9 @@ public class OWMKlijent {
                 } else {
                     mp.setWindSpeedValue(new Double(jo.getJsonArray("list").getJsonObject(i).getJsonObject("wind").getJsonNumber("speed").doubleValue()).floatValue());
                     mp.setWindDirectionValue(new Double(jo.getJsonArray("list").getJsonObject(i).getJsonObject("wind").getJsonNumber("deg").doubleValue()).floatValue());
-
+                    
                 }
-
+                
                 if (dan.isNull("weather")) {
                     String c = "0";
                     mp.setWeatherValue(c);
@@ -172,7 +183,7 @@ public class OWMKlijent {
                 mprog[i] = new MeteoPrognoza(adresa, i, mp);
             }
             return mprog;
-
+            
         } catch (Exception ex) {
             System.out.println("GRESKA: " + ex.getMessage());
             Logger.getLogger(OWMKlijent.class.getName()).log(Level.SEVERE, null, ex);
