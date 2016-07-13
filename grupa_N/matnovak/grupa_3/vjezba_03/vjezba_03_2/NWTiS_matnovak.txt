@@ -1,6 +1,0 @@
-#NWTiS matnovak - Wed Mar 23 18:47:06 CET 2016
-#Wed Mar 23 18:47:06 CET 2016
-4=Tara
-3=Sara
-2=Bara
-1=Mara
